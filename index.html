@@ -1460,5 +1460,38 @@
     applyLanguage();
   </script>
 
+  <!-- Firebase SDK -->
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw",
+    authDomain: "finanzas-2026-a6d48.firebaseapp.com",
+    projectId: "finanzas-2026-a6d48",
+    storageBucket: "finanzas-2026-a6d48.firebasestorage.app",
+    messagingSenderId: "773280047631",
+    appId: "1:773280047631:web:e11d88546678c5a979b97a",
+    measurementId: "G-VQBB18R397"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Make db available globally
+  window.firebaseDB = db;
+  window.firebaseCollection = collection;
+  window.firebaseAddDoc = addDoc;
+  window.firebaseGetDocs = getDocs;
+  window.firebaseDeleteDoc = deleteDoc;
+  window.firebaseDoc = doc;
+
+  console.log('Firebase initialized successfully');
+</script>
+
 </body>
 </html>
+
