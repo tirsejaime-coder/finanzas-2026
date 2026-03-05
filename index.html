@@ -8,7 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Google Charts -->
+  <!-- Firebase SDK compat --> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script> <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
   <style>
@@ -1498,10 +1498,10 @@
   </script>
 
   <!-- Firebase SDK -->
-<script type="module">
+<script>
   // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+  // Firebase App initialized via compat scripts in <head>
+  // Firestore initialized via compat scripts in <head>
 
   // Your web app's Firebase configuration
   const firebaseConfig = {
@@ -1515,16 +1515,16 @@
   };
 
   // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
   // Make db available globally
   window.firebaseDB = db;
-  window.firebaseCollection = collection;
-  window.firebaseAddDoc = addDoc;
-  window.firebaseGetDocs = getDocs;
-  window.firebaseDeleteDoc = deleteDoc;
-  window.firebaseDoc = doc;
+        window.firebaseCollection = (db, name) => db.collection(name);
+          window.firebaseAddDoc = (colRef, data) => colRef.add(data);
+          window.firebaseGetDocs = (colRef) => colRef.get();
+          window.firebaseDeleteDoc = (docRef) => docRef.delete();
+          window.firebaseDoc = (db, col, id) => db.collection(col).doc(id);
 
   console.log('Firebase initialized successfully');
     // Llamar la función para cargar datos al iniciar
@@ -1535,6 +1535,7 @@
 
 </body>
 </html>
+
 
 
 
