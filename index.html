@@ -594,9 +594,11 @@
     ];
 
     let language = localStorage.getItem("financeLang") || "es";
-    transactions = [];    let currentView = 'input';
+    let transactions = [];
+    let currentView = 'input';
 
     // Cargar transacciones desde Firebase al iniciar
+    async function loadTransactionsFromFirebase() {
 
   try {
     const querySnapshot = await window.firebaseGetDocs(
@@ -1491,6 +1493,8 @@
 
     // Inicializar idioma y vista
     applyLanguage();
+      // Exponer función globalmente para el módulo Firebase
+  window.loadTransactionsFromFirebase = loadTransactionsFromFirebase;
   </script>
 
   <!-- Firebase SDK -->
@@ -1524,13 +1528,14 @@
 
   console.log('Firebase initialized successfully');
     // Llamar la función para cargar datos al iniciar
-  if (typeof loadTransactionsFromFirebase === 'function') {
+    if (typeof window.loadTransactionsFromFirebase === 'function') {
     loadTransactionsFromFirebase();
   }
 </script>
 
 </body>
 </html>
+
 
 
 
