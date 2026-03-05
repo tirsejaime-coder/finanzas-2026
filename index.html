@@ -1094,9 +1094,9 @@
           this.appendChild(input);
           input.focus();
 
-          input.addEventListener("blur", function() {
+          input.addEventListener("blur", async function() {
             const newValue = parseFloat(input.value) || 0;
-            updateDayValue(currentMonth, day, field, newValue);
+            await updateDayValue(currentMonth, day, field, newValue);
             renderMonthView(currentMonth);
           });
 
@@ -1146,13 +1146,15 @@ async function updateDayValue(monthIndex, day, field, newValue) {
           const colRef = window.firebaseCollection(window.firebaseDB, 'transactions');
           const snap = await window.firebaseGetDocs(colRef);
           const deleteType = field === 'income' ? 'income' : 'expense';
-          snap.forEach(async (docSnap) => {
-            const tDate = new Date(docSnap.data().date);
-            const tStr = tDate.toISOString().split('T')[0];
-            if (tStr === dateStr && docSnap.data().type === deleteType) {
-              await window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDB, 'transactions', docSnap.id));
-            }
-          });
+                  const deletePromises = [];
+        snap.forEach((docSnap) => {
+          const tDate = new Date(docSnap.data().date);
+          const tStr = tDate.toISOString().split('T')[0];
+          if (tStr === dateStr && docSnap.data().type === deleteType) {
+            deletePromises.push(window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDB, 'transactions', docSnap.id)));
+          }
+        });
+        await Promise.all(deletePromises);});
           if (newValue > 0) {
             const tx = transactions[transactions.length - 1];
             await window.firebaseAddDoc(colRef, {
@@ -1187,13 +1189,15 @@ async function updateDayCategory(monthIndex, day, newCategory) {
         try {
           const colRef = window.firebaseCollection(window.firebaseDB, 'transactions');
           const snap = await window.firebaseGetDocs(colRef);
-          snap.forEach(async (docSnap) => {
-            const tDate = new Date(docSnap.data().date);
-            const tStr = tDate.toISOString().split('T')[0];
-            if (tStr === dateStr && docSnap.data().type === 'expense') {
-              await window.firebaseDoc(window.firebaseDB, 'transactions', docSnap.id).update({ category: newCategory });
-            }
-          });
+                  const updatePromises = [];
+        snap.forEach((docSnap) => {
+          const tDate = new Date(docSnap.data().date);
+          const tStr = tDate.toISOString().split('T')[0];
+          if (tStr === dateStr && docSnap.data().type === 'expense') {
+            updatePromises.push(window.firebaseDoc(window.firebaseDB, 'transactions', docSnap.id).update({ category: newCategory }));
+          }
+        });
+        await Promise.all(updatePromises);});
           console.log('✅ updateDayCategory sincronizado con Firebase');
         } catch(err) {
           console.error('Error sincronizando Firebase en updateDayCategory:', err);
@@ -1574,6 +1578,7 @@ async function updateDayCategory(monthIndex, day, newCategory) {
 
 </body>
 </html>
+
 
 
 
