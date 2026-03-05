@@ -869,6 +869,7 @@ async function loadTransactionsFromFirebase() {
     }
 
     730
+      
       (e) {
       e.preventDefault();
       const dateInput = document.getElementById("date").value;
@@ -891,9 +892,26 @@ async function loadTransactionsFromFirebase() {
         category: type === 'expense' ? category : null
       });
 
+      730
+      872
       871
-        ("transactions", JSON.stringify(transactions));
-      document.getElementById("amount").value = "";
+      873
+      
+        
+// Guardar en Firebase
+      try {
+        const docRef = await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDB, "transactions"), {
+          date: date.toISOString(),
+          type,
+          amount,
+          description,
+          category: type === 'expense' ? category : null
+        });
+        console.log('✅ Transacción guardada en Firebase con ID:', docRef.id);
+      } catch (error) {
+        console.error('Error al guardar en Firebase:', error);
+      }873
+        document.getElementById("amount").value = "";
       document.getElementById("description").value = "";
       alert(t("✅ Transacción guardada","✅ Transaction saved"));
       drawCategoryChart();
@@ -1128,7 +1146,7 @@ async function loadTransactionsFromFirebase() {
         });
       }
 
-      localStorage.setItem("transactions", JSON.stringify(transactions));
+// Firebase sync handled by saveTransaction function
       drawCategoryChart();
     }
 
@@ -1516,5 +1534,6 @@ async function loadTransactionsFromFirebase() {
 
 </body>
 </html>
+
 
 
