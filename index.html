@@ -445,8 +445,7 @@
     </div>
 
     <div id="view-input" class="view active">
-      <form class="quick-form" onsubmit="1380
-        event)">
+      <form class="quick-form" onsubmit="saveTransaction(event)">
         <div class="field">
           <label for="date" id="labelDate">Fecha</label>
           <input type="date" id="date" required>
@@ -595,11 +594,10 @@
     ];
 
     let language = localStorage.getItem("financeLang") || "es";
-    1240
-let transactions = [];    let currentView = 'input';
+    transactions = [];    let currentView = 'input';
 
     // Cargar transacciones desde Firebase al iniciar
-async function loadTransactionsFromFirebase() {
+
   try {
     const querySnapshot = await window.firebaseGetDocs(
       window.firebaseCollection(window.firebaseDB, "transactions")
@@ -868,9 +866,7 @@ async function loadTransactionsFromFirebase() {
       }).join(' <span>→</span> ');
     }
 
-    730
-      
-      (e) {
+    async function saveTransaction     (e) {
       e.preventDefault();
       const dateInput = document.getElementById("date").value;
       const type = document.getElementById("type").value;
@@ -892,10 +888,7 @@ async function loadTransactionsFromFirebase() {
         category: type === 'expense' ? category : null
       });
 
-      730
-      872
-      871
-      873
+      
       
         
 // Guardar en Firebase
@@ -910,7 +903,7 @@ async function loadTransactionsFromFirebase() {
         console.log('✅ Transacción guardada en Firebase con ID:', docRef.id);
       } catch (error) {
         console.error('Error al guardar en Firebase:', error);
-      }873
+      }
         document.getElementById("amount").value = "";
       document.getElementById("description").value = "";
       alert(t("✅ Transacción guardada","✅ Transaction saved"));
@@ -1530,10 +1523,15 @@ async function loadTransactionsFromFirebase() {
   window.firebaseDoc = doc;
 
   console.log('Firebase initialized successfully');
+    // Llamar la función para cargar datos al iniciar
+  if (typeof loadTransactionsFromFirebase === 'function') {
+    loadTransactionsFromFirebase();
+  }
 </script>
 
 </body>
 </html>
+
 
 
 
