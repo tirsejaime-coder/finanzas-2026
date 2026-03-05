@@ -1118,7 +1118,7 @@
       });
     }
 
-    function updateDayValue(monthIndex, day, field, newValue) {
+async function updateDayValue(monthIndex, day, field, newValue) {
       const date = new Date(2026, monthIndex, day);
       const dateStr = date.toISOString().split('T')[0];
 
@@ -1141,11 +1141,36 @@
         });
       }
 
-// Firebase sync handled by saveTransaction function
+        // Sync con Firebase: borrar docs del día/tipo y guardar nuevo valor
+        try {
+          const colRef = window.firebaseCollection(window.firebaseDB, 'transactions');
+          const snap = await window.firebaseGetDocs(colRef);
+          const deleteType = field === 'income' ? 'income' : 'expense';
+          snap.forEach(async (docSnap) => {
+            const tDate = new Date(docSnap.data().date);
+            const tStr = tDate.toISOString().split('T')[0];
+            if (tStr === dateStr && docSnap.data().type === deleteType) {
+              await window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDB, 'transactions', docSnap.id));
+            }
+          });
+          if (newValue > 0) {
+            const tx = transactions[transactions.length - 1];
+            await window.firebaseAddDoc(colRef, {
+              date: tx.date,
+              type: tx.type,
+              amount: tx.amount,
+              description: tx.description,
+              category: tx.category
+            });
+          }
+          console.log('✅ updateDayValue sincronizado con Firebase');
+        } catch(err) {
+          console.error('Error sincronizando Firebase en updateDayValue:', err);
+        }
       drawCategoryChart();
     }
 
-    function updateDayCategory(monthIndex, day, newCategory) {
+async function updateDayCategory(monthIndex, day, newCategory) {
       const date = new Date(2026, monthIndex, day);
       const dateStr = date.toISOString().split('T')[0];
 
@@ -1158,7 +1183,21 @@
         return t;
       });
 
-      localStorage.setItem("transactions", JSON.stringify(transactions));
+              // Sync con Firebase: actualizar categoría en docs del día
+        try {
+          const colRef = window.firebaseCollection(window.firebaseDB, 'transactions');
+          const snap = await window.firebaseGetDocs(colRef);
+          snap.forEach(async (docSnap) => {
+            const tDate = new Date(docSnap.data().date);
+            const tStr = tDate.toISOString().split('T')[0];
+            if (tStr === dateStr && docSnap.data().type === 'expense') {
+              await window.firebaseDoc(window.firebaseDB, 'transactions', docSnap.id).update({ category: newCategory });
+            }
+          });
+          console.log('✅ updateDayCategory sincronizado con Firebase');
+        } catch(err) {
+          console.error('Error sincronizando Firebase en updateDayCategory:', err);
+        }
       drawCategoryChart();
     }
 
@@ -1535,6 +1574,7 @@
 
 </body>
 </html>
+
 
 
 
