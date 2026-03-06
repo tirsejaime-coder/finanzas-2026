@@ -8,7 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Firebase SDK compat --> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script> <!-- Google Charts -->
+  <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
   <style>
@@ -594,28 +594,8 @@
     ];
 
     let language = localStorage.getItem("financeLang") || "es";
-    let transactions = [];
+    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
     let currentView = 'input';
-
-    // Cargar transacciones desde Firebase al iniciar
-    async function loadTransactionsFromFirebase() {
-
-  try {
-    const querySnapshot = await window.firebaseGetDocs(
-      window.firebaseCollection(window.firebaseDB, "transactions")
-    );
-    transactions = [];
-    querySnapshot.forEach((doc) => {
-      transactions.push({ id: doc.id, ...doc.data() });
-    });
-    console.log(`✅ ${transactions.length} transacciones cargadas desde Firebase`);
-    if (currentView === 'year') renderYearView();
-    if (currentView === 'month' && currentMonth !== null) renderMonthView(currentMonth);
-    drawCategoryChart();
-  } catch (error) {
-    console.error("Error cargando desde Firebase:", error);
-  }
-}
     let currentMonth = null;
     let selectedExportOption = 'year';
 
@@ -868,7 +848,7 @@
       }).join(' <span>→</span> ');
     }
 
-    async function saveTransaction     (e) {
+    function saveTransaction(e) {
       e.preventDefault();
       const dateInput = document.getElementById("date").value;
       const type = document.getElementById("type").value;
@@ -890,23 +870,8 @@
         category: type === 'expense' ? category : null
       });
 
-      
-      
-        
-// Guardar en Firebase
-      try {
-        const docRef = await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDB, "transactions"), {
-          date: date.toISOString(),
-          type,
-          amount,
-          description,
-          category: type === 'expense' ? category : null
-        });
-        console.log('✅ Transacción guardada en Firebase con ID:', docRef.id);
-      } catch (error) {
-        console.error('Error al guardar en Firebase:', error);
-      }
-        document.getElementById("amount").value = "";
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+      document.getElementById("amount").value = "";
       document.getElementById("description").value = "";
       alert(t("✅ Transacción guardada","✅ Transaction saved"));
       drawCategoryChart();
@@ -1094,9 +1059,9 @@
           this.appendChild(input);
           input.focus();
 
-          input.addEventListener("blur", async function() {
+          input.addEventListener("blur", function() {
             const newValue = parseFloat(input.value) || 0;
-            await updateDayValue(currentMonth, day, field, newValue);
+            updateDayValue(currentMonth, day, field, newValue);
             renderMonthView(currentMonth);
           });
 
@@ -1118,7 +1083,7 @@
       });
     }
 
-async function updateDayValue(monthIndex, day, field, newValue) {
+    function updateDayValue(monthIndex, day, field, newValue) {
       const date = new Date(2026, monthIndex, day);
       const dateStr = date.toISOString().split('T')[0];
 
@@ -1141,38 +1106,11 @@ async function updateDayValue(monthIndex, day, field, newValue) {
         });
       }
 
-        // Sync con Firebase: borrar docs del día/tipo y guardar nuevo valor
-        try {
-          const colRef = window.firebaseCollection(window.firebaseDB, 'transactions');
-          const snap = await window.firebaseGetDocs(colRef);
-          const deleteType = field === 'income' ? 'income' : 'expense';
-                  const deletePromises = [];
-        snap.forEach((docSnap) => {
-          const tDate = new Date(docSnap.data().date);
-          const tStr = tDate.toISOString().split('T')[0];
-          if (tStr === dateStr && docSnap.data().type === deleteType) {
-            deletePromises.push(window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDB, 'transactions', docSnap.id)));
-          }
-        });
-        await Promise.all(deletePromises);});
-          if (newValue > 0) {
-            const tx = transactions[transactions.length - 1];
-            await window.firebaseAddDoc(colRef, {
-              date: tx.date,
-              type: tx.type,
-              amount: tx.amount,
-              description: tx.description,
-              category: tx.category
-            });
-          }
-          console.log('✅ updateDayValue sincronizado con Firebase');
-        } catch(err) {
-          console.error('Error sincronizando Firebase en updateDayValue:', err);
-        }
+      localStorage.setItem("transactions", JSON.stringify(transactions));
       drawCategoryChart();
     }
 
-async function updateDayCategory(monthIndex, day, newCategory) {
+    function updateDayCategory(monthIndex, day, newCategory) {
       const date = new Date(2026, monthIndex, day);
       const dateStr = date.toISOString().split('T')[0];
 
@@ -1185,23 +1123,7 @@ async function updateDayCategory(monthIndex, day, newCategory) {
         return t;
       });
 
-              // Sync con Firebase: actualizar categoría en docs del día
-        try {
-          const colRef = window.firebaseCollection(window.firebaseDB, 'transactions');
-          const snap = await window.firebaseGetDocs(colRef);
-                  const updatePromises = [];
-        snap.forEach((docSnap) => {
-          const tDate = new Date(docSnap.data().date);
-          const tStr = tDate.toISOString().split('T')[0];
-          if (tStr === dateStr && docSnap.data().type === 'expense') {
-            updatePromises.push(window.firebaseDoc(window.firebaseDB, 'transactions', docSnap.id).update({ category: newCategory }));
-          }
-        });
-        await Promise.all(updatePromises);});
-          console.log('✅ updateDayCategory sincronizado con Firebase');
-        } catch(err) {
-          console.error('Error sincronizando Firebase en updateDayCategory:', err);
-        }
+      localStorage.setItem("transactions", JSON.stringify(transactions));
       drawCategoryChart();
     }
 
@@ -1536,53 +1458,7 @@ async function updateDayCategory(monthIndex, day, newCategory) {
 
     // Inicializar idioma y vista
     applyLanguage();
-      // Exponer función globalmente para el módulo Firebase
-  window.loadTransactionsFromFirebase = loadTransactionsFromFirebase;
   </script>
-
-  <!-- Firebase SDK -->
-<script>
-  // Import the functions you need from the SDKs you need
-  // Firebase App initialized via compat scripts in <head>
-  // Firestore initialized via compat scripts in <head>
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw",
-    authDomain: "finanzas-2026-a6d48.firebaseapp.com",
-    projectId: "finanzas-2026-a6d48",
-    storageBucket: "finanzas-2026-a6d48.firebasestorage.app",
-    messagingSenderId: "773280047631",
-    appId: "1:773280047631:web:e11d88546678c5a979b97a",
-    measurementId: "G-VQBB18R397"
-  };
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  // Make db available globally
-  window.firebaseDB = db;
-        window.firebaseCollection = (db, name) => db.collection(name);
-          window.firebaseAddDoc = (colRef, data) => colRef.add(data);
-          window.firebaseGetDocs = (colRef) => colRef.get();
-          window.firebaseDeleteDoc = (docRef) => docRef.delete();
-          window.firebaseDoc = (db, col, id) => db.collection(col).doc(id);
-
-  console.log('Firebase initialized successfully');
-    // Llamar la función para cargar datos al iniciar
-    if (typeof window.loadTransactionsFromFirebase === 'function') {
-    loadTransactionsFromFirebase();
-  }
-</script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
