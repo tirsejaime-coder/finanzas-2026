@@ -2,14 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Control de Finanzas - Vista Diaria/Mensual/Anual</title>
+  <title>Control de Finanzas - Sincronizado</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- jsPDF / AutoTable / XLSX -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Firebase SDK --> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script> <!-- Google Charts -->
+  <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
   <style>
     :root {
@@ -40,11 +44,16 @@
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
       position: relative;
     }
-    /* Botón idioma */
-    .lang-toggle {
+    /* Botón idioma y usuario */
+    .top-bar {
       position: absolute;
       top: 16px;
       right: 16px;
+      display: flex;
+      gap: 8px;
+      z-index: 20;
+    }
+    .lang-toggle, .user-btn {
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid var(--color-border);
@@ -55,11 +64,18 @@
       align-items: center;
       gap: 6px;
       color: var(--color-text-secondary);
-      z-index: 20;
     }
-    .lang-toggle span {
+    .lang-toggle span, .user-btn span {
       font-weight: 600;
       color: var(--color-text-primary);
+    }
+    .user-btn {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+    }
+    .user-btn:hover {
+      background: #2563eb;
     }
 
     h1 {
@@ -399,6 +415,35 @@
       margin-bottom: 4px;
     }
 
+    /* Sincronización */
+    .sync-status {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 30px;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    .sync-status.syncing {
+      background: #fef3c7;
+      border-color: #f59e0b;
+    }
+    .sync-status.success {
+      background: #d1fae5;
+      border-color: #10b981;
+    }
+    .sync-status.error {
+      background: #fee2e2;
+      border-color: #ef4444;
+    }
+
     @media (max-width: 768px) {
       .container { padding: 18px 14px 24px; }
       h1 { font-size: 1.4rem; }
@@ -411,19 +456,29 @@
         height: 260px !important;
         margin-bottom: 10px;
       }
+      .top-bar {
+        position: static;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+      }
     }
   .btn, .tab, .export-option { touch-action: manipulation; }</style>
 </head>
 <body>
 
   <div class="container">
-    <!-- Botón idioma -->
-    <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">
-      🌐 <span id="langToggleLabel">ES / EN</span>
-    </button>
+    <!-- Barra superior con idioma y usuario -->
+    <div class="top-bar">
+      <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">
+        🌐 <span id="langToggleLabel">ES / EN</span>
+      </button>
+      <button class="user-btn" id="authButton" onclick="handleAuth()">
+        👤 <span id="authButtonText">Iniciar sesión</span>
+      </button>
+    </div>
 
-    <!-- Gráfica 3D gastos vs ganancia (a la izquierda del botón, más arriba) -->
-    <div id="piechart_3d" style="position:absolute; top:10px; right:110px; width:260px; height:260px; z-index:10;"></div>
+    <!-- Gráfica 3D gastos vs ganancia -->
+    <div id="piechart_3d" style="position:absolute; top:10px; right:170px; width:260px; height:260px; z-index:10;"></div>
 
     <h1 id="titleText">📊 Control de Finanzas 2026</h1>
     <p class="desc" id="subtitleText">Gestiona tus ingresos y gastos por día, mes y año.</p>
@@ -547,6 +602,7 @@
 
   </div>
 
+  <!-- Modal de exportación -->
   <div id="exportModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -574,7 +630,29 @@
     </div>
   </div>
 
+  <!-- Indicador de sincronización -->
+  <div id="syncStatus" class="sync-status success" style="display: none;">
+    <span>🔄</span>
+    <span id="syncMessage">Sincronizado</span>
+  </div>
+
   <script>
+    // Configuración de Firebase (REEMPLAZA CON TUS DATOS)
+    const firebaseConfig = {
+      apiKey: "AIzaSyB...", // Reemplaza con tu apiKey
+      authDomain: "tus-finanzas.firebaseapp.com", // Reemplaza
+      projectId: "tus-finanzas", // Reemplaza
+      storageBucket: "tus-finanzas.appspot.com", // Reemplaza
+      messagingSenderId: "123456789", // Reemplaza
+      appId: "1:123456789:web:abc123" // Reemplaza
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Variables globales
     const monthNamesEs = [
       "Enero","Febrero","Marzo","Abril","Mayo","Junio",
       "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
@@ -598,9 +676,18 @@
     let currentView = 'input';
     let currentMonth = null;
     let selectedExportOption = 'year';
+    let currentUser = null;
+    let unsubscribeTransactions = null;
+    let syncTimeout = null;
 
+    // Elementos del DOM
+    const syncStatus = document.getElementById('syncStatus');
+    const syncMessage = document.getElementById('syncMessage');
+
+    // Inicializar fecha
     document.getElementById("date").valueAsDate = new Date();
 
+    // Funciones de utilidad
     function getMonthNames() {
       return language === "es" ? monthNamesEs : monthNamesEn;
     }
@@ -609,14 +696,160 @@
       return language === "es" ? es : en;
     }
 
+    // Mostrar estado de sincronización
+    function showSyncStatus(type, message) {
+      syncStatus.style.display = 'flex';
+      syncStatus.className = `sync-status ${type}`;
+      syncMessage.textContent = message;
+      
+      if (syncTimeout) clearTimeout(syncTimeout);
+      if (type !== 'syncing') {
+        syncTimeout = setTimeout(() => {
+          syncStatus.style.display = 'none';
+        }, 3000);
+      }
+    }
+
+    // Cargar transacciones desde Firestore
+    function loadTransactionsFromFirestore() {
+      if (!currentUser) {
+        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        renderCurrentView();
+        drawCategoryChart();
+        return;
+      }
+
+      showSyncStatus('syncing', t('Sincronizando...', 'Syncing...'));
+
+      if (unsubscribeTransactions) {
+        unsubscribeTransactions();
+      }
+
+      // Escuchar cambios en tiempo real
+      unsubscribeTransactions = db.collection('users').doc(currentUser.uid)
+        .collection('transactions')
+        .onSnapshot((snapshot) => {
+          transactions = [];
+          snapshot.forEach(doc => {
+            transactions.push({
+              id: doc.id,
+              ...doc.data()
+            });
+          });
+          
+          localStorage.setItem("transactions", JSON.stringify(transactions));
+          renderCurrentView();
+          drawCategoryChart();
+          showSyncStatus('success', t('Sincronizado', 'Synced'));
+        }, (error) => {
+          console.error("Error loading transactions:", error);
+          showSyncStatus('error', t('Error de sincronización', 'Sync error'));
+          transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+          renderCurrentView();
+        });
+    }
+
+    // Guardar transacción en Firestore
+    async function saveTransactionToFirestore(transaction) {
+      if (!currentUser) {
+        // Modo local
+        transactions.push(transaction);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        return;
+      }
+
+      showSyncStatus('syncing', t('Guardando...', 'Saving...'));
+
+      try {
+        const transactionData = {
+          ...transaction,
+          userId: currentUser.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        const docRef = await db.collection('users').doc(currentUser.uid)
+          .collection('transactions').add(transactionData);
+        
+        transaction.id = docRef.id;
+        showSyncStatus('success', t('Guardado', 'Saved'));
+      } catch (error) {
+        console.error("Error saving transaction:", error);
+        showSyncStatus('error', t('Error al guardar', 'Save error'));
+        
+        // Fallback a localStorage
+        transactions.push(transaction);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+      }
+    }
+
+    // Actualizar transacción en Firestore
+    async function updateTransactionInFirestore(transactionId, updates) {
+      if (!currentUser) return;
+
+      try {
+        await db.collection('users').doc(currentUser.uid)
+          .collection('transactions').doc(transactionId)
+          .update(updates);
+      } catch (error) {
+        console.error("Error updating transaction:", error);
+      }
+    }
+
+    // Eliminar transacción de Firestore
+    async function deleteTransactionFromFirestore(transactionId) {
+      if (!currentUser) return;
+
+      try {
+        await db.collection('users').doc(currentUser.uid)
+          .collection('transactions').doc(transactionId)
+          .delete();
+      } catch (error) {
+        console.error("Error deleting transaction:", error);
+      }
+    }
+
+    // Autenticación
+    function handleAuth() {
+      if (currentUser) {
+        // Cerrar sesión
+        auth.signOut();
+      } else {
+        // Iniciar sesión con Google
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider);
+      }
+    }
+
+    // Observer de autenticación
+    auth.onAuthStateChanged((user) => {
+      currentUser = user;
+      
+      const authButtonText = document.getElementById('authButtonText');
+      if (user) {
+        authButtonText.textContent = user.displayName || t('Mi cuenta', 'My account');
+        loadTransactionsFromFirestore();
+      } else {
+        authButtonText.textContent = t('Iniciar sesión', 'Sign in');
+        if (unsubscribeTransactions) {
+          unsubscribeTransactions();
+          unsubscribeTransactions = null;
+        }
+        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        renderCurrentView();
+        drawCategoryChart();
+      }
+    });
+
     // ------- Gráfica 3D Google Charts -------
     google.charts.load("current", {packages:["corechart"]});
     google.charts.setOnLoadCallback(drawCategoryChart);
 
     function getCategoryLabel(esValue) {
       const mapping = CATEGORY_OPTIONS.find(c => c.es === esValue);
-      if (!mapping) return esValue || "-";
-      return language === "es" ? mapping.es : mapping.en;
+      return mapping ? (language === "es" ? mapping.es : mapping.en) : (esValue || "-");
     }
 
     function computeCategoryData() {
@@ -687,7 +920,12 @@
       const chart = new google.visualization.PieChart(el);
       chart.draw(data, options);
     }
-    // ---------------------------------------
+
+    // Funciones de renderizado (igual que antes, pero usando transactions)
+    function renderCurrentView() {
+      if (currentView === 'year') renderYearView();
+      else if (currentView === 'month' && currentMonth !== null) renderMonthView(currentMonth);
+    }
 
     function applyLanguage() {
       document.documentElement.lang = language;
@@ -764,34 +1002,26 @@
       const proPlanFeatures = document.getElementById("proPlanFeatures");
 
       freePlanFeatures.innerHTML = language === "es"
-        ? `
-          <li>Uso sin registro (datos guardados solo en tu navegador).</li>
-          <li>Control de ingresos y gastos del año actual.</li>
-          <li>Gráficas y exportación a PDF/Excel.</li>
-          <li>Publicidad discreta dentro de la app.</li>
-        `
-        : `
-          <li>No registration required (data stored only in your browser).</li>
-          <li>Track income and expenses for the current year.</li>
-          <li>Charts and export to PDF/Excel.</li>
-          <li>Light ads inside the app.</li>
-        `;
+        ? `<li>Uso sin registro (datos guardados solo en tu navegador).</li>
+           <li>Control de ingresos y gastos del año actual.</li>
+           <li>Gráficas y exportación a PDF/Excel.</li>
+           <li>Publicidad discreta dentro de la app.</li>`
+        : `<li>No registration required (data stored only in your browser).</li>
+           <li>Track income and expenses for the current year.</li>
+           <li>Charts and export to PDF/Excel.</li>
+           <li>Light ads inside the app.</li>`;
 
       proPlanFeatures.innerHTML = language === "es"
-        ? `
-          <li>Años ilimitados de historial financiero.</li>
-          <li>Copias de seguridad automáticas semanales en la nube.</li>
-          <li>Acceso desde varios dispositivos con tu cuenta.</li>
-          <li>Uso sin anuncios.</li>
-          <li>Prioridad en nuevas funciones y soporte.</li>
-        `
-        : `
-          <li>Unlimited years of financial history.</li>
-          <li>Automatic weekly cloud backups.</li>
-          <li>Access from multiple devices with your account.</li>
-          <li>Ad‑free experience.</li>
-          <li>Priority for new features and support.</li>
-        `;
+        ? `<li>Años ilimitados de historial financiero.</li>
+           <li>Copias de seguridad automáticas semanales en la nube.</li>
+           <li>Acceso desde varios dispositivos con tu cuenta.</li>
+           <li>Uso sin anuncios.</li>
+           <li>Prioridad en nuevas funciones y soporte.</li>`
+        : `<li>Unlimited years of financial history.</li>
+           <li>Automatic weekly cloud backups.</li>
+           <li>Access from multiple devices with your account.</li>
+           <li>Ad‑free experience.</li>
+           <li>Priority for new features and support.</li>`;
 
       if (currentView === 'year') renderYearView();
       if (currentView === 'month' && currentMonth !== null) renderMonthView(currentMonth);
@@ -848,7 +1078,7 @@
       }).join(' <span>→</span> ');
     }
 
-    function saveTransaction(e) {
+    async function saveTransaction(e) {
       e.preventDefault();
       const dateInput = document.getElementById("date").value;
       const type = document.getElementById("type").value;
@@ -862,16 +1092,16 @@
       }
 
       const date = new Date(dateInput + "T00:00:00");
-      transactions.push({
+      const transaction = {
         date: date.toISOString(),
         type,
         amount,
         description,
         category: type === 'expense' ? category : null
-      });
+      };
 
-      syncToFirebase();
-          saveToLocalStorage();
+      await saveTransactionToFirestore(transaction);
+      
       document.getElementById("amount").value = "";
       document.getElementById("description").value = "";
       alert(t("✅ Transacción guardada","✅ Transaction saved"));
@@ -1084,40 +1314,73 @@
       });
     }
 
-    function updateDayValue(monthIndex, day, field, newValue) {
+    async function updateDayValue(monthIndex, day, field, newValue) {
       const date = new Date(2026, monthIndex, day);
       const dateStr = date.toISOString().split('T')[0];
 
+      // Eliminar transacciones existentes para ese día y tipo
+      const transactionsToDelete = transactions.filter(t => {
+        const tDate = new Date(t.date);
+        const tDateStr = tDate.toISOString().split('T')[0];
+        return tDateStr === dateStr && t.type === (field === 'income' ? 'income' : 'expense');
+      });
+
+      if (currentUser) {
+        // Eliminar de Firestore
+        for (const t of transactionsToDelete) {
+          if (t.id) {
+            await deleteTransactionFromFirestore(t.id);
+          }
+        }
+      }
+
+      // Actualizar array local
       transactions = transactions.filter(t => {
         const tDate = new Date(t.date);
         const tDateStr = tDate.toISOString().split('T')[0];
-        if (tDateStr === dateStr && t.type === (field === 'income' ? 'income' : 'expense')) {
-          return false;
-        }
-        return true;
+        return !(tDateStr === dateStr && t.type === (field === 'income' ? 'income' : 'expense'));
       });
 
       if (newValue > 0) {
-        transactions.push({
+        const newTransaction = {
           date: date.toISOString(),
           type: field === 'income' ? 'income' : 'expense',
           amount: newValue,
           description: `Ajuste manual ${field === 'income' ? t('ingreso','income') : t('gasto','expense')}`,
           category: field === 'expense' ? "Otros" : null
-        });
-      }
-        saveToLocalStorage();
-  syncToFirebase();
-  drawCategoryChart();
+        };
 
-      syncToFirebase();
+        if (currentUser) {
+          await saveTransactionToFirestore(newTransaction);
+        } else {
+          transactions.push(newTransaction);
+          localStorage.setItem("transactions", JSON.stringify(transactions));
+        }
+      }
+
       drawCategoryChart();
     }
 
-    function updateDayCategory(monthIndex, day, newCategory) {
+    async function updateDayCategory(monthIndex, day, newCategory) {
       const date = new Date(2026, monthIndex, day);
       const dateStr = date.toISOString().split('T')[0];
 
+      if (currentUser) {
+        // Actualizar en Firestore
+        const updates = transactions.filter(t => {
+          const tDate = new Date(t.date);
+          const tDateStr = tDate.toISOString().split('T')[0];
+          return tDateStr === dateStr && t.type === 'expense';
+        });
+
+        for (const t of updates) {
+          if (t.id) {
+            await updateTransactionInFirestore(t.id, { category: newCategory });
+          }
+        }
+      }
+
+      // Actualizar array local
       transactions = transactions.map(t => {
         const tDate = new Date(t.date);
         const tDateStr = tDate.toISOString().split('T')[0];
@@ -1127,7 +1390,10 @@
         return t;
       });
 
-      syncToFirebase();
+      if (!currentUser) {
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+      }
+
       drawCategoryChart();
     }
 
@@ -1144,7 +1410,7 @@
     function selectExportOption(option, el) {
       selectedExportOption = option;
       document.querySelectorAll(".export-option").forEach(el => el.classList.remove("selected"));
-          if (el) el.classList.add("selected");
+      if (el) el.classList.add("selected");
     }
 
     function exportPDF() {
@@ -1449,53 +1715,37 @@
       return weekData;
     }
 
-    function clearData() {
-      if (confirm(t("¿Seguro que quieres borrar todos los datos?","Are you sure you want to delete all data?"))) {
-        transactions = [];
-            localStorage.removeItem('finance2026_transactions');
-        clearFirebaseData();
-        alert(t("✅ Datos eliminados","✅ Data deleted"));
-        if (currentView === 'year') renderYearView();
-        else if (currentView === 'month') renderMonthView(currentMonth);
-        drawCategoryChart();
+    async function clearData() {
+      if (!confirm(t("¿Seguro que quieres borrar todos los datos?","Are you sure you want to delete all data?"))) {
+        return;
       }
-    }
 
-    // Inicializar idioma y vista
+      if (currentUser) {
+        showSyncStatus('syncing', t('Borrando...', 'Deleting...'));
+        
+        // Borrar todos los documentos del usuario
+        const batch = db.batch();
+        const snapshot = await db.collection('users').doc(currentUser.uid)
+          .collection('transactions').get();
+        
+        snapshot.docs.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        
+        await batch.commit();
+      }
 
-    // ========== LOCALSTORAGE + FIREBASE HYBRID SYNC ==========
-function saveToLocalStorage() {
-  try {
-    localStorage.setItem('finance2026_transactions', JSON.stringify(transactions));
-  } catch (e) {
-    console.error('Error guardando en localStorage:', e);
-  }
-}
-
-function loadFromLocalStorage() {
-  try {
-    const saved = localStorage.getItem('finance2026_transactions');
-    if (saved) {
-      transactions = JSON.parse(saved);
-      if (currentView === 'year') renderYearView();
-      if (currentView === 'month' && currentMonth !== null) renderMonthView(currentMonth);
+      transactions = [];
+      localStorage.removeItem("transactions");
+      
+      alert(t("✅ Datos eliminados","✅ Data deleted"));
+      renderCurrentView();
       drawCategoryChart();
+      showSyncStatus('success', t('Datos eliminados', 'Data deleted'));
     }
-  } catch (e) {
-    console.error('Error cargando de localStorage:', e);
-  }
-}
 
+    // Inicializar
     applyLanguage();
-    loadFromLocalStorage();
-      // ========== FIREBASE SYNC ==========
-      const firebaseConfig = { apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw", authDomain: "finanzas-2026-a6d48.firebaseapp.com", projectId: "finanzas-2026-a6d48", storageBucket: "finanzas-2026-a6d48.firebasestorage.app", messagingSenderId: "773280047631", appId: "1:773280047631:web:e11d88546678c5a979b97a" };
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      db.collection("transactions").onSnapshot(function(snapshot) { transactions = []; snapshot.forEach(function(doc) { var d = doc.data(); transactions.push({ id: doc.id, date: d.date, type: d.type, amount: d.amount, description: d.description, category: d.category }); }); if (currentView === 'year') renderYearView(); if (currentView === 'month' && currentMonth !== null) renderMonthView(currentMonth); drawCategoryChart(); });
-      function syncToFirebase() {
-          saveToLocalStorage(); // Guardar en localStorage primerodb.collection("transactions").get().then(function(snap) { var batch = db.batch(); snap.forEach(function(doc) { batch.delete(doc.ref); }); return batch.commit(); }).then(function() { var batch2 = db.batch(); transactions.forEach(function(t) { var ref = db.collection("transactions").doc(); batch2.set(ref, { date: t.date || "", type: t.type || "", amount: t.amount || 0, description: t.description || "", category: t.category || null }); }); return batch2.commit(); }); }
-      function clearFirebaseData() { db.collection("transactions").get().then(function(snap) { var batch = db.batch(); snap.forEach(function(doc) { batch.delete(doc.ref); }); return batch.commit(); }); }
   </script>
 
 </body>
