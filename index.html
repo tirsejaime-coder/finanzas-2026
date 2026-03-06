@@ -1538,6 +1538,30 @@ async function updateDayCategory(monthIndex, day, newCategory) {
     applyLanguage();
       // Exponer función globalmente para el módulo Firebase
   window.loadTransactionsFromFirebase = loadTransactionsFromFirebase;
+
+    // Fix mobile touch events para botones
+document.addEventListener('DOMContentLoaded', function() {
+  // Botón Vista Anual
+  const tabYear = document.getElementById('tabYear');
+  if (tabYear) {
+    tabYear.style.cursor = 'pointer';
+    tabYear.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      switchTab('year');
+    }, {passive: false});
+  }
+  
+  // Botón Exportar
+  const btnExport = document.getElementById('btnExport');
+  if (btnExport) {
+    btnExport.style.cursor = 'pointer';
+    btnExport.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      showExportModal();
+    }, {passive: false});
+  }
+});
+
   </script>
 
   <!-- Firebase SDK -->
@@ -1578,6 +1602,7 @@ async function updateDayCategory(monthIndex, day, newCategory) {
 
 </body>
 </html>
+
 
 
 
