@@ -8,7 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Google Charts -->
+  <!-- Firebase SDK --> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script> <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
   <style>
@@ -594,7 +594,7 @@
     ];
 
     let language = localStorage.getItem("financeLang") || "es";
-    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+    let transactions = [];
     let currentView = 'input';
     let currentMonth = null;
     let selectedExportOption = 'year';
@@ -870,7 +870,7 @@
         category: type === 'expense' ? category : null
       });
 
-      localStorage.setItem("transactions", JSON.stringify(transactions));
+      syncToFirebase();
       document.getElementById("amount").value = "";
       document.getElementById("description").value = "";
       alert(t("✅ Transacción guardada","✅ Transaction saved"));
@@ -1106,7 +1106,7 @@
         });
       }
 
-      localStorage.setItem("transactions", JSON.stringify(transactions));
+      syncToFirebase();
       drawCategoryChart();
     }
 
@@ -1123,7 +1123,7 @@
         return t;
       });
 
-      localStorage.setItem("transactions", JSON.stringify(transactions));
+      syncToFirebase();
       drawCategoryChart();
     }
 
@@ -1448,7 +1448,7 @@
     function clearData() {
       if (confirm(t("¿Seguro que quieres borrar todos los datos?","Are you sure you want to delete all data?"))) {
         transactions = [];
-        localStorage.removeItem("transactions");
+        clearFirebaseData();
         alert(t("✅ Datos eliminados","✅ Data deleted"));
         if (currentView === 'year') renderYearView();
         else if (currentView === 'month') renderMonthView(currentMonth);
@@ -1458,6 +1458,13 @@
 
     // Inicializar idioma y vista
     applyLanguage();
+      // ========== FIREBASE SYNC ==========
+      const firebaseConfig = { apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw", authDomain: "finanzas-2026-a6d48.firebaseapp.com", projectId: "finanzas-2026-a6d48", storageBucket: "finanzas-2026-a6d48.firebasestorage.app", messagingSenderId: "773280047631", appId: "1:773280047631:web:e11d88546678c5a979b97a" };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      db.collection("transactions").onSnapshot(function(snapshot) { transactions = []; snapshot.forEach(function(doc) { var d = doc.data(); transactions.push({ id: doc.id, date: d.date, type: d.type, amount: d.amount, description: d.description, category: d.category }); }); if (currentView === 'year') renderYearView(); if (currentView === 'month' && currentMonth !== null) renderMonthView(currentMonth); drawCategoryChart(); });
+      function syncToFirebase() { db.collection("transactions").get().then(function(snap) { var batch = db.batch(); snap.forEach(function(doc) { batch.delete(doc.ref); }); return batch.commit(); }).then(function() { var batch2 = db.batch(); transactions.forEach(function(t) { var ref = db.collection("transactions").doc(); batch2.set(ref, { date: t.date || "", type: t.type || "", amount: t.amount || 0, description: t.description || "", category: t.category || null }); }); return batch2.commit(); }); }
+      function clearFirebaseData() { db.collection("transactions").get().then(function(snap) { var batch = db.batch(); snap.forEach(function(doc) { batch.delete(doc.ref); }); return batch.commit(); }); }
   </script>
 
 </body>
