@@ -160,7 +160,7 @@
       transition: all 0.15s;
       font-weight: 500;
     }
-    .btn:active { transform: scale(0.97); }
+    .btn:active { transform: scale(0.97); touch-action: manipulation; }
     .btn-primary { background: var(--color-success); color: white; }
     .btn-primary:hover { background: #15803d; }
     .btn-secondary { background: var(--color-primary); color: white; }
@@ -412,7 +412,7 @@
         margin-bottom: 10px;
       }
     }
-  </style>
+  .btn, .tab, .export-option { touch-action: manipulation; }</style>
 </head>
 <body>
 
@@ -553,15 +553,15 @@
         <h2 id="modalTitle">📥 Exportar Datos</h2>
       </div>
       <div class="modal-body">
-        <div class="export-option" onclick="selectExportOption('year')">
+        <div class="export-option" onclick="selectExportOption('year', this)">
           <h4 id="optYearTitle">📅 Año Completo 2026</h4>
           <p id="optYearDesc">Exporta resumen de todos los meses del año</p>
         </div>
-        <div class="export-option" onclick="selectExportOption('month')">
+        <div class="export-option" onclick="selectExportOption('month', this)">
           <h4 id="optMonthTitle">📆 Mes Actual</h4>
           <p id="optMonthDesc">Exporta detalles día por día del mes seleccionado</p>
         </div>
-        <div class="export-option" onclick="selectExportOption('week')">
+        <div class="export-option" onclick="selectExportOption('week', this)">
           <h4 id="optWeekTitle">📊 Semana Actual</h4>
           <p id="optWeekDesc">Exporta los últimos 7 días de transacciones</p>
         </div>
@@ -810,11 +810,11 @@
       document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
 
       if (view === 'input') {
-        document.querySelector(".tab:nth-child(1)").classList.add("active");
+        document.getElementById("tabInput").classList.add("active");
         document.getElementById("view-input").classList.add("active");
         updateBreadcrumb([]);
       } else if (view === 'year') {
-        document.querySelector(".tab:nth-child(2)").classList.add("active");
+        document.getElementById("tabYear").classList.add("active");
         document.getElementById("view-year").classList.add("active");
         renderYearView();
         updateBreadcrumb([{ label: t("Año 2026","Year 2026"), action: null }]);
@@ -1137,10 +1137,10 @@
       document.getElementById("exportModal").classList.remove("active");
     }
 
-    function selectExportOption(option) {
+    function selectExportOption(option, el) {
       selectedExportOption = option;
       document.querySelectorAll(".export-option").forEach(el => el.classList.remove("selected"));
-      event.currentTarget.classList.add("selected");
+          if (el) el.classList.add("selected");
     }
 
     function exportPDF() {
@@ -1462,3 +1462,4 @@
 
 </body>
 </html>
+
