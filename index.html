@@ -871,6 +871,7 @@
       });
 
       syncToFirebase();
+          saveToLocalStorage();
       document.getElementById("amount").value = "";
       document.getElementById("description").value = "";
       alert(t("✅ Transacción guardada","✅ Transaction saved"));
@@ -1105,6 +1106,9 @@
           category: field === 'expense' ? "Otros" : null
         });
       }
+        saveToLocalStorage();
+  syncToFirebase();
+  drawCategoryChart();
 
       syncToFirebase();
       drawCategoryChart();
@@ -1448,6 +1452,7 @@
     function clearData() {
       if (confirm(t("¿Seguro que quieres borrar todos los datos?","Are you sure you want to delete all data?"))) {
         transactions = [];
+            localStorage.removeItem('finance2026_transactions');
         clearFirebaseData();
         alert(t("✅ Datos eliminados","✅ Data deleted"));
         if (currentView === 'year') renderYearView();
@@ -1457,16 +1462,41 @@
     }
 
     // Inicializar idioma y vista
+
+    // ========== LOCALSTORAGE + FIREBASE HYBRID SYNC ==========
+function saveToLocalStorage() {
+  try {
+    localStorage.setItem('finance2026_transactions', JSON.stringify(transactions));
+  } catch (e) {
+    console.error('Error guardando en localStorage:', e);
+  }
+}
+
+function loadFromLocalStorage() {
+  try {
+    const saved = localStorage.getItem('finance2026_transactions');
+    if (saved) {
+      transactions = JSON.parse(saved);
+      if (currentView === 'year') renderYearView();
+      if (currentView === 'month' && currentMonth !== null) renderMonthView(currentMonth);
+      drawCategoryChart();
+    }
+  } catch (e) {
+    console.error('Error cargando de localStorage:', e);
+  }
+}
+
     applyLanguage();
+    loadFromLocalStorage();
       // ========== FIREBASE SYNC ==========
       const firebaseConfig = { apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw", authDomain: "finanzas-2026-a6d48.firebaseapp.com", projectId: "finanzas-2026-a6d48", storageBucket: "finanzas-2026-a6d48.firebasestorage.app", messagingSenderId: "773280047631", appId: "1:773280047631:web:e11d88546678c5a979b97a" };
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
       db.collection("transactions").onSnapshot(function(snapshot) { transactions = []; snapshot.forEach(function(doc) { var d = doc.data(); transactions.push({ id: doc.id, date: d.date, type: d.type, amount: d.amount, description: d.description, category: d.category }); }); if (currentView === 'year') renderYearView(); if (currentView === 'month' && currentMonth !== null) renderMonthView(currentMonth); drawCategoryChart(); });
-      function syncToFirebase() { db.collection("transactions").get().then(function(snap) { var batch = db.batch(); snap.forEach(function(doc) { batch.delete(doc.ref); }); return batch.commit(); }).then(function() { var batch2 = db.batch(); transactions.forEach(function(t) { var ref = db.collection("transactions").doc(); batch2.set(ref, { date: t.date || "", type: t.type || "", amount: t.amount || 0, description: t.description || "", category: t.category || null }); }); return batch2.commit(); }); }
+      function syncToFirebase() {
+          saveToLocalStorage(); // Guardar en localStorage primerodb.collection("transactions").get().then(function(snap) { var batch = db.batch(); snap.forEach(function(doc) { batch.delete(doc.ref); }); return batch.commit(); }).then(function() { var batch2 = db.batch(); transactions.forEach(function(t) { var ref = db.collection("transactions").doc(); batch2.set(ref, { date: t.date || "", type: t.type || "", amount: t.amount || 0, description: t.description || "", category: t.category || null }); }); return batch2.commit(); }); }
       function clearFirebaseData() { db.collection("transactions").get().then(function(snap) { var batch = db.batch(); snap.forEach(function(doc) { batch.delete(doc.ref); }); return batch.commit(); }); }
   </script>
 
 </body>
 </html>
-
