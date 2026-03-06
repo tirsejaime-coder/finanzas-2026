@@ -4,16 +4,14 @@
   <meta charset="UTF-8">
   <title>Control de Finanzas - Sincronizado</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <!-- jsPDF / AutoTable / XLSX -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
   <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
   <style>
     :root {
@@ -44,7 +42,6 @@
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
       position: relative;
     }
-    /* Botón idioma y usuario */
     .top-bar {
       position: absolute;
       top: 16px;
@@ -77,7 +74,6 @@
     .user-btn:hover {
       background: #2563eb;
     }
-
     h1 {
       margin-top: 0;
       font-size: 1.8rem;
@@ -89,7 +85,6 @@
       color: var(--color-text-secondary);
       font-size: 0.95rem;
     }
-
     .breadcrumb {
       display: flex;
       gap: 8px;
@@ -105,7 +100,6 @@
     }
     .breadcrumb a:hover { text-decoration: underline; }
     .breadcrumb span { color: var(--color-text-secondary); }
-
     .tabs {
       display: flex;
       gap: 8px;
@@ -128,10 +122,8 @@
       border-bottom-color: var(--color-primary);
     }
     .tab:hover { color: var(--color-text-primary); }
-
     .view { display: none; }
     .view.active { display: block; }
-
     .quick-form {
       display: flex;
       flex-wrap: wrap;
@@ -163,7 +155,6 @@
       border-color: var(--color-primary);
       box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
     }
-
     .btn {
       padding: 8px 14px;
       border: none;
@@ -186,14 +177,12 @@
       border: 1px solid var(--color-border);
       color: var(--color-text-primary);
     }
-
     .buttons-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 10px;
     }
-
     .year-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -226,7 +215,6 @@
     .month-card .stat-value { font-weight: 600; }
     .month-card .stat-positive { color: var(--color-success); }
     .month-card .stat-negative { color: var(--color-danger); }
-
     .table-wrapper {
       overflow-x: auto;
       margin-top: 16px;
@@ -270,7 +258,6 @@
       background: #f9fafb !important;
       border-top: 2px solid var(--color-border);
     }
-
     .ad-slot {
       margin: 18px auto 0;
       max-width: 728px;
@@ -284,7 +271,6 @@
       font-size: 0.8rem;
       color: #9ca3af;
     }
-
     .modal {
       display: none;
       position: fixed;
@@ -347,8 +333,6 @@
       gap: 8px;
       justify-content: flex-end;
     }
-
-    /* Banner PRO */
     .pro-banner {
       margin-bottom: 16px;
       padding: 12px 14px;
@@ -376,8 +360,6 @@
       font-size: 0.7rem;
       margin-right: 6px;
     }
-
-    /* Bloque planes */
     .plans-wrapper {
       margin-top: 18px;
       padding: 14px;
@@ -411,11 +393,7 @@
       font-size: 0.85rem;
       color: var(--color-text-secondary);
     }
-    .plan-features li {
-      margin-bottom: 4px;
-    }
-
-    /* Sincronización */
+    .plan-features li { margin-bottom: 4px; }
     .sync-status {
       position: fixed;
       bottom: 20px;
@@ -443,7 +421,6 @@
       background: #fee2e2;
       border-color: #ef4444;
     }
-
     @media (max-width: 768px) {
       .container { padding: 18px 14px 24px; }
       h1 { font-size: 1.4rem; }
@@ -462,12 +439,11 @@
         margin-bottom: 10px;
       }
     }
-  .btn, .tab, .export-option { touch-action: manipulation; }</style>
+    .btn, .tab, .export-option { touch-action: manipulation; }
+  </style>
 </head>
 <body>
-
   <div class="container">
-    <!-- Barra superior con idioma y usuario -->
     <div class="top-bar">
       <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">
         🌐 <span id="langToggleLabel">ES / EN</span>
@@ -477,7 +453,6 @@
       </button>
     </div>
 
-    <!-- Gráfica 3D gastos vs ganancia -->
     <div id="piechart_3d" style="position:absolute; top:10px; right:170px; width:260px; height:260px; z-index:10;"></div>
 
     <h1 id="titleText">📊 Control de Finanzas 2026</h1>
@@ -487,10 +462,9 @@
 
     <div class="tabs">
       <button class="tab active" onclick="switchTab('input')" id="tabInput">📝 Registro Rápido</button>
-        <button class="tab" onclick="switchTab('year')" id="tabYear">📅 Vista Anual</button>
+      <button class="tab" onclick="switchTab('year')" id="tabYear">📅 Vista Anual</button>
     </div>
 
-    <!-- Banner PRO -->
     <div class="pro-banner" id="proBanner">
       <div class="pro-banner-text" id="proBannerText">
         <span class="pro-badge">PRO</span>
@@ -543,7 +517,6 @@
         <button class="btn btn-danger" onclick="clearData()" id="btnClear">🗑 Borrar datos</button>
       </div>
 
-      <!-- Bloque planes Gratis vs PRO -->
       <div class="plans-wrapper" id="plansWrapper">
         <div class="plan-box">
           <div class="plan-title" id="freePlanTitle">Plan gratuito</div>
@@ -599,10 +572,8 @@
         Aquí va tu código de anuncios (AdSense / Monetag)
       </div>
     </div>
-
   </div>
 
-  <!-- Modal de exportación -->
   <div id="exportModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -630,29 +601,47 @@
     </div>
   </div>
 
-  <!-- Indicador de sincronización -->
   <div id="syncStatus" class="sync-status success" style="display: none;">
     <span>🔄</span>
     <span id="syncMessage">Sincronizado</span>
   </div>
 
-  <script>
-    // Configuración de Firebase (REEMPLAZA CON TUS DATOS)
+  <!-- Lógica principal + Firebase modular -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      addDoc,
+      onSnapshot,
+      updateDoc,
+      deleteDoc,
+      getDocs,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
     const firebaseConfig = {
-      apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw", // Reemplaza con tu apiKey
-      authDomain: "finanzas-2026-a6d48.firebaseapp.com", // Reemplaza
-    storageBucket: "finanzas-2026-a6d48.firebasestorage.app", // Reemplaza
-      messagingSenderId: "773280047631", // Reemplaza
-          projectId: "finanzas-2026-a6d48",
-    appId: "1:773280047631:web:e11d88546678c5a979b97a" // Reemplaza
+      apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw",
+      authDomain: "finanzas-2026-a6d48.firebaseapp.com",
+      projectId: "finanzas-2026-a6d48",
+      storageBucket: "finanzas-2026-a6d48.appspot.com",
+      messagingSenderId: "773280047631",
+      appId: "1:773280047631:web:e11d88546678c5a979b97a",
+      measurementId: "G-VQB818R397"
     };
 
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // Variables globales
     const monthNamesEs = [
       "Enero","Febrero","Marzo","Abril","Mayo","Junio",
       "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
@@ -661,7 +650,6 @@
       "January","February","March","April","May","June",
       "July","August","September","October","November","December"
     ];
-
     const CATEGORY_OPTIONS = [
       { es: "Alimentos", en: "Food" },
       { es: "Renta", en: "Rent" },
@@ -673,44 +661,36 @@
 
     let language = localStorage.getItem("financeLang") || "es";
     let transactions = [];
-    let currentView = 'input';
+    let currentView = "input";
     let currentMonth = null;
-    let selectedExportOption = 'year';
+    let selectedExportOption = "year";
     let currentUser = null;
     let unsubscribeTransactions = null;
     let syncTimeout = null;
 
-    // Elementos del DOM
-    const syncStatus = document.getElementById('syncStatus');
-    const syncMessage = document.getElementById('syncMessage');
-
-    // Inicializar fecha
+    const syncStatus = document.getElementById("syncStatus");
+    const syncMessage = document.getElementById("syncMessage");
     document.getElementById("date").valueAsDate = new Date();
 
-    // Funciones de utilidad
     function getMonthNames() {
       return language === "es" ? monthNamesEs : monthNamesEn;
     }
-
     function t(es, en) {
       return language === "es" ? es : en;
     }
 
-    // Mostrar estado de sincronización
     function showSyncStatus(type, message) {
-      syncStatus.style.display = 'flex';
+      syncStatus.style.display = "flex";
       syncStatus.className = `sync-status ${type}`;
       syncMessage.textContent = message;
-      
       if (syncTimeout) clearTimeout(syncTimeout);
-      if (type !== 'syncing') {
+      if (type !== "syncing") {
         syncTimeout = setTimeout(() => {
-          syncStatus.style.display = 'none';
+          syncStatus.style.display = "none";
         }, 3000);
       }
     }
 
-    // Cargar transacciones desde Firestore
     function loadTransactionsFromFirestore() {
       if (!currentUser) {
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
@@ -718,121 +698,94 @@
         drawCategoryChart();
         return;
       }
+      showSyncStatus("syncing", t("Sincronizando...", "Syncing..."));
+      if (unsubscribeTransactions) unsubscribeTransactions();
 
-      showSyncStatus('syncing', t('Sincronizando...', 'Syncing...'));
-
-      if (unsubscribeTransactions) {
-        unsubscribeTransactions();
-      }
-
-      // Escuchar cambios en tiempo real
-      unsubscribeTransactions = db.collection('users').doc(currentUser.uid)
-        .collection('transactions')
-        .onSnapshot((snapshot) => {
-          transactions = [];
-          snapshot.forEach(doc => {
-            transactions.push({
-              id: doc.id,
-              ...doc.data()
-            });
-          });
-          
-      renderCurrentView();
-          drawCategoryChart();
-          showSyncStatus('success', t('Sincronizado', 'Synced'));
-        }, (error) => {
-          console.error("Error loading transactions:", error);
-          showSyncStatus('error', t('Error de sincronización', 'Sync error'));
-          transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-          renderCurrentView();
-                drawCategoryChart();
+      const userRef = doc(collection(db, "users"), currentUser.uid);
+      const txCol = collection(userRef, "transactions");
+      unsubscribeTransactions = onSnapshot(txCol, (snapshot) => {
+        transactions = [];
+        snapshot.forEach(d => {
+          transactions.push({ id: d.id, ...d.data() });
         });
+        renderCurrentView();
+        drawCategoryChart();
+        showSyncStatus("success", t("Sincronizado", "Synced"));
+      }, (error) => {
+        console.error("Error loading transactions:", error);
+        showSyncStatus("error", t("Error de sincronización", "Sync error"));
+        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        renderCurrentView();
+        drawCategoryChart();
+      });
     }
 
-    // Guardar transacción en Firestore
     async function saveTransactionToFirestore(transaction) {
       if (!currentUser) {
-        // Modo local
         transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
         renderCurrentView();
         drawCategoryChart();
         return;
       }
-
-      showSyncStatus('syncing', t('Guardando...', 'Saving...'));
-
+      showSyncStatus("syncing", t("Guardando...", "Saving..."));
       try {
-        const transactionData = {
-          ...transaction,
-          userId: currentUser.uid,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-
-                await db.collection('users').doc(currentUser.uid)
-          .collection('transactions').add(transactionData);
-        
-        showSyncStatus('success', t('Guardado', 'Saved'));
-      } catch (error) {
-        console.error("Error saving transaction:", error);
-        showSyncStatus('error', t('Error al guardar', 'Save error'));
-        
-        // Fallback a localStorage
+        const userRef = doc(collection(db, "users"), currentUser.uid);
+        const txCol = collection(userRef, "transactions");
+        const data = { ...transaction, userId: currentUser.uid, createdAt: serverTimestamp() };
+        await addDoc(txCol, data);
+        showSyncStatus("success", t("Guardado", "Saved"));
+      } catch (e) {
+        console.error("Error saving transaction:", e);
+        showSyncStatus("error", t("Error al guardar", "Save error"));
         transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
         renderCurrentView();
-              drawCategoryChart();
+        drawCategoryChart();
       }
     }
 
-    // Actualizar transacción en Firestore
     async function updateTransactionInFirestore(transactionId, updates) {
       if (!currentUser) return;
-
       try {
-        await db.collection('users').doc(currentUser.uid)
-          .collection('transactions').doc(transactionId)
-          .update(updates);
-      } catch (error) {
-        console.error("Error updating transaction:", error);
+        const userRef = doc(collection(db, "users"), currentUser.uid);
+        const txRef = doc(collection(userRef, "transactions"), transactionId);
+        await updateDoc(txRef, updates);
+      } catch (e) {
+        console.error("Error updating transaction:", e);
       }
     }
 
-    // Eliminar transacción de Firestore
     async function deleteTransactionFromFirestore(transactionId) {
       if (!currentUser) return;
-
       try {
-        await db.collection('users').doc(currentUser.uid)
-          .collection('transactions').doc(transactionId)
-          .delete();
-      } catch (error) {
-        console.error("Error deleting transaction:", error);
+        const userRef = doc(collection(db, "users"), currentUser.uid);
+        const txRef = doc(collection(userRef, "transactions"), transactionId);
+        await deleteDoc(txRef);
+      } catch (e) {
+        console.error("Error deleting transaction:", e);
       }
     }
 
-    // Autenticación
-    function handleAuth() {
+    window.handleAuth = function() {
       if (currentUser) {
-        // Cerrar sesión
-        auth.signOut();
+        signOut(auth);
       } else {
-        // Iniciar sesión con Google
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider);
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider).catch(err => {
+          console.error("Error en Google Sign-In:", err);
+        });
       }
-    }
+    };
 
-    // Observer de autenticación
-    auth.onAuthStateChanged((user) => {
+    onAuthStateChanged(auth, (user) => {
       currentUser = user;
-      
-      const authButtonText = document.getElementById('authButtonText');
+      const authButtonText = document.getElementById("authButtonText");
       if (user) {
-        authButtonText.textContent = user.displayName || t('Mi cuenta', 'My account');
+        authButtonText.textContent = user.displayName || t("Mi cuenta", "My account");
         loadTransactionsFromFirestore();
       } else {
-        authButtonText.textContent = t('Iniciar sesión', 'Sign in');
+        authButtonText.textContent = t("Iniciar sesión", "Sign in");
         if (unsubscribeTransactions) {
           unsubscribeTransactions();
           unsubscribeTransactions = null;
@@ -843,132 +796,103 @@
       }
     });
 
-    // ------- Gráfica 3D Google Charts -------
-    google.charts.load("current", {packages:["corechart"]});
-    google.charts.setOnLoadCallback(drawCategoryChart);
-
     function getCategoryLabel(esValue) {
-      const mapping = CATEGORY_OPTIONS.find(c => c.es === esValue);
-      return mapping ? (language === "es" ? mapping.es : mapping.en) : (esValue || "-");
+      const m = CATEGORY_OPTIONS.find(c => c.es === esValue);
+      return m ? (language === "es" ? m.es : m.en) : (esValue || "-");
     }
 
     function computeCategoryData() {
       const categoryTotals = {};
       CATEGORY_OPTIONS.forEach(c => categoryTotals[c.es] = 0);
-
       let totalIncome = 0;
-
       transactions.forEach(t => {
-        const tDate = new Date(t.date);
-        if (tDate.getFullYear() === 2026) {
+        const d = new Date(t.date);
+        if (d.getFullYear() === 2026) {
           if (t.type === "expense") {
-            const catKey = t.category || "Otros";
-            if (!categoryTotals[catKey]) categoryTotals[catKey] = 0;
-            categoryTotals[catKey] += t.amount;
+            const key = t.category || "Otros";
+            if (!categoryTotals[key]) categoryTotals[key] = 0;
+            categoryTotals[key] += t.amount;
           } else if (t.type === "income") {
             totalIncome += t.amount;
           }
         }
       });
-
       const totalExpenses = Object.values(categoryTotals).reduce((a,b)=>a+b,0);
       const totalProfit = totalIncome - totalExpenses;
-
       return { categoryTotals, totalProfit };
     }
 
+    google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(drawCategoryChart);
+
     function drawCategoryChart() {
       if (!window.google || !google.visualization) return;
-
       const { categoryTotals, totalProfit } = computeCategoryData();
-
       const data = new google.visualization.DataTable();
-      data.addColumn('string', 'Categoría');
-      data.addColumn('number', 'Monto');
-
-      Object.keys(categoryTotals).forEach(esKey => {
-        const val = categoryTotals[esKey];
-        if (val > 0) {
-          data.addRow([getCategoryLabel(esKey), val]);
-        }
+      data.addColumn("string", "Categoría");
+      data.addColumn("number", "Monto");
+      Object.keys(categoryTotals).forEach(k => {
+        const v = categoryTotals[k];
+        if (v > 0) data.addRow([getCategoryLabel(k), v]);
       });
-
       if (totalProfit > 0) {
         data.addRow([language === "es" ? "Ganancia Neta" : "Net Profit", totalProfit]);
       }
-
-      const el = document.getElementById('piechart_3d');
+      const el = document.getElementById("piechart_3d");
       if (data.getNumberOfRows() === 0) {
         if (el) el.innerHTML = "";
         return;
       }
-
       const options = {
         title: language === "es"
           ? "Gastos por categoría vs ganancias"
           : "Expenses by category vs profit",
         is3D: true,
-        legend: {
-          position: 'left',
-          alignment: 'center',
-          textStyle: { fontSize: 9 }
-        },
+        legend: { position: "left", alignment: "center", textStyle: { fontSize: 9 } },
         chartArea: { left: 80, top: 25, width: "70%", height: "70%" },
         backgroundColor: "transparent"
       };
-
       const chart = new google.visualization.PieChart(el);
       chart.draw(data, options);
     }
 
-    // Funciones de renderizado (igual que antes, pero usando transactions)
     function renderCurrentView() {
-      if (currentView === 'year') renderYearView();
-      else if (currentView === 'month' && currentMonth !== null) renderMonthView(currentMonth);
+      if (currentView === "year") renderYearView();
+      else if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
     }
 
     function applyLanguage() {
       document.documentElement.lang = language;
-
       document.getElementById("titleText").innerText = t("📊 Control de Finanzas 2026","📊 Finance Tracker 2026");
       document.getElementById("subtitleText").innerText = t("Gestiona tus ingresos y gastos por día, mes y año.","Manage your income and expenses by day, month and year.");
-
       document.getElementById("tabInput").innerText = t("📝 Registro Rápido","📝 Quick Entry");
       document.getElementById("tabYear").innerText = t("📅 Vista Anual","📅 Year View");
-
       document.getElementById("labelDate").innerText = t("Fecha","Date");
       document.getElementById("labelType").innerText = t("Tipo","Type");
       document.getElementById("labelAmount").innerText = t("Monto ($)","Amount ($)");
       document.getElementById("labelDescription").innerText = t("Descripción","Description");
       document.getElementById("labelCategory").innerText = t("Categoría (si es gasto)","Category (if expense)");
-
       document.getElementById("optIncome").innerText = t("Ingreso","Income");
       document.getElementById("optExpense").innerText = t("Gasto","Expense");
-
       const catSelect = document.getElementById("category");
       Array.from(catSelect.options).forEach(opt => {
         const esText = opt.value;
-        const mapping = CATEGORY_OPTIONS.find(c => c.es === esText);
-        if (mapping) opt.textContent = language === "es" ? mapping.es : mapping.en;
+        const m = CATEGORY_OPTIONS.find(c => c.es === esText);
+        if (m) opt.textContent = language === "es" ? m.es : m.en;
       });
-
       document.getElementById("description").placeholder = t("Ej: Venta, Alquiler","Ex: Sale, Rent");
-
       document.getElementById("btnSave").innerText = t("💾 Guardar","💾 Save");
       document.getElementById("btnExport").innerText = t("📥 Exportar Datos","📥 Export Data");
       document.getElementById("btnPrint").innerText = t("🖨 Imprimir","🖨 Print");
       document.getElementById("btnClear").innerText = t("🗑 Borrar datos","🗑 Clear data");
-
       document.getElementById("adSlot1").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)","Your ad code goes here (AdSense / Monetag)");
       document.getElementById("adSlot2").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)","Your ad code goes here (AdSense / Monetag)");
       document.getElementById("adSlot3").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)","Your ad code goes here (AdSense / Monetag)");
-
       document.getElementById("thDay").innerText = t("Día","Day");
       document.getElementById("thIncome").innerText = t("Ingresos","Income");
       document.getElementById("thExpense").innerText = t("Gastos","Expenses");
       document.getElementById("thCategory").innerText = t("Categoría","Category");
       document.getElementById("thProfit").innerText = t("Ganancia","Profit");
-
       document.getElementById("modalTitle").innerText = t("📥 Exportar Datos","📥 Export Data");
       document.getElementById("optYearTitle").innerText = t("📅 Año Completo 2026","📅 Full Year 2026");
       document.getElementById("optYearDesc").innerText = t("Exporta resumen de todos los meses del año","Export summary of all months in the year");
@@ -979,10 +903,8 @@
       document.getElementById("btnCancel").innerText = t("Cancelar","Cancel");
       document.getElementById("btnPDF").innerText = "📄 PDF";
       document.getElementById("btnExcel").innerText = "📊 Excel";
-
       document.getElementById("langToggleLabel").innerText = language === "es" ? "ES / EN" : "EN / ES";
 
-      // Textos banner PRO
       const proBannerText = document.getElementById("proBannerText");
       const proBannerButton = document.getElementById("proBannerButton");
       proBannerText.innerHTML = language === "es"
@@ -992,7 +914,6 @@
         ? "🚀 Empezar prueba PRO de 60 días"
         : "🚀 Start 60‑day PRO trial";
 
-      // Textos planes
       document.getElementById("freePlanTitle").textContent = t("Plan gratuito","Free plan");
       document.getElementById("freePlanPrice").textContent = t("0 USD / mes","0 USD / month");
       document.getElementById("proPlanTitle").textContent = t("Plan PRO","PRO plan");
@@ -1000,7 +921,6 @@
 
       const freePlanFeatures = document.getElementById("freePlanFeatures");
       const proPlanFeatures = document.getElementById("proPlanFeatures");
-
       freePlanFeatures.innerHTML = language === "es"
         ? `<li>Uso sin registro (datos guardados solo en tu navegador).</li>
            <li>Control de ingresos y gastos del año actual.</li>
@@ -1010,7 +930,6 @@
            <li>Track income and expenses for the current year.</li>
            <li>Charts and export to PDF/Excel.</li>
            <li>Light ads inside the app.</li>`;
-
       proPlanFeatures.innerHTML = language === "es"
         ? `<li>Años ilimitados de historial financiero.</li>
            <li>Copias de seguridad automáticas semanales en la nube.</li>
@@ -1023,46 +942,45 @@
            <li>Ad‑free experience.</li>
            <li>Priority for new features and support.</li>`;
 
-      if (currentView === 'year') renderYearView();
-      if (currentView === 'month' && currentMonth !== null) renderMonthView(currentMonth);
+      if (currentView === "year") renderYearView();
+      if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
       drawCategoryChart();
     }
 
-    function toggleLanguage() {
+    window.toggleLanguage = function() {
       language = language === "es" ? "en" : "es";
       localStorage.setItem("financeLang", language);
       applyLanguage();
-    }
+    };
 
-    function switchTab(view) {
+    window.switchTab = function(view) {
       currentView = view;
       document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
       document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-
-      if (view === 'input') {
+      if (view === "input") {
         document.getElementById("tabInput").classList.add("active");
         document.getElementById("view-input").classList.add("active");
         updateBreadcrumb([]);
-      } else if (view === 'year') {
+      } else if (view === "year") {
         document.getElementById("tabYear").classList.add("active");
         document.getElementById("view-year").classList.add("active");
         renderYearView();
         updateBreadcrumb([{ label: t("Año 2026","Year 2026"), action: null }]);
       }
-    }
+    };
 
-    function showMonthView(monthIndex) {
+    window.showMonthView = function(monthIndex) {
       currentMonth = monthIndex;
-      currentView = 'month';
+      currentView = "month";
       document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
       document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
       document.getElementById("view-month").classList.add("active");
       renderMonthView(monthIndex);
       updateBreadcrumb([
-        { label: t("Año 2026","Year 2026"), action: () => switchTab('year') },
+        { label: t("Año 2026","Year 2026"), action: () => window.switchTab("year") },
         { label: getMonthNames()[monthIndex], action: null }
       ]);
-    }
+    };
 
     function updateBreadcrumb(items) {
       const breadcrumb = document.getElementById("breadcrumb");
@@ -1078,49 +996,86 @@
       }).join(' <span>→</span> ');
     }
 
-    async function saveTransaction(e) {
+    window.saveTransaction = async function(e) {
       e.preventDefault();
       const dateInput = document.getElementById("date").value;
       const type = document.getElementById("type").value;
       const amount = parseFloat(document.getElementById("amount").value) || 0;
       const description = document.getElementById("description").value.trim();
       const category = document.getElementById("category").value;
-
       if (!dateInput || !amount) {
         alert(t("Por favor ingresa fecha y monto.","Please enter date and amount."));
         return;
       }
-
       const date = new Date(dateInput + "T00:00:00");
       const transaction = {
         date: date.toISOString(),
         type,
         amount,
         description,
-        category: type === 'expense' ? category : null
+        category: type === "expense" ? category : null
       };
-
       await saveTransactionToFirestore(transaction);
-      
       document.getElementById("amount").value = "";
       document.getElementById("description").value = "";
       alert(t("✅ Transacción guardada","✅ Transaction saved"));
       drawCategoryChart();
+    };
+
+    function calculateYearData() {
+      const yearData = [];
+      for (let m = 0; m < 12; m++) {
+        let income = 0;
+        let expense = 0;
+        transactions.forEach(t => {
+          const d = new Date(t.date);
+          if (d.getMonth() === m && d.getFullYear() === 2026) {
+            if (t.type === "income") income += t.amount;
+            else expense += t.amount;
+          }
+        });
+        const profit = income - expense;
+        yearData.push({ income, expense, profit });
+      }
+      return yearData;
+    }
+
+    function calculateMonthData(monthIndex) {
+      const daysInMonth = new Date(2026, monthIndex + 1, 0).getDate();
+      const monthData = [];
+      for (let d = 1; d <= daysInMonth; d++) {
+        let income = 0;
+        let expense = 0;
+        const categoriesSet = new Set();
+        transactions.forEach(t => {
+          const td = new Date(t.date);
+          if (td.getFullYear() === 2026 && td.getMonth() === monthIndex && td.getDate() === d) {
+            if (t.type === "income") income += t.amount;
+            else {
+              expense += t.amount;
+              if (t.category) categoriesSet.add(t.category);
+            }
+          }
+        });
+        const profit = income - expense;
+        let categoryDisplay = "";
+        if (categoriesSet.size === 1) categoryDisplay = Array.from(categoriesSet)[0];
+        else if (categoriesSet.size > 1) categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
+        else categoryDisplay = "-";
+        monthData.push({ day: d, income, expense, profit, category: categoryDisplay });
+      }
+      return monthData;
     }
 
     function renderYearView() {
       const yearData = calculateYearData();
       const grid = document.getElementById("yearGrid");
       grid.innerHTML = "";
-
       const monthNames = getMonthNames();
-
       yearData.forEach((month, idx) => {
         const card = document.createElement("div");
         card.className = "month-card";
-
-        const profitClass = month.profit >= 0 ? 'stat-positive' : 'stat-negative';
-
+        const profitClass = month.profit >= 0 ? "stat-positive" : "stat-negative";
         card.innerHTML = `
           <h3>${monthNames[idx]}</h3>
           <div class="stat">
@@ -1141,39 +1096,44 @@
             <button class="btn btn-primary btn-month-excel">📊 Excel</button>
           </div>
         `;
-
-        card.querySelector(".btn-month-view").onclick = () => showMonthView(idx);
-
+        card.querySelector(".btn-month-view").onclick = () => window.showMonthView(idx);
         card.querySelector(".btn-month-pdf").onclick = () => {
           const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
+          const docPdf = new jsPDF();
           currentMonth = idx;
-          exportMonthPDF(doc);
+          exportMonthPDF(docPdf);
         };
-
         card.querySelector(".btn-month-excel").onclick = () => {
           currentMonth = idx;
           exportMonthExcel();
         };
-
         grid.appendChild(card);
       });
+    }
+
+    function renderCategorySelect(currentCategory, day) {
+      let display = currentCategory && currentCategory !== "-" && currentCategory !== "Múltiples"
+        ? currentCategory
+        : "Otros";
+      const optsHtml = CATEGORY_OPTIONS.map(c => {
+        const text = language === "es" ? c.es : c.en;
+        const selected = (c.es === display) ? "selected" : "";
+        return `<option value="${c.es}" ${selected}>${text}</option>`;
+      }).join("");
+      return `<select data-day="${day}" class="category-select">${optsHtml}</select>`;
     }
 
     function renderMonthView(monthIndex) {
       const monthData = calculateMonthData(monthIndex);
       const tbody = document.getElementById("monthTableBody");
       tbody.innerHTML = "";
-
       let totalIncome = 0;
       let totalExpense = 0;
       let totalProfit = 0;
-
       monthData.forEach(day => {
         totalIncome += day.income;
         totalExpense += day.expense;
         totalProfit += day.profit;
-
         const row = document.createElement("tr");
         row.innerHTML = `
           <td><strong>${day.day}</strong></td>
@@ -1184,7 +1144,6 @@
         `;
         tbody.appendChild(row);
       });
-
       const totalRow = document.createElement("tr");
       totalRow.className = "total-row";
       totalRow.innerHTML = `
@@ -1195,80 +1154,8 @@
         <td><strong>$${totalProfit.toFixed(2)}</strong></td>
       `;
       tbody.appendChild(totalRow);
-
       attachEditListeners();
       attachCategoryListeners();
-    }
-
-    function renderCategorySelect(currentCategory, day) {
-      let display = currentCategory && currentCategory !== "-" && currentCategory !== "Múltiples"
-        ? currentCategory
-        : "Otros";
-      const optsHtml = CATEGORY_OPTIONS.map(catObj => {
-        const text = language === "es" ? catObj.es : catObj.en;
-        const selected = (catObj.es === display) ? "selected" : "";
-        return `<option value="${catObj.es}" ${selected}>${text}</option>`;
-      }).join('');
-      return `<select data-day="${day}" class="category-select">${optsHtml}</select>`;
-    }
-
-    function calculateYearData() {
-      const yearData = [];
-
-      for (let m = 0; m < 12; m++) {
-        let income = 0;
-        let expense = 0;
-
-        transactions.forEach(t => {
-          const tDate = new Date(t.date);
-          if (tDate.getMonth() === m && tDate.getFullYear() === 2026) {
-            if (t.type === 'income') income += t.amount;
-            else expense += t.amount;
-          }
-        });
-
-        const profit = income - expense;
-        yearData.push({ income, expense, profit });
-      }
-
-      return yearData;
-    }
-
-    function calculateMonthData(monthIndex) {
-      const daysInMonth = new Date(2026, monthIndex + 1, 0).getDate();
-      const monthData = [];
-
-      for (let d = 1; d <= daysInMonth; d++) {
-        let income = 0;
-        let expense = 0;
-        const categoriesSet = new Set();
-
-        transactions.forEach(t => {
-          const tDate = new Date(t.date);
-          if (tDate.getFullYear() === 2026 && tDate.getMonth() === monthIndex && tDate.getDate() === d) {
-            if (t.type === 'income') {
-              income += t.amount;
-            } else {
-              expense += t.amount;
-              if (t.category) categoriesSet.add(t.category);
-            }
-          }
-        });
-
-        const profit = income - expense;
-        let categoryDisplay = "";
-        if (categoriesSet.size === 1) {
-          categoryDisplay = Array.from(categoriesSet)[0];
-        } else if (categoriesSet.size > 1) {
-          categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
-        } else {
-          categoryDisplay = "-";
-        }
-
-        monthData.push({ day: d, income, expense, profit, category: categoryDisplay });
-      }
-
-      return monthData;
     }
 
     function attachEditListeners() {
@@ -1279,23 +1166,19 @@
           const monthData = calculateMonthData(currentMonth);
           const dayData = monthData.find(d => d.day === day);
           const currentValue = dayData[field];
-
           const input = document.createElement("input");
           input.type = "number";
           input.className = "edit-input";
           input.value = currentValue.toFixed(2);
           input.step = "0.01";
-
           this.innerHTML = "";
           this.appendChild(input);
           input.focus();
-
           input.addEventListener("blur", function() {
             const newValue = parseFloat(input.value) || 0;
             updateDayValue(currentMonth, day, field, newValue);
             renderMonthView(currentMonth);
           });
-
           input.addEventListener("keydown", function(e) {
             if (e.key === "Enter") input.blur();
           });
@@ -1316,130 +1199,106 @@
 
     async function updateDayValue(monthIndex, day, field, newValue) {
       const date = new Date(2026, monthIndex, day);
-      const dateStr = date.toISOString().split('T')[0];
-
-      // Eliminar transacciones existentes para ese día y tipo
-      const transactionsToDelete = transactions.filter(t => {
-        const tDate = new Date(t.date);
-        const tDateStr = tDate.toISOString().split('T')[0];
-        return tDateStr === dateStr && t.type === (field === 'income' ? 'income' : 'expense');
+      const dateStr = date.toISOString().split("T")[0];
+      const toDelete = transactions.filter(t => {
+        const d = new Date(t.date);
+        const ds = d.toISOString().split("T")[0];
+        return ds === dateStr && t.type === (field === "income" ? "income" : "expense");
       });
-
       if (currentUser) {
-        // Eliminar de Firestore
-        for (const t of transactionsToDelete) {
-          if (t.id) {
-            await deleteTransactionFromFirestore(t.id);
-          }
+        for (const t of toDelete) {
+          if (t.id) await deleteTransactionFromFirestore(t.id);
         }
       }
-
-      // Actualizar array local
       transactions = transactions.filter(t => {
-        const tDate = new Date(t.date);
-        const tDateStr = tDate.toISOString().split('T')[0];
-        return !(tDateStr === dateStr && t.type === (field === 'income' ? 'income' : 'expense'));
+        const d = new Date(t.date);
+        const ds = d.toISOString().split("T")[0];
+        return !(ds === dateStr && t.type === (field === "income" ? "income" : "expense"));
       });
-
       if (newValue > 0) {
-        const newTransaction = {
+        const newTx = {
           date: date.toISOString(),
-          type: field === 'income' ? 'income' : 'expense',
+          type: field === "income" ? "income" : "expense",
           amount: newValue,
-          description: `Ajuste manual ${field === 'income' ? t('ingreso','income') : t('gasto','expense')}`,
-          category: field === 'expense' ? "Otros" : null
+          description: `Ajuste manual ${field === "income" ? t("ingreso","income") : t("gasto","expense")}`,
+          category: field === "expense" ? "Otros" : null
         };
-
         if (currentUser) {
-          await saveTransactionToFirestore(newTransaction);
+          await saveTransactionToFirestore(newTx);
         } else {
-          transactions.push(newTransaction);
+          transactions.push(newTx);
           localStorage.setItem("transactions", JSON.stringify(transactions));
         }
       }
-
       drawCategoryChart();
     }
 
     async function updateDayCategory(monthIndex, day, newCategory) {
       const date = new Date(2026, monthIndex, day);
-      const dateStr = date.toISOString().split('T')[0];
-
+      const dateStr = date.toISOString().split("T")[0];
       if (currentUser) {
-        // Actualizar en Firestore
         const updates = transactions.filter(t => {
-          const tDate = new Date(t.date);
-          const tDateStr = tDate.toISOString().split('T')[0];
-          return tDateStr === dateStr && t.type === 'expense';
+          const d = new Date(t.date);
+          const ds = d.toISOString().split("T")[0];
+          return ds === dateStr && t.type === "expense";
         });
-
         for (const t of updates) {
-          if (t.id) {
-            await updateTransactionInFirestore(t.id, { category: newCategory });
-          }
+          if (t.id) await updateTransactionInFirestore(t.id, { category: newCategory });
         }
       }
-
-      // Actualizar array local
       transactions = transactions.map(t => {
-        const tDate = new Date(t.date);
-        const tDateStr = tDate.toISOString().split('T')[0];
-        if (tDateStr === dateStr && t.type === 'expense') {
+        const d = new Date(t.date);
+        const ds = d.toISOString().split("T")[0];
+        if (ds === dateStr && t.type === "expense") {
           return { ...t, category: newCategory };
         }
         return t;
       });
-
       if (!currentUser) {
         localStorage.setItem("transactions", JSON.stringify(transactions));
       }
-
       drawCategoryChart();
     }
 
-    function showExportModal() {
+    window.showExportModal = function() {
       document.getElementById("exportModal").classList.add("active");
-      selectedExportOption = 'year';
+      selectedExportOption = "year";
       document.querySelectorAll(".export-option").forEach(el => el.classList.remove("selected"));
-    }
+    };
 
-    function closeExportModal() {
+    window.closeExportModal = function() {
       document.getElementById("exportModal").classList.remove("active");
-    }
+    };
 
-    function selectExportOption(option, el) {
+    window.selectExportOption = function(option, el) {
       selectedExportOption = option;
-      document.querySelectorAll(".export-option").forEach(el => el.classList.remove("selected"));
+      document.querySelectorAll(".export-option").forEach(e => e.classList.remove("selected"));
       if (el) el.classList.add("selected");
-    }
+    };
 
-    function exportPDF() {
+    window.exportPDF = function() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      if (selectedExportOption === 'year') {
-        exportYearPDF(doc);
-      } else if (selectedExportOption === 'month') {
+      const docPdf = new jsPDF();
+      if (selectedExportOption === "year") {
+        exportYearPDF(docPdf);
+      } else if (selectedExportOption === "month") {
         if (currentMonth === null) {
           alert(t("Por favor selecciona un mes primero desde la vista anual","Please select a month first from the year view"));
           return;
         }
-        exportMonthPDF(doc);
-      } else if (selectedExportOption === 'week') {
-        exportWeekPDF(doc);
+        exportMonthPDF(docPdf);
+      } else if (selectedExportOption === "week") {
+        exportWeekPDF(docPdf);
       }
-
       closeExportModal();
-    }
+    };
 
-    function exportYearPDF(doc) {
-      doc.setFontSize(16);
-      doc.text(t("Reporte Financiero Anual 2026","Annual Financial Report 2026"), 10, 10);
-
+    function exportYearPDF(docPdf) {
+      docPdf.setFontSize(16);
+      docPdf.text(t("Reporte Financiero Anual 2026","Annual Financial Report 2026"), 10, 10);
       const yearData = calculateYearData();
       const tableData = [];
       const monthNames = getMonthNames();
-
       yearData.forEach((m, idx) => {
         tableData.push([
           monthNames[idx],
@@ -1448,19 +1307,16 @@
           `$${m.profit.toFixed(2)}`
         ]);
       });
-
-      const totalIncome = yearData.reduce((s, m) => s + m.income, 0);
-      const totalExpense = yearData.reduce((s, m) => s + m.expense, 0);
-      const totalProfit = yearData.reduce((s, m) => s + m.profit, 0);
-
+      const totalIncome = yearData.reduce((s,m)=>s+m.income,0);
+      const totalExpense = yearData.reduce((s,m)=>s+m.expense,0);
+      const totalProfit = yearData.reduce((s,m)=>s+m.profit,0);
       tableData.push([
         t("TOTAL","TOTAL"),
         `$${totalIncome.toFixed(2)}`,
         `$${totalExpense.toFixed(2)}`,
         `$${totalProfit.toFixed(2)}`
       ]);
-
-      doc.autoTable({
+      docPdf.autoTable({
         head: [[
           t("Mes","Month"),
           t("Ingresos","Income"),
@@ -1471,21 +1327,18 @@
         startY: 20,
         theme: "grid"
       });
-
-      doc.save(language === "es" ? "reporte-anual-2026.pdf" : "annual-report-2026.pdf");
+      docPdf.save(language === "es" ? "reporte-anual-2026.pdf" : "annual-report-2026.pdf");
     }
 
-    function exportMonthPDF(doc) {
+    function exportMonthPDF(docPdf) {
       const monthNames = getMonthNames();
-      doc.setFontSize(16);
-      doc.text(
+      docPdf.setFontSize(16);
+      docPdf.text(
         t("Reporte Mensual - ","Monthly Report - ") + monthNames[currentMonth] + " 2026",
         10, 10
       );
-
       const monthData = calculateMonthData(currentMonth);
       const tableData = [];
-
       monthData.forEach(day => {
         tableData.push([
           `${day.day}`,
@@ -1495,11 +1348,9 @@
           `$${day.profit.toFixed(2)}`
         ]);
       });
-
-      const totalIncome = monthData.reduce((s, d) => s + d.income, 0);
-      const totalExpense = monthData.reduce((s, d) => s + d.expense, 0);
-      const totalProfit = monthData.reduce((s, d) => s + d.profit, 0);
-
+      const totalIncome = monthData.reduce((s,d)=>s+d.income,0);
+      const totalExpense = monthData.reduce((s,d)=>s+d.expense,0);
+      const totalProfit = monthData.reduce((s,d)=>s+d.profit,0);
       tableData.push([
         t("TOTAL","TOTAL"),
         `$${totalIncome.toFixed(2)}`,
@@ -1507,8 +1358,7 @@
         "",
         `$${totalProfit.toFixed(2)}`
       ]);
-
-      doc.autoTable({
+      docPdf.autoTable({
         head: [[
           t("Día","Day"),
           t("Ingresos","Income"),
@@ -1520,20 +1370,45 @@
         startY: 20,
         theme: "grid"
       });
-
       const filename = language === "es"
         ? `reporte-${monthNames[currentMonth].toLowerCase()}-2026.pdf`
         : `report-${monthNames[currentMonth].toLowerCase()}-2026.pdf`;
-      doc.save(filename);
+      docPdf.save(filename);
     }
 
-    function exportWeekPDF(doc) {
-      doc.setFontSize(16);
-      doc.text(t("Reporte Semanal - Últimos 7 días","Weekly Report - Last 7 days"), 10, 10);
+    function calculateWeekData() {
+      const today = new Date();
+      const weekAgo = new Date(today);
+      weekAgo.setDate(today.getDate() - 6);
+      const weekData = [];
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(weekAgo);
+        date.setDate(weekAgo.getDate() + i);
+        let income = 0;
+        let expense = 0;
+        transactions.forEach(t => {
+          const d = new Date(t.date);
+          if (d.toDateString() === date.toDateString()) {
+            if (t.type === "income") income += t.amount;
+            else expense += t.amount;
+          }
+        });
+        const profit = income - expense;
+        weekData.push({
+          date: language === "es" ? date.toLocaleDateString("es-ES") : date.toLocaleDateString("en-US"),
+          income,
+          expense,
+          profit
+        });
+      }
+      return weekData;
+    }
 
+    function exportWeekPDF(docPdf) {
+      docPdf.setFontSize(16);
+      docPdf.text(t("Reporte Semanal - Últimos 7 días","Weekly Report - Last 7 days"), 10, 10);
       const weekData = calculateWeekData();
       const tableData = [];
-
       weekData.forEach(day => {
         tableData.push([
           day.date,
@@ -1542,19 +1417,16 @@
           `$${day.profit.toFixed(2)}`
         ]);
       });
-
-      const totalIncome = weekData.reduce((s, d) => s + d.income, 0);
-      const totalExpense = weekData.reduce((s, d) => s + d.expense, 0);
-      const totalProfit = weekData.reduce((s, d) => s + d.profit, 0);
-
+      const totalIncome = weekData.reduce((s,d)=>s+d.income,0);
+      const totalExpense = weekData.reduce((s,d)=>s+d.expense,0);
+      const totalProfit = weekData.reduce((s,d)=>s+d.profit,0);
       tableData.push([
         t("TOTAL","TOTAL"),
         `$${totalIncome.toFixed(2)}`,
         `$${totalExpense.toFixed(2)}`,
         `$${totalProfit.toFixed(2)}`
       ]);
-
-      doc.autoTable({
+      docPdf.autoTable({
         head: [[
           t("Fecha","Date"),
           t("Ingresos","Income"),
@@ -1565,25 +1437,23 @@
         startY: 20,
         theme: "grid"
       });
-
-      doc.save(language === "es" ? "reporte-semanal.pdf" : "weekly-report.pdf");
+      docPdf.save(language === "es" ? "reporte-semanal.pdf" : "weekly-report.pdf");
     }
 
-    function exportExcel() {
-      if (selectedExportOption === 'year') {
+    window.exportExcel = function() {
+      if (selectedExportOption === "year") {
         exportYearExcel();
-      } else if (selectedExportOption === 'month') {
+      } else if (selectedExportOption === "month") {
         if (currentMonth === null) {
           alert(t("Por favor selecciona un mes primero desde la vista anual","Please select a month first from the year view"));
           return;
         }
         exportMonthExcel();
-      } else if (selectedExportOption === 'week') {
+      } else if (selectedExportOption === "week") {
         exportWeekExcel();
       }
-
       closeExportModal();
-    }
+    };
 
     function exportYearExcel() {
       const yearData = calculateYearData();
@@ -1594,7 +1464,6 @@
         t("Gastos","Expenses"),
         t("Ganancia","Profit")
       ]];
-
       yearData.forEach((m, idx) => {
         data.push([
           monthNames[idx],
@@ -1603,13 +1472,10 @@
           m.profit
         ]);
       });
-
-      const totalIncome = yearData.reduce((s, m) => s + m.income, 0);
-      const totalExpense = yearData.reduce((s, m) => s + m.expense, 0);
-      const totalProfit = yearData.reduce((s, m) => s + m.profit, 0);
-
+      const totalIncome = yearData.reduce((s,m)=>s+m.income,0);
+      const totalExpense = yearData.reduce((s,m)=>s+m.expense,0);
+      const totalProfit = yearData.reduce((s,m)=>s+m.profit,0);
       data.push([t("TOTAL","TOTAL"), totalIncome, totalExpense, totalProfit]);
-
       const ws = XLSX.utils.aoa_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, language === "es" ? "Año 2026" : "Year 2026");
@@ -1625,7 +1491,6 @@
         t("Categoría","Category"),
         t("Ganancia","Profit")
       ]];
-
       monthData.forEach(day => {
         data.push([
           day.day,
@@ -1635,13 +1500,10 @@
           day.profit
         ]);
       });
-
-      const totalIncome = monthData.reduce((s, d) => s + d.income, 0);
-      const totalExpense = monthData.reduce((s, d) => s + d.expense, 0);
-      const totalProfit = monthData.reduce((s, d) => s + d.profit, 0);
-
+      const totalIncome = monthData.reduce((s,d)=>s+d.income,0);
+      const totalExpense = monthData.reduce((s,d)=>s+d.expense,0);
+      const totalProfit = monthData.reduce((s,d)=>s+d.profit,0);
       data.push([t("TOTAL","TOTAL"), totalIncome, totalExpense, "", totalProfit]);
-
       const ws = XLSX.utils.aoa_to_sheet(data);
       const wb = XLSX.utils.book_new();
       const monthNames = getMonthNames();
@@ -1659,7 +1521,6 @@
         t("Gastos","Expenses"),
         t("Ganancia","Profit")
       ]];
-
       weekData.forEach(day => {
         data.push([
           day.date,
@@ -1668,95 +1529,38 @@
           day.profit
         ]);
       });
-
-      const totalIncome = weekData.reduce((s, d) => s + d.income, 0);
-      const totalExpense = weekData.reduce((s, d) => s + d.expense, 0);
-      const totalProfit = weekData.reduce((s, d) => s + d.profit, 0);
-
+      const totalIncome = weekData.reduce((s,d)=>s+d.income,0);
+      const totalExpense = weekData.reduce((s,d)=>s+d.expense,0);
+      const totalProfit = weekData.reduce((s,d)=>s+d.profit,0);
       data.push([t("TOTAL","TOTAL"), totalIncome, totalExpense, totalProfit]);
-
       const ws = XLSX.utils.aoa_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, language === "es" ? "Semana" : "Week");
       XLSX.writeFile(wb, language === "es" ? "reporte-semanal.xlsx" : "weekly-report.xlsx");
     }
 
-    function calculateWeekData() {
-      const today = new Date();
-      const weekAgo = new Date(today);
-      weekAgo.setDate(today.getDate() - 6);
-
-      const weekData = [];
-
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(weekAgo);
-        date.setDate(weekAgo.getDate() + i);
-        
-        let income = 0;
-        let expense = 0;
-
-        transactions.forEach(t => {
-          const tDate = new Date(t.date);
-          if (tDate.toDateString() === date.toDateString()) {
-            if (t.type === 'income') income += t.amount;
-            else expense += t.amount;
-          }
-        });
-
-        const profit = income - expense;
-        weekData.push({
-          date: language === "es" ? date.toLocaleDateString('es-ES') : date.toLocaleDateString('en-US'),
-          income,
-          expense,
-          profit
-        });
-      }
-
-      return weekData;
-    }
-
-    async function clearData() {
-      if (!confirm(t("¿Seguro que quieres borrar todos los datos?","Are you sure you want to delete all data?"))) {
-        return;
-      }
-
+    window.clearData = async function() {
+      if (!confirm(t("¿Seguro que quieres borrar todos los datos?","Are you sure you want to delete all data?"))) return;
       if (currentUser) {
-        showSyncStatus('syncing', t('Borrando...', 'Deleting...'));
-        
-        // Borrar todos los documentos del usuario
-        const batch = db.batch();
-        const snapshot = await db.collection('users').doc(currentUser.uid)
-          .collection('transactions').get();
-        
-        snapshot.docs.forEach(doc => {
-          batch.delete(doc.ref);
-        });
-        
-        await batch.commit();
+        showSyncStatus("syncing", t("Borrando...", "Deleting..."));
+        const userRef = doc(collection(db, "users"), currentUser.uid);
+        const txCol = collection(userRef, "transactions");
+        const snapshot = await getDocs(txCol);
+        const batchIds = [];
+        snapshot.forEach(d => batchIds.push(d.id));
+        for (const id of batchIds) {
+          await deleteTransactionFromFirestore(id);
+        }
       }
-
       transactions = [];
       localStorage.removeItem("transactions");
-      
       alert(t("✅ Datos eliminados","✅ Data deleted"));
       renderCurrentView();
       drawCategoryChart();
-      showSyncStatus('success', t('Datos eliminados', 'Data deleted'));
-    }
+      showSyncStatus("success", t("Datos eliminados", "Data deleted"));
+    };
 
-    // Inicializar
     applyLanguage();
   </script>
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
