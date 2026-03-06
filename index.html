@@ -1154,7 +1154,7 @@ async function updateDayValue(monthIndex, day, field, newValue) {
             deletePromises.push(window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDB, 'transactions', docSnap.id)));
           }
         });
-        await Promise.all(deletePromises);}
+        await Promise.all(deletePromises);});
           if (newValue > 0) {
             const tx = transactions[transactions.length - 1];
             await window.firebaseAddDoc(colRef, {
@@ -1201,7 +1201,7 @@ async function updateDayCategory(monthIndex, day, newCategory) {
           console.log('✅ updateDayCategory sincronizado con Firebase');
         } catch(err) {
           console.error('Error sincronizando Firebase en updateDayCategory:', err);
-      
+        }
       drawCategoryChart();
     }
 
@@ -1538,8 +1538,6 @@ async function updateDayCategory(monthIndex, day, newCategory) {
     applyLanguage();
       // Exponer función globalmente para el módulo Firebase
   window.loadTransactionsFromFirebase = loadTransactionsFromFirebase;
-
-
   </script>
 
   <!-- Firebase SDK -->
@@ -1580,10 +1578,6 @@ async function updateDayCategory(monthIndex, day, newCategory) {
 
 </body>
 </html>
-
-
-
-
 
 
 
