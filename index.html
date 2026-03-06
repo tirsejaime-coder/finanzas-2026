@@ -818,7 +818,7 @@
       } else {
         // Iniciar sesión con Google
         const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider);
+        auth.signInWithRedirect(provider);
       }
     }
 
@@ -1749,6 +1749,7 @@
 
 </body>
 </html>
+
 
 
 
