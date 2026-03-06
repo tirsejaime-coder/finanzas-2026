@@ -768,10 +768,9 @@
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
-        const docRef = await db.collection('users').doc(currentUser.uid)
+                await db.collection('users').doc(currentUser.uid)
           .collection('transactions').add(transactionData);
         
-        transaction.id = docRef.id;
         showSyncStatus('success', t('Guardado', 'Saved'));
       } catch (error) {
         console.error("Error saving transaction:", error);
@@ -781,6 +780,7 @@
         transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
         renderCurrentView();
+              drawCategoryChart();
       }
     }
 
@@ -1749,6 +1749,7 @@
 
 </body>
 </html>
+
 
 
 
