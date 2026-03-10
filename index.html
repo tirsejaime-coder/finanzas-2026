@@ -4,321 +4,248 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LUMENSSAVE - Bienvenida</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
 
-    :root {
-      --bg-1: #020617;
-      --bg-2: #071126;
-      --card: rgba(10, 18, 38, 0.88);
-      --line: rgba(255, 255, 255, 0.08);
-      --text: #e5eefc;
-      --muted: #9fb0c9;
-      --cyan: #00eaff;
-      --blue: #1388ff;
-      --teal: #18f0c6;
-      --green: #2df598;
-    }
+<style>
 
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 50% 0%, rgba(0, 160, 255, 0.18), transparent 28%),
-        radial-gradient(circle at 18% 18%, rgba(0, 255, 213, 0.08), transparent 22%),
-        radial-gradient(circle at 82% 20%, rgba(0, 110, 255, 0.10), transparent 24%),
-        linear-gradient(180deg, #030814 0%, #020617 45%, #000814 100%);
-    }
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
 
-    .container {
-      width: 100%;
-      max-width: 1120px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      align-items: center;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 26px;
-      padding: 36px;
-      box-shadow:
-        0 24px 80px rgba(0, 0, 0, 0.55),
-        0 0 60px rgba(0, 210, 255, 0.08),
-        inset 0 1px 0 rgba(255,255,255,0.04);
-      backdrop-filter: blur(8px);
-      overflow: hidden;
-      position: relative;
-    }
+:root{
+--bg-1:#020617;
+--bg-2:#071126;
+--card:rgba(10,18,38,0.88);
+--line:rgba(255,255,255,0.08);
+--text:#e5eefc;
+--muted:#9fb0c9;
+}
 
-    .container::before {
-      content: "";
-      position: absolute;
-      width: 360px;
-      height: 360px;
-      right: -120px;
-      top: -120px;
-      background: radial-gradient(circle, rgba(0,234,255,0.12), transparent 68%);
-      pointer-events: none;
-    }
+body{
+font-family:Arial,Helvetica,sans-serif;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:24px;
+color:var(--text);
+background:
+radial-gradient(circle at 50% 0%,rgba(0,160,255,0.18),transparent 28%),
+radial-gradient(circle at 18% 18%,rgba(0,255,213,0.08),transparent 22%),
+radial-gradient(circle at 82% 20%,rgba(0,110,255,0.10),transparent 24%),
+linear-gradient(180deg,#030814 0%,#020617 45%,#000814 100%);
+}
 
-    .logo-panel {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 520px;
-      position: relative;
-    }
+.container{
+width:100%;
+max-width:1120px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:40px;
+align-items:center;
+background:var(--card);
+border:1px solid var(--line);
+border-radius:26px;
+padding:36px;
+box-shadow:
+0 24px 80px rgba(0,0,0,0.55),
+0 0 60px rgba(0,210,255,0.08),
+inset 0 1px 0 rgba(255,255,255,0.04);
+}
 
-    .logo-wrap {
-      width: 100%;
-      max-width: 460px;
-      aspect-ratio: 1 / 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
+.logo-panel{
+display:flex;
+align-items:center;
+justify-content:center;
+min-height:520px;
+}
 
-    .logo-wrap::before {
-      content: "";
-      position: absolute;
-      inset: 14% 14%;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,255,213,0.12), rgba(0,140,255,0.05) 45%, transparent 72%);
-      filter: blur(18px);
-      pointer-events: none;
-    }
+.logo-img{
+width:100%;
+max-width:430px;
+filter:
+drop-shadow(0 0 10px rgba(0,255,255,0.20))
+drop-shadow(0 0 28px rgba(0,190,255,0.22))
+drop-shadow(0 0 42px rgba(0,255,200,0.12));
+}
 
-    .logo-img {
-      width: 100%;
-      max-width: 430px;
-      height: auto;
-      display: block;
-      position: relative;
-      z-index: 1;
-      filter:
-        drop-shadow(0 0 10px rgba(0, 255, 255, 0.20))
-        drop-shadow(0 0 28px rgba(0, 190, 255, 0.22))
-        drop-shadow(0 0 42px rgba(0, 255, 200, 0.12));
-    }
+.badge{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:8px 14px;
+border-radius:999px;
+border:1px solid rgba(45,245,152,0.22);
+background:rgba(45,245,152,0.08);
+color:#8effc8;
+font-size:.82rem;
+margin-bottom:18px;
+}
 
-    .right {
-      position: relative;
-      z-index: 1;
-    }
+.badge-dot{
+width:8px;
+height:8px;
+border-radius:50%;
+background:#2df598;
+box-shadow:0 0 12px rgba(45,245,152,.8);
+}
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(45, 245, 152, 0.22);
-      background: rgba(45, 245, 152, 0.08);
-      color: #8effc8;
-      font-size: 0.82rem;
-      margin-bottom: 18px;
-    }
+h1{
+font-size:clamp(2.4rem,5vw,4.2rem);
+letter-spacing:.08em;
+line-height:1;
+margin-bottom:18px;
+text-transform:uppercase;
+font-weight:800;
+}
 
-    .badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #2df598;
-      box-shadow: 0 0 12px rgba(45, 245, 152, 0.8);
-    }
+.save{
+background:linear-gradient(90deg,#9afcff 0%,#16f4c7 55%,#0ef6a8 100%);
+-webkit-background-clip:text;
+color:transparent;
+}
 
-    h1 {
-      font-size: clamp(2.4rem, 5vw, 4.2rem);
-      letter-spacing: 0.08em;
-      line-height: 1;
-      margin-bottom: 18px;
-      text-transform: uppercase;
-      font-weight: 800;
-    }
+.subtitle{
+color:var(--muted);
+font-size:1rem;
+line-height:1.75;
+max-width:520px;
+margin-bottom:24px;
+}
 
-    h1 .light {
-      color: #e7eef9;
-    }
+.features{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+margin-bottom:24px;
+}
 
-    h1 .save {
-      background: linear-gradient(90deg, #9afcff 0%, #16f4c7 55%, #0ef6a8 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+.card{
+padding:16px;
+border-radius:16px;
+background:rgba(3,9,22,.9);
+border:1px solid rgba(255,255,255,.06);
+font-size:.95rem;
+}
 
-    .subtitle {
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.75;
-      max-width: 520px;
-      margin-bottom: 24px;
-    }
+.card span{
+display:block;
+color:var(--muted);
+font-size:.84rem;
+margin-top:6px;
+}
 
-    .features {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 24px;
-    }
+.actions{
+display:flex;
+gap:12px;
+}
 
-    .card {
-      padding: 16px;
-      border-radius: 16px;
-      background: rgba(3, 9, 22, 0.9);
-      border: 1px solid rgba(255,255,255,0.06);
-      color: #dce8fa;
-      font-size: 0.95rem;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-    }
+.btn{
+border:none;
+border-radius:999px;
+padding:14px 22px;
+font-size:.95rem;
+font-weight:700;
+cursor:pointer;
+transition:.2s;
+}
 
-    .card span {
-      display: block;
-      color: var(--muted);
-      font-size: 0.84rem;
-      margin-top: 6px;
-      line-height: 1.5;
-    }
+.btn:hover{
+transform:translateY(-1px);
+}
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
+.btn-primary{
+color:#03121a;
+background:linear-gradient(135deg,#19bfff 0%,#16f4c7 60%,#2df598 100%);
+box-shadow:0 12px 26px rgba(0,240,200,.18);
+}
 
-    .btn {
-      border: none;
-      border-radius: 999px;
-      padding: 14px 22px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-    }
+@media(max-width:920px){
 
-    .btn:hover {
-      transform: translateY(-1px);
-    }
+.container{
+grid-template-columns:1fr;
+}
 
-    .btn-primary {
-      color: #03121a;
-      background: linear-gradient(135deg, #19bfff 0%, #16f4c7 60%, #2df598 100%);
-      box-shadow: 0 12px 26px rgba(0, 240, 200, 0.18);
-    }
+.logo-panel{
+min-height:auto;
+}
 
-    .btn-secondary {
-      color: #d9e5f8;
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.14);
-    }
+.features{
+grid-template-columns:1fr;
+}
 
-    .meta {
-      color: #8ea2c3;
-      font-size: 0.88rem;
-      line-height: 1.7;
-    }
+}
 
-    .meta strong {
-      color: #b9fff1;
-    }
-
-    @media (max-width: 920px) {
-      .container {
-        grid-template-columns: 1fr;
-        padding: 24px;
-        gap: 22px;
-      }
-
-      .logo-panel {
-        min-height: auto;
-      }
-
-      .logo-wrap {
-        max-width: 360px;
-        margin: 0 auto;
-      }
-
-      .logo-img {
-        max-width: 320px;
-      }
-
-      .features {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+</style>
 </head>
+
 <body>
-  <section class="container">
-    <div class="logo-panel">
-      <div class="logo-wrap">
-        <img
-          class="logo-img"
-          src="lumenssave-logo.png"
-          alt="Logo LUMENSSAVE"
-        />
-      </div>
-    </div>
 
-    <div class="right">
-      <div class="badge">
-        <span class="badge-dot"></span>
-        Plataforma de finanzas personales
-      </div>
+<section class="container">
 
-      <h1>
-        <span class="light">LUMENS</span><span class="save">SAVE</span>
-      </h1>
+<div class="logo-panel">
 
-      <p class="subtitle">
-        Bienvenido a LUMENSSAVE, tu espacio para controlar ingresos, gastos
-        y metas de ahorro con una imagen moderna, clara y profesional desde
-        el primer momento.
-      </p>
+<img
+class="logo-img"
+src="lumenssave-logo.png"
+alt="Logo LUMENSSAVE"
+/>
 
-      <div class="features">
-        <div class="card">
-          📊 Control financiero
-          <span>Registra ingresos, gastos y movimientos con claridad.</span>
-        </div>
+</div>
 
-        <div class="card">
-          🔒 Datos seguros
-          <span>Mantén tu información organizada y protegida.</span>
-        </div>
+<div>
 
-        <div class="card">
-          🎯 Metas de ahorro
-          <span>Visualiza objetivos y sigue tu progreso fácilmente.</span>
-        </div>
+<div class="badge">
+<span class="badge-dot"></span>
+Plataforma de finanzas personales
+</div>
 
-        <div class="card">
-          📈 Mejor análisis
-          <span>Convierte datos en decisiones más inteligentes.</span>
-        </div>
-      </div>
+<h1>
+LUMENS<span class="save">SAVE</span>
+</h1>
 
-      <div class="actions">
-        <button class="btn btn-primary">Ir al panel financiero</button>
-        <button class="btn btn-secondary">Ver planes</button>
-      </div>
+<p class="subtitle">
+Bienvenido a LUMENSSAVE, tu espacio para controlar ingresos,
+gastos y metas de ahorro de forma clara y profesional.
+</p>
 
-      <p class="meta">
-        El logo está integrado como <strong>imagen PNG</strong>, que es la forma
-        más estable y rápida para que se vea exactamente igual al original.
-      </p>
-    </div>
-  </section>
+<div class="features">
+
+<div class="card">
+📊 Control financiero
+<span>Registra ingresos y gastos fácilmente.</span>
+</div>
+
+<div class="card">
+🔒 Datos seguros
+<span>Tu información queda guardada en tu navegador.</span>
+</div>
+
+<div class="card">
+🎯 Metas de ahorro
+<span>Visualiza tu progreso.</span>
+</div>
+
+<div class="card">
+📈 Mejor análisis
+<span>Toma decisiones financieras inteligentes.</span>
+</div>
+
+</div>
+
+<div class="actions">
+
+<button class="btn btn-primary"
+onclick="window.location.href='aplicación.html'">
+Ir al panel financiero
+</button>
+
+</div>
+
+</div>
+
+</section>
+
 </body>
 </html>
