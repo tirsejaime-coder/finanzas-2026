@@ -118,7 +118,7 @@ font-size:28px;
 margin-top:4px;
 }
 
-/* BARRAS MENSUALES */
+/* BARRAS */
 
 .bar-chart{
 display:flex;
@@ -142,7 +142,7 @@ margin-top:6px;
 color:#9fb0c9;
 }
 
-/* PIE 3D */
+/* PIE */
 
 .pie-wrapper{
 display:flex;
@@ -151,23 +151,19 @@ gap:20px;
 }
 
 .pie-chart{
-
 width:90px;
 height:90px;
 border-radius:50%;
-
 background:conic-gradient(
 #16f4c7 0% 35%,
 #00eaff 35% 60%,
 #4f7cff 60% 80%,
 #8892ff 80% 100%
 );
-
 box-shadow:
 inset 0 6px 10px rgba(255,255,255,0.15),
 inset 0 -10px 20px rgba(0,0,0,0.5),
 0 6px 20px rgba(0,255,200,0.2);
-
 }
 
 .pie-legend{
@@ -244,9 +240,7 @@ grid-template-columns:1fr;
 <section class="container">
 
 <div class="logo-panel">
-
 <img src="lumenssave-logo.png" class="logo-img">
-
 </div>
 
 <div>
@@ -272,7 +266,6 @@ Controla ingresos, gastos y metas de ahorro en un solo lugar.
 </div>
 
 <div class="bar-chart">
-
 <div class="bar" style="height:40%"></div>
 <div class="bar" style="height:60%"></div>
 <div class="bar" style="height:50%"></div>
@@ -285,24 +278,11 @@ Controla ingresos, gastos y metas de ahorro en un solo lugar.
 <div class="bar" style="height:95%"></div>
 <div class="bar" style="height:70%"></div>
 <div class="bar" style="height:88%"></div>
-
 </div>
 
 <div class="months">
-
-<span>E</span>
-<span>F</span>
-<span>M</span>
-<span>A</span>
-<span>M</span>
-<span>J</span>
-<span>J</span>
-<span>A</span>
-<span>S</span>
-<span>O</span>
-<span>N</span>
-<span>D</span>
-
+<span>E</span><span>F</span><span>M</span><span>A</span><span>M</span><span>J</span>
+<span>J</span><span>A</span><span>S</span><span>O</span><span>N</span><span>D</span>
 </div>
 
 </div>
@@ -314,12 +294,10 @@ Controla ingresos, gastos y metas de ahorro en un solo lugar.
 <div class="pie-chart"></div>
 
 <div class="pie-legend">
-
 <div><span class="dot food"></span> Alimentación</div>
 <div><span class="dot transport"></span> Transporte</div>
 <div><span class="dot services"></span> Servicios</div>
 <div><span class="dot other"></span> Otros</div>
-
 </div>
 
 </div>
@@ -334,7 +312,7 @@ Controla ingresos, gastos y metas de ahorro en un solo lugar.
 Iniciar sesión
 </button>
 
-<button class="btn btn-primary" onclick="goRegister()">
+<button class="btn btn-primary" onclick="showRegister()">
 Crear cuenta
 </button>
 
@@ -344,34 +322,36 @@ Usar versión Free
 
 </div>
 
+<!-- LOGIN -->
+
 <div class="login-panel" id="loginPanel">
 
 <h3>Iniciar sesión</h3>
 
 <input type="email" placeholder="Correo electrónico">
-
 <input type="password" placeholder="Contraseña">
 
 <br><br>
 
-<button class="btn btn-primary" onclick="goRegisterApp()">
-Crear cuenta
+<button class="btn btn-primary" onclick="goPro()">
+Entrar
 </button>
+
 </div>
+
+<!-- REGISTRO -->
 
 <div class="login-panel" id="registerPanel">
 
 <h3>Crear cuenta</h3>
 
 <input type="text" placeholder="Nombre">
-
 <input type="email" placeholder="Correo electrónico">
-
 <input type="password" placeholder="Contraseña">
 
 <br><br>
 
-<button class="btn btn-primary" onclick="goPro()">
+<button class="btn btn-primary" onclick="goRegisterApp()">
 Crear cuenta
 </button>
 
@@ -384,45 +364,29 @@ Crear cuenta
 <script>
 
 function showLogin(){
-
 document.getElementById("loginPanel").style.display="block";
 document.getElementById("registerPanel").style.display="none";
-
 }
 
 function showRegister(){
-
 document.getElementById("registerPanel").style.display="block";
 document.getElementById("loginPanel").style.display="none";
-
 }
 
 function goFree(){
-
 window.location.href="panel-free.html";
-
 }
 
 function goPro(){
 window.location.href="app.html";
-  
 }
 
 function goRegisterApp(){
-
 localStorage.clear();
-
 window.location.href="app.html";
-
 }
-  
+
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
