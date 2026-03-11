@@ -348,9 +348,9 @@ Usar versión Free
 
 <h3>Iniciar sesión</h3>
 
-<input type="email" placeholder="Correo electrónico">
+<input type="email" id="loginEmail" placeholder="Correo electrónico">
 
-<input type="password" placeholder="Contraseña">
+<input type="password" id="loginPassword" placeholder="Contraseña">
 
 <br><br>
 
@@ -364,15 +364,15 @@ Entrar
 
 <h3>Crear cuenta</h3>
 
-<input type="text" placeholder="Nombre">
+<input type="text" id="regName" placeholder="Nombre">
 
-<input type="email" placeholder="Correo electrónico">
+<input type="email" id="regEmail" placeholder="Correo electrónico">
 
-<input type="password" placeholder="Contraseña">
+<input type="password" id="regPassword" placeholder="Contraseña">
 
 <br><br>
 
-<button class="btn btn-primary" onclick="goPro()">
+<button class="btn btn-primary" onclick="goRegister()">
 Crear cuenta
 </button>
 
@@ -382,7 +382,7 @@ Crear cuenta
 
 </section>
 
-<script>
+<script type="module">import{initializeApp}from"https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";import{getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";const firebaseConfig={apiKey:"AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw",authDomain:"finanzas-2026-a6d48.firebaseapp.com",projectId:"finanzas-2026-a6d48"};const app=initializeApp(firebaseConfig);const auth=getAuth(app);onAuthStateChanged(auth,(user)=>{if(user){window.location.href="app.html";}});function showLogin(){document.getElementById("loginPanel").style.display="block";document.getElementById("registerPanel").style.display="none";}function showRegister(){document.getElementById("registerPanel").style.display="block";document.getElementById("loginPanel").style.display="none";}function goFree(){window.location.href="app.html";}window.showLogin=showLogin;window.showRegister=showRegister;window.goFree=goFree;window.goPro=async function(){const email=document.getElementById("loginEmail").value;const pass=document.getElementById("loginPassword").value;try{await signInWithEmailAndPassword(auth,email,pass);window.location.href="app.html";}catch(e){alert("Error al iniciar sesion: "+e.message);}};window.goRegister=async function(){const name=document.getElementById("regName").value;const email=document.getElementById("regEmail").value;const pass=document.getElementById("regPassword").value;try{const cred=await createUserWithEmailAndPassword(auth,email,pass);window.location.href="app.html";}catch(e){alert("Error al crear cuenta: "+e.message);}};
 
 function showLogin(){
 
@@ -413,5 +413,6 @@ window.location.href="app.html";
 
 </body>
 </html>
+
 
 
