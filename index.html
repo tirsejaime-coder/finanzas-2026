@@ -247,7 +247,36 @@ applyLanguage();
 
 }
 
+function applyLanguage(){
 
+let lang = localStorage.getItem("financeLang") || "es";
+
+if(lang === "en"){
+
+document.querySelector(".subtitle").innerText =
+"Control your income, expenses and savings goals in one place. Access from any device.";
+
+document.querySelector(".btn-primary").innerText = "Create account";
+
+document.querySelectorAll(".btn-primary")[1].innerText = "Login";
+
+document.querySelector(".btn-secondary").innerText = "Use FREE version";
+
+}else{
+
+document.querySelector(".subtitle").innerText =
+"Controla tus ingresos, gastos y metas de ahorro en un solo lugar. Accede desde cualquier dispositivo.";
+
+document.querySelector(".btn-primary").innerText = "Crear cuenta";
+
+document.querySelectorAll(".btn-primary")[1].innerText = "Iniciar sesión";
+
+document.querySelector(".btn-secondary").innerText = "Usar versión FREE";
+
+}
+
+}
+  
 /* GRAFICO BARRAS */
 
 new Chart(document.getElementById("barChart"),{
@@ -332,3 +361,4 @@ window.location.href="index-con-firebase.html";
 </body>
 
 </html>
+
