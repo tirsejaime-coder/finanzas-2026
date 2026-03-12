@@ -129,6 +129,44 @@ font-size:14px;
 color:#9fb0c9;
 }
 
+/* MODAL LOGIN */
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.75);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:999;
+}
+
+.modal-box{
+background:#071126;
+padding:30px;
+border-radius:16px;
+width:320px;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.modal-box input{
+padding:10px;
+border:none;
+border-radius:8px;
+background:#020617;
+color:white;
+}
+
+.modal-box span{
+color:#16f4c7;
+cursor:pointer;
+}
+
 @media(max-width:900px){
 .container{
 grid-template-columns:1fr;
@@ -140,7 +178,7 @@ grid-template-columns:1fr;
 
 <body>
 
-<div class="lang" onclick="toggleLang()">🌐 <span id="langLabel">ES</span></div>
+<div class="lang" onclick="toggleLang()">🌐 ES / EN</div>
 
 <div class="container">
 
@@ -157,11 +195,11 @@ Accede desde cualquier dispositivo.
 
 <div class="buttons">
 
-<button class="btn btn-primary" onclick="goApp()">
+<button class="btn btn-primary" onclick="openLogin()">
 Crear cuenta
 </button>
 
-<button class="btn btn-primary" onclick="goApp()">
+<button class="btn btn-primary" onclick="openLogin()">
 Iniciar sesión
 </button>
 
@@ -195,13 +233,34 @@ Balance anual: $12,480
 
 </div>
 
+
+<!-- MODAL LOGIN -->
+
+<div class="modal" id="authModal">
+
+<div class="modal-box">
+
+<h2 id="modalTitle">Iniciar sesión</h2>
+
+<input type="email" id="email" placeholder="Correo electrónico">
+
+<input type="password" id="password" placeholder="Contraseña">
+
+<button class="btn btn-primary" onclick="loginUser()">Entrar</button>
+
+<p>
+¿No tienes cuenta?
+<span onclick="showRegister()">Crear cuenta</span>
+</p>
+
+</div>
+
+</div>
+
+
 <script>
 
 /* NAVEGACION */
-
-function goApp(){
-window.location.href="app.html";
-}
 
 function goFree(){
 window.location.href="panel-free.html";
@@ -215,51 +274,33 @@ let lang = localStorage.getItem("financeLang") || "es";
 
 lang = lang === "es" ? "en" : "es";
 
-localStorage.setItem("financeLang", lang);
+localStorage.setItem("financeLang",lang);
 
-applyLanguage();
-
-}
-
-function applyLanguage(){
-
-let lang = localStorage.getItem("financeLang") || "es";
-
-const subtitle = document.querySelector(".subtitle");
-const btnCreate = document.querySelectorAll(".btn-primary")[0];
-const btnLogin = document.querySelectorAll(".btn-primary")[1];
-const btnFree = document.querySelector(".btn-secondary");
-const langLabel = document.getElementById("langLabel");
-
-if(lang === "en"){
-
-subtitle.innerText =
-"Control your income, expenses and savings goals in one place. Access from any device.";
-
-btnCreate.innerText = "Create account";
-btnLogin.innerText = "Login";
-btnFree.innerText = "Use FREE version";
-
-langLabel.innerText = "EN";
-
-}else{
-
-subtitle.innerText =
-"Controla tus ingresos, gastos y metas de ahorro en un solo lugar. Accede desde cualquier dispositivo.";
-
-btnCreate.innerText = "Crear cuenta";
-btnLogin.innerText = "Iniciar sesión";
-btnFree.innerText = "Usar versión FREE";
-
-langLabel.innerText = "ES";
+location.reload();
 
 }
 
+/* MODAL LOGIN */
+
+let registerMode=false;
+
+function openLogin(){
+
+document.getElementById("authModal").style.display="flex";
+
+registerMode=false;
+
+document.getElementById("modalTitle").innerText="Iniciar sesión";
+
 }
 
-/* INICIALIZAR IDIOMA */
+function showRegister(){
 
-applyLanguage();
+registerMode=true;
+
+document.getElementById("modalTitle").innerText="Crear cuenta";
+
+}
 
 /* GRAFICO BARRAS */
 
@@ -310,10 +351,17 @@ labels:{color:"#9fb0c9"}
 
 </script>
 
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { 
+getAuth,
+onAuthStateChanged,
+signInWithEmailAndPassword,
+createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE470W20CMoUUtw",
@@ -327,6 +375,37 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+
+window.loginUser=function(){
+
+const email=document.getElementById("email").value;
+const pass=document.getElementById("password").value;
+
+if(registerMode){
+
+createUserWithEmailAndPassword(auth,email,pass)
+.then(()=>{
+
+window.location.href="app.html";
+
+})
+.catch(e=>alert(e.message));
+
+}else{
+
+signInWithEmailAndPassword(auth,email,pass)
+.then(()=>{
+
+window.location.href="app.html";
+
+})
+.catch(e=>alert(e.message));
+
+}
+
+}
+
+/* REDIRECCION AUTOMATICA SI YA ESTA LOGUEADO */
 
 onAuthStateChanged(auth,(user)=>{
 
