@@ -129,8 +129,6 @@ font-size:14px;
 color:#9fb0c9;
 }
 
-/* MODAL */
-
 .modal{
 position:fixed;
 top:0;
@@ -164,10 +162,6 @@ font-size:18px;
 opacity:0.7;
 }
 
-.close:hover{
-opacity:1;
-}
-
 .modal-box input{
 padding:10px;
 border:none;
@@ -175,11 +169,6 @@ border-radius:8px;
 background:#020617;
 color:white;
 width:100%;
-}
-
-.modal-box span{
-color:#16f4c7;
-cursor:pointer;
 }
 
 .password-container{
@@ -196,12 +185,6 @@ right:10px;
 top:50%;
 transform:translateY(-50%);
 cursor:pointer;
-font-size:16px;
-opacity:0.7;
-}
-
-.toggle-pass:hover{
-opacity:1;
 }
 
 @media(max-width:900px){
@@ -232,22 +215,16 @@ Accede desde cualquier dispositivo.
 
 <div class="buttons">
 
-<button class="btn btn-primary" onclick="openLogin()">
-Crear cuenta
-</button>
+<button class="btn btn-primary" onclick="openLogin()">Crear cuenta</button>
 
-<button class="btn btn-primary" onclick="openLogin()">
-Iniciar sesión
-</button>
+<button class="btn btn-primary" onclick="openLogin()">Iniciar sesión</button>
 
-<button class="btn btn-secondary" onclick="goFree()">
-Usar versión FREE
-</button>
+<button class="btn btn-secondary" onclick="goFree()">Usar versión FREE</button>
 
 </div>
 
 <div class="hero-logo">
-<img src="lumenssave-logo.png" alt="LUMENSSAVE Logo">
+<img src="lumenssave-logo.png">
 </div>
 
 </div>
@@ -270,7 +247,6 @@ Balance anual: $12,480
 
 </div>
 
-<!-- MODAL LOGIN -->
 
 <div class="modal" id="authModal">
 
@@ -298,6 +274,7 @@ Balance anual: $12,480
 
 </div>
 
+
 <script>
 
 function goFree(){
@@ -323,13 +300,6 @@ function closeModal(){
 document.getElementById("authModal").style.display="none";
 }
 
-window.onclick=function(e){
-const modal=document.getElementById("authModal");
-if(e.target===modal){
-modal.style.display="none";
-}
-}
-
 function showRegister(){
 registerMode=true;
 document.getElementById("modalTitle").innerText="Crear cuenta";
@@ -350,13 +320,6 @@ datasets:[{
 data:[400,600,500,700,800,650,900,750,850,950,700,880],
 backgroundColor:"#16f4c7"
 }]
-},
-options:{
-plugins:{legend:{display:false}},
-scales:{
-x:{ticks:{color:"#9fb0c9"}},
-y:{ticks:{color:"#9fb0c9"}}
-}
 }
 });
 
@@ -374,9 +337,6 @@ backgroundColor:[
 "#b794f4"
 ]
 }]
-},
-options:{
-plugins:{legend:{labels:{color:"#9fb0c9"}}}
 }
 });
 
@@ -384,25 +344,19 @@ plugins:{legend:{labels:{color:"#9fb0c9"}}}
 
 </script>
 
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import { 
-getAuth,
-onAuthStateChanged,
-signInWithEmailAndPassword,
-createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE470W20CMoUUtw",
+  apiKey: "TU_API_KEY_REAL_AQUI",
   authDomain: "finanzas-2026-a6d48.firebaseapp.com",
   projectId: "finanzas-2026-a6d48",
   storageBucket: "finanzas-2026-a6d48.appspot.com",
   messagingSenderId: "773280047631",
-  appId: "1:773280047631:web:e11d88546678c5a979b97a",
-  measurementId: "G-VQB8I18R397"
+  appId: "1:773280047631:web:e11d88546678c5a979b97a"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -416,13 +370,13 @@ const pass=document.getElementById("password").value;
 if(registerMode){
 
 createUserWithEmailAndPassword(auth,email,pass)
-.then(()=>{window.location.href="app.html";})
+.then(()=>window.location.href="app.html")
 .catch(e=>alert(e.message));
 
 }else{
 
 signInWithEmailAndPassword(auth,email,pass)
-.then(()=>{window.location.href="app.html";})
+.then(()=>window.location.href="app.html")
 .catch(e=>alert(e.message));
 
 }
@@ -439,4 +393,3 @@ window.location.href="app.html";
 
 </body>
 </html>
-
