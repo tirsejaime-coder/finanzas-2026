@@ -160,11 +160,36 @@ border:none;
 border-radius:8px;
 background:#020617;
 color:white;
+width:100%;
 }
 
 .modal-box span{
 color:#16f4c7;
 cursor:pointer;
+}
+
+/* PASSWORD VIEW */
+
+.password-container{
+position:relative;
+}
+
+.password-container input{
+padding-right:40px;
+}
+
+.toggle-pass{
+position:absolute;
+right:10px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
+font-size:16px;
+opacity:0.7;
+}
+
+.toggle-pass:hover{
+opacity:1;
 }
 
 @media(max-width:900px){
@@ -233,7 +258,6 @@ Balance anual: $12,480
 
 </div>
 
-
 <!-- MODAL LOGIN -->
 
 <div class="modal" id="authModal">
@@ -244,7 +268,10 @@ Balance anual: $12,480
 
 <input type="email" id="email" placeholder="Correo electrónico">
 
+<div class="password-container">
 <input type="password" id="password" placeholder="Contraseña">
+<span class="toggle-pass" onclick="togglePassword()">👁</span>
+</div>
 
 <button class="btn btn-primary" onclick="loginUser()">Entrar</button>
 
@@ -256,7 +283,6 @@ Balance anual: $12,480
 </div>
 
 </div>
-
 
 <script>
 
@@ -299,6 +325,20 @@ function showRegister(){
 registerMode=true;
 
 document.getElementById("modalTitle").innerText="Crear cuenta";
+
+}
+
+/* MOSTRAR / OCULTAR PASSWORD */
+
+function togglePassword(){
+
+const pass=document.getElementById("password");
+
+if(pass.type==="password"){
+pass.type="text";
+}else{
+pass.type="password";
+}
 
 }
 
@@ -351,7 +391,6 @@ labels:{color:"#9fb0c9"}
 
 </script>
 
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -385,9 +424,7 @@ if(registerMode){
 
 createUserWithEmailAndPassword(auth,email,pass)
 .then(()=>{
-
 window.location.href="app.html";
-
 })
 .catch(e=>alert(e.message));
 
@@ -395,9 +432,7 @@ window.location.href="app.html";
 
 signInWithEmailAndPassword(auth,email,pass)
 .then(()=>{
-
 window.location.href="app.html";
-
 })
 .catch(e=>alert(e.message));
 
@@ -405,7 +440,7 @@ window.location.href="app.html";
 
 }
 
-/* REDIRECCION AUTOMATICA SI YA ESTA LOGUEADO */
+/* REDIRECCION AUTOMATICA */
 
 onAuthStateChanged(auth,(user)=>{
 
