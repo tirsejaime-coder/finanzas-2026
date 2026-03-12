@@ -241,9 +241,9 @@ let lang = localStorage.getItem("financeLang") || "es";
 
 lang = lang === "es" ? "en" : "es";
 
-localStorage.setItem("financeLang",lang);
+localStorage.setItem("financeLang", lang);
 
-location.reload();
+applyLanguage();
 
 }
 
@@ -330,4 +330,5 @@ window.location.href="index-con-firebase.html";
 </script>
 
 </body>
+
 </html>
