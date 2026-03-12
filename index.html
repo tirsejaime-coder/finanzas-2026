@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LUMENSSAVE</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+body{
+font-family:Arial,Helvetica,sans-serif;
+background:#020617;
+color:white;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+}
+
+.container{
+max-width:1100px;
+width:100%;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:40px;
+background:#071126;
+padding:40px;
+border-radius:24px;
+position:relative;
+}
+
+/* LOGO TEXTO */
+
+.logo{
+font-size:42px;
+font-weight:bold;
+letter-spacing:3px;
+}
+
+.save{
+background:linear-gradient(90deg,#00eaff,#16f4c7);
+-webkit-background-clip:text;
+color:transparent;
+}
+
+/* SUBTITULO */
+
+.subtitle{
+margin-top:10px;
+color:#9fb0c9;
+line-height:1.6;
+}
+
+/* BOTONES */
+
+.buttons{
+margin-top:25px;
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.btn{
+border:none;
+padding:12px 20px;
+border-radius:999px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.btn-primary{
+background:linear-gradient(135deg,#19bfff,#16f4c7);
+}
+
+.btn-secondary{
+background:#1e293b;
+color:white;
+}
+
+/* LOGO HERO */
+
+.hero-logo{
+margin-top:40px;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.hero-logo img{
+width:260px;
+max-width:100%;
+opacity:0.9;
+filter:drop-shadow(0 0 20px rgba(0,255,200,.35));
+transition:transform .4s ease, opacity .4s ease;
+}
+
+.hero-logo img:hover{
+transform:scale(1.05);
+opacity:1;
+}
+
+/* PREVIEW PANEL */
+
+.preview{
+background:#030916;
+border-radius:16px;
+padding:20px;
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+
+.balance{
+font-size:24px;
+}
+
+/* CHART BOX */
+
+.chart-box{
+background:#020617;
+padding:15px;
+border-radius:12px;
+}
+
+/* LANGUAGE BUTTON */
+
+.lang{
+position:absolute;
+top:20px;
+right:20px;
+cursor:pointer;
+font-size:14px;
+color:#9fb0c9;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+.container{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="lang" onclick="toggleLang()">🌐 ES / EN</div>
+
+<div class="container">
+
+<!-- COLUMNA IZQUIERDA -->
+
+<div>
+
+<div class="logo">
+LUMENS<span class="save">SAVE</span>
+</div>
+
+<p class="subtitle">
+Controla tus ingresos, gastos y metas de ahorro en un solo lugar.
+Accede desde cualquier dispositivo.
+</p>
+
+<div class="buttons">
+
+<button class="btn btn-primary" onclick="goApp()">
+Crear cuenta
+</button>
+
+<button class="btn btn-primary" onclick="goApp()">
+Iniciar sesión
+</button>
+
+<button class="btn btn-secondary" onclick="goFree()">
+Usar versión FREE
+</button>
+
+</div>
+
+<!-- LOGO DE LA APP -->
+
+<div class="hero-logo">
+<img src="lumenssave-logo.png" alt="LUMENSSAVE Logo">
+</div>
+
+</div>
+
+
+<!-- COLUMNA DERECHA -->
+
+<div class="preview">
+
+<div class="balance">
+Balance anual: $12,480
+</div>
+
+<div class="chart-box">
+<canvas id="barChart"></canvas>
+</div>
+
+<div class="chart-box">
+<canvas id="pieChart"></canvas>
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* NAVEGACION */
+
+function goApp(){
+window.location.href="app.html";
+}
+
+function goFree(){
+window.location.href="panel-free.html";
+}
+
+/* CAMBIO IDIOMA */
+
+function toggleLang(){
+
+let lang = localStorage.getItem("financeLang") || "es";
+
+lang = lang === "es" ? "en" : "es";
+
+localStorage.setItem("financeLang",lang);
+
+location.reload();
+
+}
+
+
+/* GRAFICO BARRAS */
+
+new Chart(document.getElementById("barChart"),{
+type:"bar",
+data:{
+labels:["E","F","M","A","M","J","J","A","S","O","N","D"],
+datasets:[{
+label:"Balance",
+data:[400,600,500,700,800,650,900,750,850,950,700,880],
+backgroundColor:"#16f4c7"
+}]
+},
+options:{
+plugins:{legend:{display:false}},
+scales:{
+x:{ticks:{color:"#9fb0c9"}},
+y:{ticks:{color:"#9fb0c9"}}
+}
+}
+});
+
+
+/* GRAFICO CIRCULAR */
+
+new Chart(document.getElementById("pieChart"),{
+type:"doughnut",
+data:{
+labels:["Alimentos","Transporte","Servicios","Entretenimiento","Otros"],
+datasets:[{
+data:[35,20,18,15,12],
+backgroundColor:[
+"#16f4c7",
+"#00eaff",
+"#4f7cff",
+"#8892ff",
+"#b794f4"
+]
+}]
+},
+options:{
+plugins:{
+legend:{
+labels:{color:"#9fb0c9"}
+}
+}
+}
+});
+
+</script>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE470W20CMoUUtw",
+  authDomain: "finanzas-2026-a6d48.firebaseapp.com",
+  projectId: "finanzas-2026-a6d48",
+  storageBucket: "finanzas-2026-a6d48.firebasestorage.app",
+  messagingSenderId: "773280047631",
+  appId: "1:773280047631:web:e11d88546678c5a979b97a",
+  measurementId: "G-VQB8I18R397"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+
+// CAMBIA ESTE NOMBRE SI TU APP SE LLAMA DISTINTO
+window.location.href="index-con-firebase.html";
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
