@@ -158,7 +158,7 @@ grid-template-columns:1fr;
 
 <body>
 
-<div class="lang" onclick="toggleLang()">🌐 ES / EN</div>
+<div class="lang" onclick="toggleLang()">🌐 <span id="langLabel">ES</span></div>
 
 <div class="container">
 
@@ -247,31 +247,46 @@ applyLanguage();
 
 }
 
+
 function applyLanguage(){
 
 let lang = localStorage.getItem("financeLang") || "es";
 
+const subtitle = document.querySelector(".subtitle");
+const btnCreate = document.querySelectorAll(".btn-primary")[0];
+const btnLogin = document.querySelectorAll(".btn-primary")[1];
+const btnFree = document.querySelector(".btn-secondary");
+const langLabel = document.getElementById("langLabel");
+
+
 if(lang === "en"){
 
-document.querySelector(".subtitle").innerText =
+subtitle.innerText =
 "Control your income, expenses and savings goals in one place. Access from any device.";
 
-document.querySelector(".btn-primary").innerText = "Create account";
+btnCreate.innerText = "Create account";
+btnLogin.innerText = "Login";
+btnFree.innerText = "Use FREE version";
 
-document.querySelectorAll(".btn-primary")[1].innerText = "Login";
-
-document.querySelector(".btn-secondary").innerText = "Use FREE version";
+langLabel.innerText = "EN";
 
 }else{
 
-document.querySelector(".subtitle").innerText =
+subtitle.innerText =
 "Controla tus ingresos, gastos y metas de ahorro en un solo lugar. Accede desde cualquier dispositivo.";
 
-document.querySelector(".btn-primary").innerText = "Crear cuenta";
+btnCreate.innerText = "Crear cuenta";
+btnLogin.innerText = "Iniciar sesión";
+btnFree.innerText = "Usar versión FREE";
 
-document.querySelectorAll(".btn-primary")[1].innerText = "Iniciar sesión";
+langLabel.innerText = "ES";
 
-document.querySelector(".btn-secondary").innerText = "Usar versión FREE";
+}
+
+}
+
+
+/* INICIALIZAR IDIOMA AL CARGAR */
 
 applyLanguage();
 
@@ -363,5 +378,6 @@ window.location.href="index-con-firebase.html";
 </body>
 
 </html>
+
 
 
