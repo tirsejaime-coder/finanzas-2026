@@ -1614,6 +1614,83 @@ window.showLoginOptions = function() {
 
     applyLanguage();
   </script>
+  window.openLogin = function(){
+
+if(currentUser){
+
+if(confirm("¿Cerrar sesión?")){
+signOut(auth);
+}
+
+}else{
+
+document.getElementById("loginModal").classList.add("active");
+
+}
+
+}
+
+window.closeLogin=function(){
+document.getElementById("loginModal").classList.remove("active");
+}
+
+window.togglePassword=function(){
+
+const pass=document.getElementById("loginPassword");
+
+pass.type = pass.type === "password" ? "text" : "password";
+
+}
+
+window.loginEmail=function(){
+
+const email=document.getElementById("loginEmail").value;
+const pass=document.getElementById("loginPassword").value;
+
+signInWithEmailAndPassword(auth,email,pass)
+
+.then(()=>{
+
+closeLogin();
+
+})
+
+.catch(e=>alert(e.message));
+
+}
+
+window.registerEmail=function(){
+
+const email=document.getElementById("loginEmail").value;
+const pass=document.getElementById("loginPassword").value;
+
+createUserWithEmailAndPassword(auth,email,pass)
+
+.then(()=>{
+
+closeLogin();
+
+})
+
+.catch(e=>alert(e.message));
+
+}
+
+window.loginGoogle=function(){
+
+const provider=new GoogleAuthProvider();
+
+signInWithPopup(auth,provider)
+
+.then(()=>{
+
+closeLogin();
+
+})
+
+.catch(e=>alert(e.message));
+
+}
 </body>
 </html>
 
