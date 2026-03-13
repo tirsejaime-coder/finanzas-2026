@@ -316,13 +316,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE470W20CMoUUtw",
-  authDomain: "finanzas-2026-a6d48.firebaseapp.com",
-  projectId: "finanzas-2026-a6d48",
-  storageBucket: "finanzas-2026-a6d48.firebasestorage.app",
-  messagingSenderId: "773280047631",
-  appId: "1:773280047631:web:e11d88546678c5a979b97a",
-  measurementId: "G-VQB8I18R397"
+
+apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw",
+authDomain: "finanzas-2026-a6d48.firebaseapp.com",
+projectId: "finanzas-2026-a6d48",
+storageBucket: "finanzas-2026-a6d48.appspot.com",
+messagingSenderId: "773280047631",
+appId: "1:773280047631:web:e11d88546678c5a979b97a"
+
 };
 
 const app = initializeApp(firebaseConfig);
@@ -331,7 +332,9 @@ const auth = getAuth(app);
 onAuthStateChanged(auth,(user)=>{
 
 if(user){
+
 window.location.href="app.html";
+
 }
 
 });
