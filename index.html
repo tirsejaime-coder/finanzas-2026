@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>LUMENSSAVE</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+
 *{
 box-sizing:border-box;
 margin:0;
@@ -127,301 +129,213 @@ font-size:14px;
 color:#9fb0c9;
 }
 
-/* MODAL */
-.modal{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,.75);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:999;
-}
-
-.modal-box{
-background:#071126;
-padding:30px;
-border-radius:16px;
-width:320px;
-display:flex;
-flex-direction:column;
-gap:12px;
-position:relative;
-}
-
-.close-btn{
-position:absolute;
-top:10px;
-right:14px;
-font-size:18px;
-cursor:pointer;
-color:#9fb0c9;
-}
-
-.modal-box input{
-padding:10px;
-border:none;
-border-radius:8px;
-background:#020617;
-color:white;
-width:100%;
-}
-
-.modal-box span{
-color:#16f4c7;
-cursor:pointer;
-}
-
-.password-container{
-position:relative;
-}
-
-.password-container input{
-padding-right:42px;
-}
-
-.toggle-pass{
-position:absolute;
-right:10px;
-top:50%;
-transform:translateY(-50%);
-cursor:pointer;
-font-size:16px;
-opacity:.8;
-}
-
-.toggle-pass:hover{
-opacity:1;
-}
-
-.helper{
-font-size:14px;
-color:#9fb0c9;
-}
-
 @media(max-width:900px){
 .container{
 grid-template-columns:1fr;
 }
 }
+
 </style>
 </head>
 
 <body>
 
-<div class="lang" onclick="toggleLang()">🌐 ES / EN</div>
+<div class="lang" onclick="toggleLang()">🌐 <span id="langLabel">ES</span></div>
 
 <div class="container">
-  <div>
-    <div class="logo">
-      LUMENS<span class="save">SAVE</span>
-    </div>
 
-    <p class="subtitle">
-      Controla tus ingresos, gastos y metas de ahorro en un solo lugar.
-      Accede desde cualquier dispositivo.
-    </p>
+<div>
 
-    <div class="buttons">
-      <button class="btn btn-primary" onclick="openRegister()">
-        Crear cuenta
-      </button>
-
-      <button class="btn btn-primary" onclick="openLogin()">
-        Iniciar sesión
-      </button>
-
-      <button class="btn btn-secondary" onclick="goFree()">
-        Usar versión FREE
-      </button>
-    </div>
-
-    <div class="hero-logo">
-      <img src="lumenssave-logo.png" alt="LUMENSSAVE Logo">
-    </div>
-  </div>
-
-  <div class="preview">
-    <div class="balance">
-      Balance anual: $12,480
-    </div>
-
-    <div class="chart-box">
-      <canvas id="barChart"></canvas>
-    </div>
-
-    <div class="chart-box">
-      <canvas id="pieChart"></canvas>
-    </div>
-  </div>
+<div class="logo">
+LUMENS<span class="save">SAVE</span>
 </div>
 
-<!-- MODAL LOGIN -->
-<div class="modal" id="authModal">
-  <div class="modal-box">
-    <div class="close-btn" onclick="closeModal()">✖</div>
+<p class="subtitle">
+Controla tus ingresos, gastos y metas de ahorro en un solo lugar.
+Accede desde cualquier dispositivo.
+</p>
 
-    <h2 id="modalTitle">Iniciar sesión</h2>
+<div class="buttons">
 
-    <input type="email" id="email" placeholder="Correo electrónico">
+<button class="btn btn-primary" onclick="goApp()">
+Crear cuenta
+</button>
 
-    <div class="password-container">
-      <input type="password" id="password" placeholder="Contraseña">
-      <span class="toggle-pass" onclick="togglePassword()">👁</span>
-    </div>
+<button class="btn btn-primary" onclick="goApp()">
+Iniciar sesión
+</button>
 
-    <button class="btn btn-primary" onclick="loginUser()">Entrar</button>
+<button class="btn btn-secondary" onclick="goFree()">
+Usar versión FREE
+</button>
 
-    <p class="helper" id="switchText">
-      ¿No tienes cuenta?
-      <span onclick="openRegister()">Crear cuenta</span>
-    </p>
-  </div>
+</div>
+
+<div class="hero-logo">
+<img src="lumenssave-logo.png" alt="LUMENSSAVE Logo">
+</div>
+
+</div>
+
+<div class="preview">
+
+<div class="balance">
+Balance anual: $12,480
+</div>
+
+<div class="chart-box">
+<canvas id="barChart"></canvas>
+</div>
+
+<div class="chart-box">
+<canvas id="pieChart"></canvas>
+</div>
+
+</div>
+
 </div>
 
 <script>
-function goFree(){
-  window.location.href = "panel-free.html";
+
+/* NAVEGACION */
+
+function goApp(){
+window.location.href="app.html";
 }
+
+function goFree(){
+window.location.href="panel-free.html";
+}
+
+/* CAMBIO IDIOMA */
 
 function toggleLang(){
-  let lang = localStorage.getItem("financeLang") || "es";
-  lang = lang === "es" ? "en" : "es";
-  localStorage.setItem("financeLang", lang);
-  location.reload();
+
+let lang = localStorage.getItem("financeLang") || "es";
+
+lang = lang === "es" ? "en" : "es";
+
+localStorage.setItem("financeLang", lang);
+
+applyLanguage();
+
 }
 
-/* estado compartido */
-window.registerMode = false;
+function applyLanguage(){
 
-function openLogin(){
-  window.registerMode = false;
-  document.getElementById("authModal").style.display = "flex";
-  document.getElementById("modalTitle").innerText = "Iniciar sesión";
-  document.getElementById("switchText").innerHTML =
-    '¿No tienes cuenta? <span onclick="openRegister()">Crear cuenta</span>';
+let lang = localStorage.getItem("financeLang") || "es";
+
+const subtitle = document.querySelector(".subtitle");
+const btnCreate = document.querySelectorAll(".btn-primary")[0];
+const btnLogin = document.querySelectorAll(".btn-primary")[1];
+const btnFree = document.querySelector(".btn-secondary");
+const langLabel = document.getElementById("langLabel");
+
+if(lang === "en"){
+
+subtitle.innerText =
+"Control your income, expenses and savings goals in one place. Access from any device.";
+
+btnCreate.innerText = "Create account";
+btnLogin.innerText = "Login";
+btnFree.innerText = "Use FREE version";
+
+langLabel.innerText = "EN";
+
+}else{
+
+subtitle.innerText =
+"Controla tus ingresos, gastos y metas de ahorro en un solo lugar. Accede desde cualquier dispositivo.";
+
+btnCreate.innerText = "Crear cuenta";
+btnLogin.innerText = "Iniciar sesión";
+btnFree.innerText = "Usar versión FREE";
+
+langLabel.innerText = "ES";
+
 }
 
-function openRegister(){
-  window.registerMode = true;
-  document.getElementById("authModal").style.display = "flex";
-  document.getElementById("modalTitle").innerText = "Crear cuenta";
-  document.getElementById("switchText").innerHTML =
-    '¿Ya tienes cuenta? <span onclick="openLogin()">Iniciar sesión</span>';
 }
 
-function closeModal(){
-  document.getElementById("authModal").style.display = "none";
-}
+/* INICIALIZAR IDIOMA */
 
-window.addEventListener("click", function(e){
-  const modal = document.getElementById("authModal");
-  if(e.target === modal){
-    closeModal();
-  }
+applyLanguage();
+
+/* GRAFICO BARRAS */
+
+new Chart(document.getElementById("barChart"),{
+type:"bar",
+data:{
+labels:["E","F","M","A","M","J","J","A","S","O","N","D"],
+datasets:[{
+label:"Balance",
+data:[400,600,500,700,800,650,900,750,850,950,700,880],
+backgroundColor:"#16f4c7"
+}]
+},
+options:{
+plugins:{legend:{display:false}},
+scales:{
+x:{ticks:{color:"#9fb0c9"}},
+y:{ticks:{color:"#9fb0c9"}}
+}
+}
 });
 
-function togglePassword(){
-  const pass = document.getElementById("password");
-  pass.type = pass.type === "password" ? "text" : "password";
+/* GRAFICO CIRCULAR */
+
+new Chart(document.getElementById("pieChart"),{
+type:"doughnut",
+data:{
+labels:["Alimentos","Transporte","Servicios","Entretenimiento","Otros"],
+datasets:[{
+data:[35,20,18,15,12],
+backgroundColor:[
+"#16f4c7",
+"#00eaff",
+"#4f7cff",
+"#8892ff",
+"#b794f4"
+]
+}]
+},
+options:{
+plugins:{
+legend:{
+labels:{color:"#9fb0c9"}
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  new Chart(document.getElementById("barChart"), {
-    type: "bar",
-    data: {
-      labels: ["E","F","M","A","M","J","J","A","S","O","N","D"],
-      datasets: [{
-        data: [400,600,500,700,800,650,900,750,850,950,700,880],
-        backgroundColor: "#16f4c7"
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: "#9fb0c9" } },
-        y: { ticks: { color: "#9fb0c9" } }
-      }
-    }
-  });
-
-  new Chart(document.getElementById("pieChart"), {
-    type: "doughnut",
-    data: {
-      labels: ["Alimentos","Transporte","Servicios","Entretenimiento","Otros"],
-      datasets: [{
-        data: [35,20,18,15,12],
-        backgroundColor: [
-          "#16f4c7",
-          "#00eaff",
-          "#4f7cff",
-          "#8892ff",
-          "#b794f4"
-        ]
-      }]
-    },
-    options: {
-      plugins: {
-        legend: {
-          labels: { color: "#9fb0c9" }
-        }
-      }
-    }
-  });
+}
+}
 });
+
 </script>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE470W20CMoUUtw",
   authDomain: "finanzas-2026-a6d48.firebaseapp.com",
   projectId: "finanzas-2026-a6d48",
-  storageBucket: "finanzas-2026-a6d48.appspot.com",
+  storageBucket: "finanzas-2026-a6d48.firebasestorage.app",
   messagingSenderId: "773280047631",
-  appId: "1:773280047631:web:e11d88546678c5a979b97a"
+  appId: "1:773280047631:web:e11d88546678c5a979b97a",
+  measurementId: "G-VQB8I18R397"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-window.loginUser = async function(){
-  const email = document.getElementById("email").value.trim();
-  const pass = document.getElementById("password").value;
+onAuthStateChanged(auth,(user)=>{
 
-  if(!email || !pass){
-    alert("Completa correo y contraseña.");
-    return;
-  }
+if(user){
+window.location.href="app.html";
+}
 
-  try{
-    if(window.registerMode){
-      await createUserWithEmailAndPassword(auth, email, pass);
-    }else{
-      await signInWithEmailAndPassword(auth, email, pass);
-    }
-    window.location.href = "app.html";
-  }catch(e){
-    console.error("Firebase auth error:", e);
-    alert(e.message);
-  }
-};
-
-onAuthStateChanged(auth, (user) => {
-  if(user){
-    window.location.href = "app.html";
-  }
 });
+
 </script>
 
 </body>
