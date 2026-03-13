@@ -780,6 +780,24 @@
       }
     };
 
+window.loginEmail = function() {
+  const email = prompt("Email:");
+  const password = prompt("Password:");
+  if (email && password) {
+    signInWithEmailAndPassword(auth, email, password)
+      .catch(err => { alert(err.message); });
+  }
+};
+
+window.registerEmail = function() {
+  const email = prompt("Email:");
+  const password = prompt("Password (min 6 chars):");
+  if (email && password) {
+    createUserWithEmailAndPassword(auth, email, password)
+      .catch(err => { alert(err.message); });
+  }
+};
+
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       const authButtonText = document.getElementById("authButtonText");
