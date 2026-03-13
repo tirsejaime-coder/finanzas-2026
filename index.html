@@ -129,8 +129,6 @@ font-size:14px;
 color:#9fb0c9;
 }
 
-/* MODAL LOGIN */
-
 .modal{
 position:fixed;
 top:0;
@@ -210,7 +208,7 @@ Usar versión FREE
 </div>
 
 <div class="hero-logo">
-<img src="lumenssave-logo.png" alt="LUMENSSAVE Logo">
+<img src="lumenssave-logo.png">
 </div>
 
 </div>
@@ -233,8 +231,7 @@ Balance anual: $12,480
 
 </div>
 
-
-<!-- MODAL LOGIN -->
+<!-- LOGIN MODAL -->
 
 <div class="modal" id="authModal">
 
@@ -257,73 +254,42 @@ Balance anual: $12,480
 
 </div>
 
-
 <script>
-
-/* NAVEGACION */
 
 function goFree(){
 window.location.href="panel-free.html";
 }
 
-/* CAMBIO IDIOMA */
-
 function toggleLang(){
-
 let lang = localStorage.getItem("financeLang") || "es";
-
 lang = lang === "es" ? "en" : "es";
-
 localStorage.setItem("financeLang",lang);
-
 location.reload();
-
 }
-
-/* MODAL LOGIN */
 
 let registerMode=false;
 
 function openLogin(){
-
 document.getElementById("authModal").style.display="flex";
-
 registerMode=false;
-
 document.getElementById("modalTitle").innerText="Iniciar sesión";
-
 }
 
 function showRegister(){
-
 registerMode=true;
-
 document.getElementById("modalTitle").innerText="Crear cuenta";
-
 }
-
-/* GRAFICO BARRAS */
 
 new Chart(document.getElementById("barChart"),{
 type:"bar",
 data:{
 labels:["E","F","M","A","M","J","J","A","S","O","N","D"],
 datasets:[{
-label:"Balance",
 data:[400,600,500,700,800,650,900,750,850,950,700,880],
 backgroundColor:"#16f4c7"
 }]
-},
-options:{
-plugins:{legend:{display:false}},
-scales:{
-x:{ticks:{color:"#9fb0c9"}},
-y:{ticks:{color:"#9fb0c9"}}
-}
 }
 });
-
-/* GRAFICO CIRCULAR */
 
 new Chart(document.getElementById("pieChart"),{
 type:"doughnut",
@@ -339,34 +305,31 @@ backgroundColor:[
 "#b794f4"
 ]
 }]
-},
-options:{
-plugins:{
-legend:{
-labels:{color:"#9fb0c9"}
-}
-}
 }
 });
 
 </script>
 
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { 
+getAuth,
+onAuthStateChanged,
+signInWithEmailAndPassword,
+createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE470W20CMoUUtw",
   authDomain: "finanzas-2026-a6d48.firebaseapp.com",
   projectId: "finanzas-2026-a6d48",
-  storageBucket: "finanzas-2026-a6d48.firebasestorage.app",
+  storageBucket: "finanzas-2026-a6d48.appspot.com",
   messagingSenderId: "773280047631",
-  appId: "1:773280047631:web:e11d88546678c5a979b97a",
-  measurementId: "G-VQB8I18R397"
+  appId: "1:773280047631:web:e11d88546678c5a979b97a"
 };
-
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -380,9 +343,7 @@ if(registerMode){
 
 createUserWithEmailAndPassword(auth,email,pass)
 .then(()=>{
-
 window.location.href="app.html";
-
 })
 .catch(e=>alert(e.message));
 
@@ -390,9 +351,7 @@ window.location.href="app.html";
 
 signInWithEmailAndPassword(auth,email,pass)
 .then(()=>{
-
 window.location.href="app.html";
-
 })
 .catch(e=>alert(e.message));
 
@@ -400,14 +359,10 @@ window.location.href="app.html";
 
 }
 
-/* REDIRECCION AUTOMATICA SI YA ESTA LOGUEADO */
-
 onAuthStateChanged(auth,(user)=>{
-
 if(user){
 window.location.href="app.html";
 }
-
 });
 
 </script>
