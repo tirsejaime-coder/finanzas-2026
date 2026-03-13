@@ -448,7 +448,7 @@
       <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">
         🌐 <span id="langToggleLabel">ES / EN</span>
       </button>
-      <button class="user-btn" id="authButton" onclick="handleAuth()">
+      <button class="user-btn" id="authButton" onclick="openLogin()">
         👤 <span id="authButtonText">Iniciar sesión</span>
       </button>
     </div>
@@ -1614,7 +1614,7 @@ window.showLoginOptions = function() {
 
     applyLanguage();
   </script>
-  window.openLogin = function(){
+window.openLogin = function(){
 
 if(currentUser){
 
@@ -1648,6 +1648,39 @@ const email=document.getElementById("loginEmail").value;
 const pass=document.getElementById("loginPassword").value;
 
 signInWithEmailAndPassword(auth,email,pass)
+
+.then(()=>{
+
+closeLogin();
+
+})
+
+.catch(e=>alert(e.message));
+
+}
+
+window.registerEmail=function(){
+
+const email=document.getElementById("loginEmail").value;
+const pass=document.getElementById("loginPassword").value;
+
+createUserWithEmailAndPassword(auth,email,pass)
+
+.then(()=>{
+
+closeLogin();
+
+})
+
+.catch(e=>alert(e.message));
+
+}
+
+window.loginGoogle=function(){
+
+const provider=new GoogleAuthProvider();
+
+signInWithPopup(auth,provider)
 
 .then(()=>{
 
