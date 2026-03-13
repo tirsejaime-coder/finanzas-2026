@@ -770,32 +770,49 @@
     }
 
     window.handleAuth = function() {
-      if (currentUser) {
-        signOut(auth);
-      } else {
-        const provider = new GoogleAuthProvider();
-        signInWithPopup(auth, provider).catch(err => {
-          console.error("Error en Google Sign-In:", err);
-        });
+
+  if (currentUser) {
+
+    if(confirm(language === "es" ? "¿Cerrar sesión?" : "Sign out?")){
+      signOut(auth).then(()=>{
+        alert(language === "es" ? "Sesión cerrada" : "Signed out");
+      });
+    }
+
+  } else {
+
+    const option = prompt(
+      language === "es"
+      ? "1 = Google\n2 = Iniciar con Email\n3 = Crear cuenta con Email"
+      : "1 = Google\n2 = Login Email\n3 = Create Email Account"
+    );
+
+    if(option == "1"){
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider)
+      .catch(err => alert(err.message));
+    }
+
+    if(option == "2"){
+      const email = prompt("Email:");
+      const pass = prompt("Password:");
+      if(email && pass){
+        signInWithEmailAndPassword(auth,email,pass)
+        .catch(err => alert(err.message));
       }
-    };
+    }
 
-window.loginEmail = function() {
-  const email = prompt("Email:");
-  const password = prompt("Password:");
-  if (email && password) {
-    signInWithEmailAndPassword(auth, email, password)
-      .catch(err => { alert(err.message); });
-  }
-};
+    if(option == "3"){
+      const email = prompt("Email:");
+      const pass = prompt("Password (min 6 chars):");
+      if(email && pass){
+        createUserWithEmailAndPassword(auth,email,pass)
+        .catch(err => alert(err.message));
+      }
+    }
 
-window.registerEmail = function() {
-  const email = prompt("Email:");
-  const password = prompt("Password (min 6 chars):");
-  if (email && password) {
-    createUserWithEmailAndPassword(auth, email, password)
-      .catch(err => { alert(err.message); });
   }
+
 };
 
 window.showLoginOptions = function() {
