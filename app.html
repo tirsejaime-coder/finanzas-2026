@@ -798,6 +798,21 @@ window.registerEmail = function() {
   }
 };
 
+window.showLoginOptions = function() {
+  const option = prompt(
+    "1 = Google\n2 = Email login\n3 = Crear cuenta email"
+  );
+  if (option == "1") {
+    handleAuth();
+  }
+  if (option == "2") {
+    loginEmail();
+  }
+  if (option == "3") {
+    registerEmail();
+  }
+};
+
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       const authButtonText = document.getElementById("authButtonText");
