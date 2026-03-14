@@ -912,7 +912,9 @@ let isProUser = false;
     let syncTimeout = null;
     let currentPlan = "free";
     const PRO_TRIAL_DAYS = 60;
-    const STRIPE_PAYMENT_LINK = "";
+    const STRIPE_PAYMENT_LINK = "REEMPLAZA_AQUI_TU_PAYMENT_LINK_DE_STRIPE";
+    const STRIPE_SUCCESS_PARAM = "stripe_success";
+    const STRIPE_CANCEL_PARAM = "stripe_cancel";
 
 
     function getFutureDateISO(days) {
@@ -1061,13 +1063,7 @@ let isProUser = false;
       const profile = snap.exists() ? snap.data() : {};
 
       if (profile?.trialUsed) {
-        if (STRIPE_PAYMENT_LINK) {
-          window.open(STRIPE_PAYMENT_LINK, "_blank");
-        } else {
-          alert(language === "es"
-            ? "Tu prueba gratis ya fue usada. Agrega tu enlace de pago de Stripe en STRIPE_PAYMENT_LINK para activar PRO de pago."
-            : "Your free trial has already been used. Add your Stripe payment link in STRIPE_PAYMENT_LINK to activate paid PRO.");
-        }
+        await startPaidProCheckout();
         return;
       }
 
@@ -1082,6 +1078,82 @@ let isProUser = false;
         ? "✅ Tu prueba PRO de 60 días ya está activa."
         : "✅ Your 60-day PRO trial is now active.");
     }
+
+
+function getAppReturnUrl(extraParams = {}) {
+  const url = new URL(window.location.href);
+  url.search = "";
+  Object.entries(extraParams).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+  return url.toString();
+}
+
+function buildStripeCheckoutUrl() {
+  if (!STRIPE_PAYMENT_LINK || STRIPE_PAYMENT_LINK.includes("REEMPLAZA_AQUI")) {
+    return null;
+  }
+
+  const url = new URL(STRIPE_PAYMENT_LINK);
+
+  if (currentUser?.email) {
+    url.searchParams.set("prefilled_email", currentUser.email);
+  }
+
+  if (currentUser?.uid) {
+    url.searchParams.set("client_reference_id", currentUser.uid);
+  }
+
+  url.searchParams.set("after_completion[redirect][url]", getAppReturnUrl({
+    [STRIPE_SUCCESS_PARAM]: "1"
+  }));
+
+  return url.toString();
+}
+
+async function startPaidProCheckout() {
+  if (!currentUser) {
+    alert(language === "es"
+      ? "Primero inicia sesión para continuar con PRO."
+      : "Please sign in first to continue with PRO.");
+    return;
+  }
+
+  const checkoutUrl = buildStripeCheckoutUrl();
+
+  if (!checkoutUrl) {
+    alert(language === "es"
+      ? "Falta configurar tu enlace de Stripe en STRIPE_PAYMENT_LINK."
+      : "You still need to configure your Stripe link in STRIPE_PAYMENT_LINK.");
+    return;
+  }
+
+  window.location.href = checkoutUrl;
+}
+
+async function handleStripeReturn() {
+  const url = new URL(window.location.href);
+  const hasSuccess = url.searchParams.get(STRIPE_SUCCESS_PARAM) === "1";
+  const hasCancel = url.searchParams.get(STRIPE_CANCEL_PARAM) === "1";
+
+  if (hasSuccess) {
+    alert(language === "es"
+      ? "Pago recibido. Ahora Stripe debe confirmar el pago en tu backend para activar PRO automáticamente."
+      : "Payment received. Stripe must now confirm the payment in your backend to activate PRO automatically.");
+
+    url.searchParams.delete(STRIPE_SUCCESS_PARAM);
+    window.history.replaceState({}, "", url.toString());
+  }
+
+  if (hasCancel) {
+    alert(language === "es"
+      ? "Pago cancelado. Tu plan sigue en FREE."
+      : "Payment canceled. Your plan remains FREE.");
+
+    url.searchParams.delete(STRIPE_CANCEL_PARAM);
+    window.history.replaceState({}, "", url.toString());
+  }
+}
 
     const syncStatus = document.getElementById("syncStatus");
     const syncMessage = document.getElementById("syncMessage");
@@ -2018,7 +2090,8 @@ let isProUser = false;
     window.toggleLanguage = function () {
       language = language === "es" ? "en" : "es";
       localStorage.setItem("financeLang", language);
-      applyLanguage();
+      handleStripeReturn();
+    applyLanguage();
     };
 
     window.switchTab = function (view) {
@@ -2332,6 +2405,7 @@ window.showExportModal = function () {
       }
     });
 
+    handleStripeReturn();
     applyLanguage();
     switchTab("input");
   </script>
