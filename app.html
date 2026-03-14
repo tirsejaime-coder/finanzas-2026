@@ -713,7 +713,7 @@
           <ul class="plan-features" id="freePlanFeatures">
             <li>Uso sin registro (datos guardados solo en tu navegador).</li>
             <li>Control de ingresos y gastos del año actual.</li>
-            <li>Gráficas y exportación a PDF/Excel.</li>
+            <li>Gráficas e impresión gratuita.</li>
             <li>Publicidad discreta dentro de la app.</li>
           </ul>
         </div>
@@ -1160,12 +1160,20 @@ let isProUser = false;
 
         card.querySelector(".btn-month-view").onclick = () => showMonthView(idx);
         card.querySelector(".btn-month-pdf").onclick = () => {
+          if (!isProUser) {
+            showProExportMessage();
+            return;
+          }
           currentMonth = idx;
           const { jsPDF } = window.jspdf;
           const docPdf = new jsPDF();
           exportMonthPDF(docPdf);
         };
         card.querySelector(".btn-month-excel").onclick = () => {
+          if (!isProUser) {
+            showProExportMessage();
+            return;
+          }
           currentMonth = idx;
           exportMonthExcel();
         };
@@ -1792,7 +1800,7 @@ let isProUser = false;
       document.getElementById("freePlanFeatures").innerHTML = language === "es"
         ? `<li>Uso sin registro (datos guardados solo en tu navegador).</li>
            <li>Control de ingresos y gastos del año actual.</li>
-           <li>Gráficas y exportación a PDF/Excel.</li>
+           <li>Gráficas e impresión gratuita.</li>
            <li>Publicidad discreta dentro de la app.</li>`
         : `<li>No registration required (data stored only in your browser).</li>
            <li>Track income and expenses for the current year.</li>
@@ -1809,7 +1817,8 @@ let isProUser = false;
            <li>Automatic weekly cloud backups.</li>
            <li>Access from multiple devices with your account.</li>
            <li>Ad-free experience.</li>
-           <li>Priority for new features and support.</li>`;
+           <li>Priority for new features and support.</li>
+            <li>Exportación a PDF y Excel.</li>`;
 
       document.getElementById("loginModalTitle").textContent = t("🔐 Iniciar sesión", "🔐 Sign in");
       document.getElementById("loginEmailLabel").textContent = t("Correo electrónico", "Email");
@@ -1889,16 +1898,19 @@ let isProUser = false;
     };
 
     
+
+window.showProExportMessage = function () {
+  alert(
+    language === "es"
+      ? "La exportación de documentos es una función PRO.\n\nPuedes imprimir gratis usando el botón 🖨 Imprimir."
+      : "Document export is a PRO feature.\n\nYou can still print for free using the 🖨 Print button."
+  );
+};
+
 window.checkExportAccess = function () {
 
   if (!isProUser) {
-
-    alert(
-      language === "es"
-        ? "La exportación de documentos es una función PRO.\n\nPuedes imprimir gratis usando el botón 🖨 Imprimir."
-        : "Document export is a PRO feature.\n\nYou can still print for free using the 🖨 Print button."
-    );
-
+    showProExportMessage();
     return;
   }
 
