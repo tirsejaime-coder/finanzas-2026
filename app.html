@@ -861,6 +861,8 @@
       updateDoc,
       deleteDoc,
       getDocs,
+      getDoc,
+      setDoc,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
@@ -906,7 +908,180 @@ let isProUser = false;
     let selectedExportOption = "year";
     let currentUser = null;
     let unsubscribeTransactions = null;
+    let unsubscribeUserProfile = null;
     let syncTimeout = null;
+    let currentPlan = "free";
+    const PRO_TRIAL_DAYS = 60;
+    const STRIPE_PAYMENT_LINK = "";
+
+
+    function getFutureDateISO(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return d.toISOString();
+    }
+
+    function formatPlanDate(dateIso) {
+      if (!dateIso) return "";
+      const d = new Date(dateIso);
+      return language === "es"
+        ? d.toLocaleDateString("es-ES")
+        : d.toLocaleDateString("en-US");
+    }
+
+    function getPlanLabel(plan) {
+      if (plan === "pro" || plan === "pro_trial") {
+        return language === "es" ? "PRO" : "PRO";
+      }
+      return language === "es" ? "FREE" : "FREE";
+    }
+
+    function isProfilePro(profile) {
+      if (!profile) return false;
+      if (profile.plan === "pro") return true;
+      if (profile.plan === "pro_trial" && profile.proUntil) {
+        return new Date(profile.proUntil).getTime() > Date.now();
+      }
+      return false;
+    }
+
+    function getProfileStatusText(profile) {
+      if (!profile || !isProfilePro(profile)) {
+        return language === "es" ? "Plan FREE" : "FREE plan";
+      }
+
+      if (profile.plan === "pro_trial" && profile.proUntil) {
+        const endDate = formatPlanDate(profile.proUntil);
+        return language === "es"
+          ? `Prueba PRO activa hasta ${endDate}`
+          : `PRO trial active until ${endDate}`;
+      }
+
+      return language === "es" ? "Plan PRO activo" : "PRO plan active";
+    }
+
+    function updatePlanUI(profile = null) {
+      const proBanner = document.getElementById("proBanner");
+      const proBannerText = document.getElementById("proBannerText");
+      const proBannerButton = document.getElementById("proBannerButton");
+
+      isProUser = isProfilePro(profile);
+      currentPlan = profile?.plan || "free";
+
+      if (isProUser) {
+        proBanner.style.display = "flex";
+        proBannerText.innerHTML = language === "es"
+          ? `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. Ya tienes exportación PDF/Excel y funciones premium activas.`
+          : `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. PDF/Excel export and premium features are already active.`;
+
+        proBannerButton.textContent = language === "es"
+          ? "✅ PRO activo"
+          : "✅ PRO active";
+        proBannerButton.disabled = true;
+        proBannerButton.style.opacity = "0.7";
+        proBannerButton.style.cursor = "default";
+        return;
+      }
+
+      proBanner.style.display = "flex";
+      proBannerText.innerHTML = language === "es"
+        ? '<span class="pro-badge">PRO</span>Controla tus finanzas como un profesional. Prueba la versión PRO 60 días gratis y guarda todos tus años, con copias de seguridad automáticas semanales.'
+        : '<span class="pro-badge">PRO</span>Take control of your money like a pro. Try the PRO version free for 60 days and keep unlimited years with weekly automatic backups.';
+
+      if (!currentUser) {
+        proBannerButton.textContent = language === "es"
+          ? "🔐 Inicia sesión para activar PRO"
+          : "🔐 Sign in to activate PRO";
+      } else if (profile?.trialUsed) {
+        proBannerButton.textContent = language === "es"
+          ? "💳 Activar PRO de pago"
+          : "💳 Activate paid PRO";
+      } else {
+        proBannerButton.textContent = language === "es"
+          ? "🚀 Empezar prueba PRO de 60 días"
+          : "🚀 Start 60-day PRO trial";
+      }
+
+      proBannerButton.disabled = false;
+      proBannerButton.style.opacity = "1";
+      proBannerButton.style.cursor = "pointer";
+    }
+
+    async function ensureUserProfile(user) {
+      const userRef = doc(collection(db, "users"), user.uid);
+      const snap = await getDoc(userRef);
+
+      if (!snap.exists()) {
+        await setDoc(userRef, {
+          uid: user.uid,
+          email: user.email || "",
+          displayName: user.displayName || "",
+          plan: "free",
+          trialUsed: false,
+          proUntil: null,
+          createdAt: serverTimestamp()
+        }, { merge: true });
+      } else {
+        await setDoc(userRef, {
+          email: user.email || snap.data().email || "",
+          displayName: user.displayName || snap.data().displayName || ""
+        }, { merge: true });
+      }
+
+      return userRef;
+    }
+
+    function watchUserProfile(user) {
+      if (unsubscribeUserProfile) {
+        unsubscribeUserProfile();
+        unsubscribeUserProfile = null;
+      }
+
+      const userRef = doc(collection(db, "users"), user.uid);
+
+      unsubscribeUserProfile = onSnapshot(userRef, (snap) => {
+        const profile = snap.exists() ? snap.data() : null;
+        updatePlanUI(profile);
+      }, (error) => {
+        console.error("Error loading profile:", error);
+        updatePlanUI(null);
+      });
+    }
+
+    async function startProTrial() {
+      if (!currentUser) {
+        alert(language === "es"
+          ? "Primero inicia sesión para activar tu prueba PRO."
+          : "Please sign in first to activate your PRO trial.");
+        return;
+      }
+
+      const userRef = await ensureUserProfile(currentUser);
+      const snap = await getDoc(userRef);
+      const profile = snap.exists() ? snap.data() : {};
+
+      if (profile?.trialUsed) {
+        if (STRIPE_PAYMENT_LINK) {
+          window.open(STRIPE_PAYMENT_LINK, "_blank");
+        } else {
+          alert(language === "es"
+            ? "Tu prueba gratis ya fue usada. Agrega tu enlace de pago de Stripe en STRIPE_PAYMENT_LINK para activar PRO de pago."
+            : "Your free trial has already been used. Add your Stripe payment link in STRIPE_PAYMENT_LINK to activate paid PRO.");
+        }
+        return;
+      }
+
+      await setDoc(userRef, {
+        plan: "pro_trial",
+        trialUsed: true,
+        proUntil: getFutureDateISO(PRO_TRIAL_DAYS),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      alert(language === "es"
+        ? "✅ Tu prueba PRO de 60 días ya está activa."
+        : "✅ Your 60-day PRO trial is now active.");
+    }
 
     const syncStatus = document.getElementById("syncStatus");
     const syncMessage = document.getElementById("syncMessage");
@@ -1834,6 +2009,7 @@ let isProUser = false;
       );
 
       drawCategoryChart();
+      updatePlanUI(currentUser ? { plan: currentPlan } : null);
 
       if (currentView === "year") renderYearView();
       if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
@@ -2107,6 +2283,11 @@ window.showExportModal = function () {
         });
     };
 
+
+    document.getElementById("proBannerButton").addEventListener("click", async () => {
+      await startProTrial();
+    });
+
     document.getElementById("loginModal").addEventListener("click", (e) => {
       if (e.target.id === "loginModal") closeLogin();
     });
@@ -2115,12 +2296,14 @@ window.showExportModal = function () {
       if (e.target.id === "exportModal") closeExportModal();
     });
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       currentUser = user;
       const authButtonText = document.getElementById("authButtonText");
 
       if (user) {
         authButtonText.textContent = user.displayName || user.email || t("Mi cuenta", "My account");
+        await ensureUserProfile(user);
+        watchUserProfile(user);
         loadTransactionsFromFirestore();
       } else {
         authButtonText.textContent = t("Iniciar sesión", "Sign in");
@@ -2130,6 +2313,12 @@ window.showExportModal = function () {
           unsubscribeTransactions = null;
         }
 
+        if (unsubscribeUserProfile) {
+          unsubscribeUserProfile();
+          unsubscribeUserProfile = null;
+        }
+
+        updatePlanUI(null);
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
         if (currentView === "year") renderYearView();
