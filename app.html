@@ -701,7 +701,7 @@
       </form>
 
       <div class="buttons-row">
-        <button class="btn btn-secondary" onclick="showExportModal()" id="btnExport">📥 Exportar Datos</button>
+        <button class="btn btn-secondary" onclick="checkExportAccess()" id="btnExport">📥 Exportar Datos</button>
         <button class="btn btn-outline" onclick="window.print()" id="btnPrint">🖨 Imprimir</button>
         <button class="btn btn-danger" onclick="clearData()" id="btnClear">🗑 Borrar datos</button>
       </div>
@@ -899,6 +899,7 @@
     ];
 
     let language = localStorage.getItem("financeLang") || "es";
+let isProUser = false;
     let transactions = [];
     let currentView = "input";
     let currentMonth = null;
@@ -1887,7 +1888,24 @@
       drawCategoryChart();
     };
 
-    window.showExportModal = function () {
+    
+window.checkExportAccess = function () {
+
+  if (!isProUser) {
+
+    alert(
+      language === "es"
+        ? "La exportación de documentos es una función PRO.\n\nPuedes imprimir gratis usando el botón 🖨 Imprimir."
+        : "Document export is a PRO feature.\n\nYou can still print for free using the 🖨 Print button."
+    );
+
+    return;
+  }
+
+  showExportModal();
+};
+
+window.showExportModal = function () {
       document.getElementById("exportModal").classList.add("active");
       selectedExportOption = "year";
       document.querySelectorAll(".export-option").forEach(el => el.classList.remove("selected"));
@@ -1904,6 +1922,16 @@
     };
 
     window.exportPDF = function () {
+
+  if (!isProUser) {
+    alert(
+      language === "es"
+        ? "Exportar documentos es una función PRO."
+        : "Document export is a PRO feature."
+    );
+    return;
+  }
+
       const { jsPDF } = window.jspdf;
       const docPdf = new jsPDF();
 
@@ -1923,6 +1951,16 @@
     };
 
     window.exportExcel = function () {
+
+  if (!isProUser) {
+    alert(
+      language === "es"
+        ? "Exportar documentos es una función PRO."
+        : "Document export is a PRO feature."
+    );
+    return;
+  }
+
       if (selectedExportOption === "year") {
         exportYearExcel();
       } else if (selectedExportOption === "month") {
