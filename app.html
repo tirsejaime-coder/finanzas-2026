@@ -639,7 +639,7 @@
 
     <div id="piechart_3d" style="position:absolute; top:10px; right:170px; width:260px; height:260px; z-index:10;"></div>
 
-    <h1 id="titleText">📊 Control de Finanzas 2026</h1>
+    <h1 id="titleText">📊 Control de Finanzas</h1>
     <p class="desc" id="subtitleText">Gestiona tus ingresos y gastos por día, mes y año.</p>
 
     <div class="breadcrumb" id="breadcrumb"></div>
@@ -773,7 +773,7 @@
 
       <div class="modal-body">
         <div class="export-option" onclick="selectExportOption('year', this)">
-          <h4 id="optYearTitle">📅 Año Completo 2026</h4>
+          <h4 id="optYearTitle">📅 Año Completo</h4>
           <p id="optYearDesc">Exporta resumen de todos los meses del año</p>
         </div>
 
@@ -877,6 +877,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+      const CURRENT_YEAR = new Date().getFullYear();
 
     const monthNamesEs = [
       "Enero","Febrero","Marzo","Abril","Mayo","Junio",
@@ -990,7 +991,7 @@
 
       transactions.forEach(tx => {
         const d = new Date(tx.date);
-        if (d.getFullYear() === 2026) {
+        if (d.getFullYear() === CURRENT_YEAR) {
           if (tx.type === "expense") {
             const key = tx.category || "Otros";
             if (!categoryTotals[key]) categoryTotals[key] = 0;
@@ -1056,7 +1057,7 @@
 
         transactions.forEach(tx => {
           const d = new Date(tx.date);
-          if (d.getMonth() === m && d.getFullYear() === 2026) {
+          if (d.getMonth() === m && d.getFullYear() === CURRENT_YEAR) {
             if (tx.type === "income") income += tx.amount;
             else expense += tx.amount;
           }
@@ -1073,7 +1074,7 @@
     }
 
     function calculateMonthData(monthIndex) {
-      const daysInMonth = new Date(2026, monthIndex + 1, 0).getDate();
+      const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
       const monthData = [];
 
       for (let d = 1; d <= daysInMonth; d++) {
@@ -1084,7 +1085,7 @@
         transactions.forEach(tx => {
           const td = new Date(tx.date);
           if (
-            td.getFullYear() === 2026 &&
+            td.getFullYear() === CURRENT_YEAR &&
             td.getMonth() === monthIndex &&
             td.getDate() === d
           ) {
@@ -1126,7 +1127,7 @@
       document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
       document.getElementById("tabYear").classList.add("active");
 
-      updateBreadcrumb([{ label: t("Año 2026", "Year 2026"), action: null }]);
+      updateBreadcrumb([{ label: t(`Año ${CURRENT_YEAR}`, `Year ${CURRENT_YEAR}`), action: null }]);
 
       grid.innerHTML = "";
 
@@ -1196,7 +1197,7 @@
       document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
 
       updateBreadcrumb([
-        { label: t("Año 2026", "Year 2026"), action: () => switchTab("year") },
+        { label: t(`Año ${CURRENT_YEAR}`, `Year ${CURRENT_YEAR}`), action: () => switchTab("year") },
         { label: getMonthNames()[monthIndex], action: null }
       ]);
 
@@ -1376,7 +1377,7 @@
     }
 
     async function updateDayValue(monthIndex, day, field, newValue) {
-      const date = new Date(2026, monthIndex, day);
+      const date = new Date(CURRENT_YEAR, monthIndex, day);
       const dateStr = date.toISOString().split("T")[0];
       const targetType = field === "income" ? "income" : "expense";
 
@@ -1421,7 +1422,7 @@
     }
 
     async function updateDayCategory(monthIndex, day, newCategory) {
-      const date = new Date(2026, monthIndex, day);
+      const date = new Date(CURRENT_YEAR, monthIndex, day);
       const dateStr = date.toISOString().split("T")[0];
 
       if (currentUser) {
@@ -1488,7 +1489,7 @@
 
     function exportYearPDF(docPdf) {
       docPdf.setFontSize(16);
-      docPdf.text(t("Reporte Financiero Anual 2026", "Annual Financial Report 2026"), 10, 10);
+      docPdf.text(t(`Reporte Financiero Anual ${CURRENT_YEAR}`, `Annual Financial Report ${CURRENT_YEAR}`), 10, 10);
 
       const yearData = calculateYearData();
       const monthNames = getMonthNames();
@@ -1523,7 +1524,7 @@
         theme: "grid"
       });
 
-      docPdf.save(language === "es" ? "reporte-anual-2026.pdf" : "annual-report-2026.pdf");
+      docPdf.save(language === "es" ? `reporte-anual-${CURRENT_YEAR}.pdf` : `annual-report-${CURRENT_YEAR}.pdf`);
     }
 
     function exportMonthPDF(docPdf) {
@@ -1536,7 +1537,7 @@
 
       docPdf.setFontSize(16);
       docPdf.text(
-        t("Reporte Mensual - ", "Monthly Report - ") + monthNames[currentMonth] + " 2026",
+        t("Reporte Mensual - ", "Monthly Report - ") + monthNames[currentMonth] + ` ${CURRENT_YEAR}`,
         10,
         10
       );
@@ -1577,8 +1578,8 @@
       });
 
       const filename = language === "es"
-        ? `reporte-${monthNames[currentMonth].toLowerCase()}-2026.pdf`
-        : `report-${monthNames[currentMonth].toLowerCase()}-2026.pdf`;
+        ? `reporte-${monthNames[currentMonth].toLowerCase()}-${CURRENT_YEAR}.pdf`
+        : `report-${monthNames[currentMonth].toLowerCase()}-${CURRENT_YEAR}.pdf`;
 
       docPdf.save(filename);
     }
@@ -1644,8 +1645,8 @@
 
       const ws = XLSX.utils.aoa_to_sheet(data);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, language === "es" ? "Año 2026" : "Year 2026");
-      XLSX.writeFile(wb, language === "es" ? "reporte-anual-2026.xlsx" : "annual-report-2026.xlsx");
+      XLSX.utils.book_append_sheet(wb, ws, language === "es" ? `Año ${CURRENT_YEAR}` : `Year ${CURRENT_YEAR}`);
+      XLSX.writeFile(wb, language === "es" ? "reporte-anual-${CURRENT_YEAR}.xlsx` : "annual-report-${CURRENT_YEAR}.xlsx`);
     }
 
     function exportMonthExcel() {
@@ -1683,8 +1684,8 @@
       XLSX.writeFile(
         wb,
         language === "es"
-          ? `reporte-${monthNames[currentMonth].toLowerCase()}-2026.xlsx`
-          : `report-${monthNames[currentMonth].toLowerCase()}-2026.xlsx`
+          ? `reporte-${monthNames[currentMonth].toLowerCase()}-${CURRENT_YEAR}.xlsx`
+          : `report-${monthNames[currentMonth].toLowerCase()}-${CURRENT_YEAR}.xlsx`
       );
     }
 
@@ -1718,7 +1719,7 @@
     function applyLanguage() {
       document.documentElement.lang = language;
 
-      document.getElementById("titleText").innerText = t("📊 Control de Finanzas 2026", "📊 Finance Tracker 2026");
+      document.getElementById("titleText").innerText = t(`📊 Control de Finanzas ${CURRENT_YEAR}`, `📊 Finance Tracker ${CURRENT_YEAR}`);
       document.getElementById("subtitleText").innerText = t(
         "Gestiona tus ingresos y gastos por día, mes y año.",
         "Manage your income and expenses by day, month and year."
@@ -1759,7 +1760,7 @@
       document.getElementById("thProfit").innerText = t("Ganancia", "Profit");
 
       document.getElementById("modalTitle").innerText = t("📥 Exportar Datos", "📥 Export Data");
-      document.getElementById("optYearTitle").innerText = t("📅 Año Completo 2026", "📅 Full Year 2026");
+      document.getElementById("optYearTitle").innerText = t(`📅 Año Completo ${CURRENT_YEAR}`, `📅 Full Year ${CURRENT_YEAR}`);
       document.getElementById("optYearDesc").innerText = t("Exporta resumen de todos los meses del año", "Export summary of all months in the year");
       document.getElementById("optMonthTitle").innerText = t("📆 Mes Actual", "📆 Current Month");
       document.getElementById("optMonthDesc").innerText = t("Exporta detalles día por día del mes seleccionado", "Export day by day details of selected month");
