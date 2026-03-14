@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Control de Finanzas - Sincronizado</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- jsPDF / AutoTable / XLSX -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -25,7 +25,9 @@
       --color-danger: #ef4444;
       --color-warning: #f59e0b;
     }
+
     * { box-sizing: border-box; }
+
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       background: var(--color-bg-primary);
@@ -33,6 +35,7 @@
       padding: 20px;
       color: var(--color-text-primary);
     }
+
     .container {
       background: var(--color-surface);
       padding: 24px 20px 28px;
@@ -42,6 +45,7 @@
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
       position: relative;
     }
+
     .top-bar {
       position: absolute;
       top: 16px;
@@ -50,7 +54,9 @@
       gap: 8px;
       z-index: 20;
     }
-    .lang-toggle, .user-btn {
+
+    .lang-toggle,
+    .user-btn {
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid var(--color-border);
@@ -62,29 +68,40 @@
       gap: 6px;
       color: var(--color-text-secondary);
     }
-    .lang-toggle span, .user-btn span {
+
+    .lang-toggle span,
+    .user-btn span {
       font-weight: 600;
       color: var(--color-text-primary);
     }
+
     .user-btn {
       background: var(--color-primary);
       color: white;
       border: none;
     }
+
+    .user-btn span {
+      color: white;
+    }
+
     .user-btn:hover {
       background: #2563eb;
     }
+
     h1 {
       margin-top: 0;
       font-size: 1.8rem;
       color: var(--color-text-primary);
     }
+
     p.desc {
       margin-top: 4px;
       margin-bottom: 18px;
       color: var(--color-text-secondary);
       font-size: 0.95rem;
     }
+
     .breadcrumb {
       display: flex;
       gap: 8px;
@@ -92,20 +109,31 @@
       margin-bottom: 16px;
       font-size: 0.9rem;
       color: var(--color-text-secondary);
+      flex-wrap: wrap;
     }
+
     .breadcrumb a {
       color: var(--color-primary);
       text-decoration: none;
       cursor: pointer;
     }
-    .breadcrumb a:hover { text-decoration: underline; }
-    .breadcrumb span { color: var(--color-text-secondary); }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb span {
+      color: var(--color-text-secondary);
+    }
+
     .tabs {
       display: flex;
       gap: 8px;
       margin-bottom: 20px;
       border-bottom: 2px solid var(--color-border);
+      flex-wrap: wrap;
     }
+
     .tab {
       padding: 10px 16px;
       cursor: pointer;
@@ -116,14 +144,20 @@
       color: var(--color-text-secondary);
       transition: all 0.2s;
     }
+
     .tab.active {
       color: var(--color-text-primary);
       font-weight: 600;
       border-bottom-color: var(--color-primary);
     }
-    .tab:hover { color: var(--color-text-primary); }
+
+    .tab:hover {
+      color: var(--color-text-primary);
+    }
+
     .view { display: none; }
     .view.active { display: block; }
+
     .quick-form {
       display: flex;
       flex-wrap: wrap;
@@ -133,28 +167,36 @@
       background: #f9fafb;
       border-radius: 8px;
     }
+
     .field {
       display: flex;
       flex-direction: column;
       min-width: 120px;
+      flex: 1 1 160px;
     }
+
     .field label {
       font-size: 0.75rem;
       color: var(--color-text-secondary);
       margin-bottom: 4px;
       font-weight: 500;
     }
-    .field input, .field select {
+
+    .field input,
+    .field select {
       padding: 8px 10px;
       border-radius: 6px;
       border: 1px solid var(--color-border);
       font-size: 0.9rem;
     }
-    .field input:focus, .field select:focus {
+
+    .field input:focus,
+    .field select:focus {
       outline: none;
       border-color: var(--color-primary);
       box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
     }
+
     .btn {
       padding: 8px 14px;
       border: none;
@@ -167,28 +209,59 @@
       transition: all 0.15s;
       font-weight: 500;
     }
-    .btn:active { transform: scale(0.97); touch-action: manipulation; }
-    .btn-primary { background: var(--color-success); color: white; }
-    .btn-primary:hover { background: #15803d; }
-    .btn-secondary { background: var(--color-primary); color: white; }
-    .btn-danger { background: var(--color-danger); color: white; }
+
+    .btn:active {
+      transform: scale(0.97);
+      touch-action: manipulation;
+    }
+
+    .btn-primary {
+      background: var(--color-success);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #15803d;
+    }
+
+    .btn-secondary {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #2563eb;
+    }
+
+    .btn-danger {
+      background: var(--color-danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
     .btn-outline {
       background: transparent;
       border: 1px solid var(--color-border);
       color: var(--color-text-primary);
     }
+
     .buttons-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 10px;
     }
+
     .year-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 12px;
       margin-top: 16px;
     }
+
     .month-card {
       padding: 16px;
       background: #f9fafb;
@@ -196,56 +269,73 @@
       border: 1px solid var(--color-border);
       transition: all 0.2s;
     }
+
     .month-card:hover {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       transform: translateY(-2px);
     }
+
     .month-card h3 {
       margin: 0 0 8px;
       font-size: 1.1rem;
       color: var(--color-text-primary);
     }
+
     .month-card .stat {
       display: flex;
       justify-content: space-between;
       margin: 4px 0;
       font-size: 0.85rem;
     }
+
     .month-card .stat-label { color: var(--color-text-secondary); }
     .month-card .stat-value { font-weight: 600; }
     .month-card .stat-positive { color: var(--color-success); }
     .month-card .stat-negative { color: var(--color-danger); }
+
     .table-wrapper {
       overflow-x: auto;
       margin-top: 16px;
     }
+
     table.data-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 0.9rem;
     }
+
     table.data-table thead {
       background: #f9fafb;
       border-bottom: 2px solid var(--color-border);
       position: sticky;
       top: 0;
     }
+
     table.data-table th {
       padding: 10px 8px;
       text-align: left;
       font-weight: 600;
       color: var(--color-text-secondary);
     }
+
     table.data-table td {
       padding: 8px;
       border-bottom: 1px solid #f3f4f6;
     }
-    table.data-table tbody tr:hover { background: #f9fafb; }
+
+    table.data-table tbody tr:hover {
+      background: #f9fafb;
+    }
+
     table.data-table td.editable {
       cursor: pointer;
       transition: background 0.1s;
     }
-    table.data-table td.editable:hover { background: #dbeafe; }
+
+    table.data-table td.editable:hover {
+      background: #dbeafe;
+    }
+
     table.data-table input.edit-input {
       width: 90px;
       padding: 4px 6px;
@@ -253,11 +343,13 @@
       border-radius: 4px;
       font-size: 0.85rem;
     }
+
     .total-row {
       font-weight: 600;
       background: #f9fafb !important;
       border-top: 2px solid var(--color-border);
     }
+
     .ad-slot {
       margin: 18px auto 0;
       max-width: 728px;
@@ -270,23 +362,27 @@
       justify-content: center;
       font-size: 0.8rem;
       color: #9ca3af;
+      text-align: center;
+      padding: 10px;
     }
+
     .modal {
       display: none;
       position: fixed;
       z-index: 1000;
-      left: 0;
-      top: 0;
+      inset: 0;
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(4px);
     }
+
     .modal.active {
       display: flex;
       align-items: center;
       justify-content: center;
     }
+
     .modal-content {
       background: var(--color-surface);
       padding: 24px;
@@ -295,13 +391,21 @@
       width: 90%;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
-    .modal-header { margin-bottom: 20px; }
+
+    .modal-header {
+      margin-bottom: 20px;
+    }
+
     .modal-header h2 {
       margin: 0;
       font-size: 1.3rem;
       color: var(--color-text-primary);
     }
-    .modal-body { margin-bottom: 20px; }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
     .export-option {
       padding: 12px;
       margin-bottom: 8px;
@@ -310,29 +414,36 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+
     .export-option:hover {
       border-color: var(--color-primary);
       background: #f0f9ff;
     }
+
     .export-option.selected {
       border-color: var(--color-primary);
       background: #dbeafe;
     }
+
     .export-option h4 {
       margin: 0 0 4px;
       font-size: 0.95rem;
       color: var(--color-text-primary);
     }
+
     .export-option p {
       margin: 0;
       font-size: 0.8rem;
       color: var(--color-text-secondary);
     }
+
     .modal-footer {
       display: flex;
       gap: 8px;
       justify-content: flex-end;
+      flex-wrap: wrap;
     }
+
     .pro-banner {
       margin-bottom: 16px;
       padding: 12px 14px;
@@ -345,13 +456,16 @@
       justify-content: space-between;
       gap: 8px;
     }
+
     .pro-banner-text {
       font-size: 0.9rem;
       color: #14532d;
     }
+
     .pro-banner-text strong {
       font-weight: 700;
     }
+
     .pro-badge {
       padding: 2px 6px;
       border-radius: 999px;
@@ -360,6 +474,7 @@
       font-size: 0.7rem;
       margin-right: 6px;
     }
+
     .plans-wrapper {
       margin-top: 18px;
       padding: 14px;
@@ -370,22 +485,26 @@
       grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
       gap: 12px;
     }
+
     .plan-box {
       background: white;
       border-radius: 10px;
       border: 1px solid #e5e7eb;
       padding: 12px 14px;
     }
+
     .plan-title {
       font-size: 0.95rem;
       font-weight: 600;
       margin-bottom: 4px;
     }
+
     .plan-price {
       font-size: 0.9rem;
       color: var(--color-text-secondary);
       margin-bottom: 8px;
     }
+
     .plan-features {
       list-style: none;
       padding-left: 0;
@@ -393,7 +512,11 @@
       font-size: 0.85rem;
       color: var(--color-text-secondary);
     }
-    .plan-features li { margin-bottom: 4px; }
+
+    .plan-features li {
+      margin-bottom: 4px;
+    }
+
     .sync-status {
       position: fixed;
       bottom: 20px;
@@ -409,18 +532,76 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       z-index: 100;
     }
+
     .sync-status.syncing {
       background: #fef3c7;
       border-color: #f59e0b;
     }
+
     .sync-status.success {
       background: #d1fae5;
       border-color: #10b981;
     }
+
     .sync-status.error {
       background: #fee2e2;
       border-color: #ef4444;
     }
+
+    .login-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .login-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .login-field label {
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+    }
+
+    .login-field input {
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .login-field input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.08);
+    }
+
+    .password-wrap {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .password-wrap input {
+      flex: 1;
+    }
+
+    .login-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .login-note {
+      font-size: 0.82rem;
+      color: var(--color-text-secondary);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
     @media (max-width: 768px) {
       .container { padding: 18px 14px 24px; }
       h1 { font-size: 1.4rem; }
@@ -439,7 +620,10 @@
         margin-bottom: 10px;
       }
     }
-    .btn, .tab, .export-option { touch-action: manipulation; }
+
+    .btn, .tab, .export-option {
+      touch-action: manipulation;
+    }
   </style>
 </head>
 <body>
@@ -477,8 +661,9 @@
       <form class="quick-form" onsubmit="saveTransaction(event)">
         <div class="field">
           <label for="date" id="labelDate">Fecha</label>
-          <input type="date" id="date" required>
+          <input type="date" id="date" required />
         </div>
+
         <div class="field">
           <label for="type" id="labelType">Tipo</label>
           <select id="type">
@@ -486,14 +671,17 @@
             <option value="expense" id="optExpense">Gasto</option>
           </select>
         </div>
+
         <div class="field">
           <label for="amount" id="labelAmount">Monto ($)</label>
-          <input type="number" id="amount" step="0.01" placeholder="0.00" required>
+          <input type="number" id="amount" step="0.01" placeholder="0.00" required />
         </div>
+
         <div class="field">
           <label for="description" id="labelDescription">Descripción</label>
-          <input type="text" id="description" placeholder="Ej: Venta, Alquiler">
+          <input type="text" id="description" placeholder="Ej: Venta, Alquiler" />
         </div>
+
         <div class="field">
           <label for="category" id="labelCategory">Categoría (si es gasto)</label>
           <select id="category">
@@ -505,7 +693,8 @@
             <option value="Otros">Otros</option>
           </select>
         </div>
-        <div class="field" style="justify-content: flex-end;">
+
+        <div class="field" style="justify-content:flex-end;">
           <label>&nbsp;</label>
           <button type="submit" class="btn btn-primary" id="btnSave">💾 Guardar</button>
         </div>
@@ -528,6 +717,7 @@
             <li>Publicidad discreta dentro de la app.</li>
           </ul>
         </div>
+
         <div class="plan-box">
           <div class="plan-title" id="proPlanTitle">Plan PRO</div>
           <div class="plan-price" id="proPlanPrice">4,99 USD / mes</div>
@@ -574,25 +764,30 @@
     </div>
   </div>
 
+  <!-- Modal exportar -->
   <div id="exportModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2 id="modalTitle">📥 Exportar Datos</h2>
       </div>
+
       <div class="modal-body">
         <div class="export-option" onclick="selectExportOption('year', this)">
           <h4 id="optYearTitle">📅 Año Completo 2026</h4>
           <p id="optYearDesc">Exporta resumen de todos los meses del año</p>
         </div>
+
         <div class="export-option" onclick="selectExportOption('month', this)">
           <h4 id="optMonthTitle">📆 Mes Actual</h4>
           <p id="optMonthDesc">Exporta detalles día por día del mes seleccionado</p>
         </div>
+
         <div class="export-option" onclick="selectExportOption('week', this)">
           <h4 id="optWeekTitle">📊 Semana Actual</h4>
           <p id="optWeekDesc">Exporta los últimos 7 días de transacciones</p>
         </div>
       </div>
+
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeExportModal()" id="btnCancel">Cancelar</button>
         <button class="btn btn-secondary" onclick="exportPDF()" id="btnPDF">📄 PDF</button>
@@ -601,23 +796,62 @@
     </div>
   </div>
 
-  <div id="syncStatus" class="sync-status success" style="display: none;">
+  <!-- Modal login -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="loginModalTitle">🔐 Iniciar sesión</h2>
+      </div>
+
+      <div class="modal-body">
+        <div class="login-form">
+          <div class="login-field">
+            <label for="loginEmail" id="loginEmailLabel">Correo electrónico</label>
+            <input type="email" id="loginEmail" placeholder="tuemail@gmail.com" />
+          </div>
+
+          <div class="login-field">
+            <label for="loginPassword" id="loginPasswordLabel">Contraseña</label>
+            <div class="password-wrap">
+              <input type="password" id="loginPassword" placeholder="******" />
+              <button type="button" class="btn btn-outline" onclick="togglePassword()" id="btnTogglePassword">👁 Ver</button>
+            </div>
+          </div>
+
+          <div class="login-actions">
+            <button type="button" class="btn btn-secondary" onclick="loginEmail()" id="btnLoginEmail">✉️ Entrar</button>
+            <button type="button" class="btn btn-primary" onclick="registerEmail()" id="btnRegisterEmail">🆕 Crear cuenta</button>
+            <button type="button" class="btn btn-outline" onclick="loginGoogle()" id="btnLoginGoogle">🔵 Google</button>
+          </div>
+
+          <div class="login-note" id="loginNote">
+            Tus datos se sincronizan en la nube cuando inicias sesión.
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeLogin()" id="btnCloseLogin">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="syncStatus" class="sync-status success" style="display:none;">
     <span>🔄</span>
     <span id="syncMessage">Sincronizado</span>
   </div>
 
-  <!-- Lógica principal + Firebase modular -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
     import {
       getFirestore,
       collection,
@@ -648,10 +882,12 @@
       "Enero","Febrero","Marzo","Abril","Mayo","Junio",
       "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
     ];
+
     const monthNamesEn = [
       "January","February","March","April","May","June",
       "July","August","September","October","November","December"
     ];
+
     const CATEGORY_OPTIONS = [
       { es: "Alimentos", en: "Food" },
       { es: "Renta", en: "Rent" },
@@ -672,11 +908,13 @@
 
     const syncStatus = document.getElementById("syncStatus");
     const syncMessage = document.getElementById("syncMessage");
+
     document.getElementById("date").valueAsDate = new Date();
 
     function getMonthNames() {
       return language === "es" ? monthNamesEs : monthNamesEn;
     }
+
     function t(es, en) {
       return language === "es" ? es : en;
     }
@@ -685,7 +923,9 @@
       syncStatus.style.display = "flex";
       syncStatus.className = `sync-status ${type}`;
       syncMessage.textContent = message;
+
       if (syncTimeout) clearTimeout(syncTimeout);
+
       if (type !== "syncing") {
         syncTimeout = setTimeout(() => {
           syncStatus.style.display = "none";
@@ -693,208 +933,106 @@
       }
     }
 
-    function loadTransactionsFromFirestore() {
-      if (!currentUser) {
-        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-        renderCurrentView();
-        drawCategoryChart();
-        return;
-      }
-      showSyncStatus("syncing", t("Sincronizando...", "Syncing..."));
-      if (unsubscribeTransactions) unsubscribeTransactions();
-
-      const userRef = doc(collection(db, "users"), currentUser.uid);
-      const txCol = collection(userRef, "transactions");
-      unsubscribeTransactions = onSnapshot(txCol, (snapshot) => {
-        transactions = [];
-        snapshot.forEach(d => {
-          transactions.push({ id: d.id, ...d.data() });
-        });
-        renderCurrentView();
-        drawCategoryChart();
-        showSyncStatus("success", t("Sincronizado", "Synced"));
-      }, (error) => {
-        console.error("Error loading transactions:", error);
-        showSyncStatus("error", t("Error de sincronización", "Sync error"));
-        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-        renderCurrentView();
-        drawCategoryChart();
-      });
-    }
-
-    async function saveTransactionToFirestore(transaction) {
-      if (!currentUser) {
-        transactions.push(transaction);
-        localStorage.setItem("transactions", JSON.stringify(transactions));
-        renderCurrentView();
-        drawCategoryChart();
-        return;
-      }
-      showSyncStatus("syncing", t("Guardando...", "Saving..."));
-      try {
-        const userRef = doc(collection(db, "users"), currentUser.uid);
-        const txCol = collection(userRef, "transactions");
-        const data = { ...transaction, userId: currentUser.uid, createdAt: serverTimestamp() };
-        await addDoc(txCol, data);
-        showSyncStatus("success", t("Guardado", "Saved"));
-      } catch (e) {
-        console.error("Error saving transaction:", e);
-        showSyncStatus("error", t("Error al guardar", "Save error"));
-        transactions.push(transaction);
-        localStorage.setItem("transactions", JSON.stringify(transactions));
-        renderCurrentView();
-        drawCategoryChart();
-      }
-    }
-
-    async function updateTransactionInFirestore(transactionId, updates) {
-      if (!currentUser) return;
-      try {
-        const userRef = doc(collection(db, "users"), currentUser.uid);
-        const txRef = doc(collection(userRef, "transactions"), transactionId);
-        await updateDoc(txRef, updates);
-      } catch (e) {
-        console.error("Error updating transaction:", e);
-      }
-    }
-
-    async function deleteTransactionFromFirestore(transactionId) {
-      if (!currentUser) return;
-      try {
-        const userRef = doc(collection(db, "users"), currentUser.uid);
-        const txRef = doc(collection(userRef, "transactions"), transactionId);
-        await deleteDoc(txRef);
-      } catch (e) {
-        console.error("Error deleting transaction:", e);
-      }
-    }
-
-    window.handleAuth = function() {
-
-  if (currentUser) {
-
-    if(confirm(language === "es" ? "¿Cerrar sesión?" : "Sign out?")){
-      signOut(auth).then(()=>{
-        alert(language === "es" ? "Sesión cerrada" : "Signed out");
-      });
-    }
-
-  } else {
-
-    const option = prompt(
-      language === "es"
-      ? "1 = Google\n2 = Iniciar con Email\n3 = Crear cuenta con Email"
-      : "1 = Google\n2 = Login Email\n3 = Create Email Account"
-    );
-
-    if(option == "1"){
-      const provider = new GoogleAuthProvider();
-      signInWithPopup(auth, provider)
-      .catch(err => alert(err.message));
-    }
-
-    if(option == "2"){
-      const email = prompt("Email:");
-      const pass = prompt("Password:");
-      if(email && pass){
-        signInWithEmailAndPassword(auth,email,pass)
-        .catch(err => alert(err.message));
-      }
-    }
-
-    if(option == "3"){
-      const email = prompt("Email:");
-      const pass = prompt("Password (min 6 chars):");
-      if(email && pass){
-        createUserWithEmailAndPassword(auth,email,pass)
-        .catch(err => alert(err.message));
-      }
-    }
-
-  }
-
-};
-
-window.showLoginOptions = function() {
-  const option = prompt(
-    "1 = Google\n2 = Email login\n3 = Crear cuenta email"
-  );
-  if (option == "1") {
-    handleAuth();
-  }
-  if (option == "2") {
-    loginEmail();
-  }
-  if (option == "3") {
-    registerEmail();
-  }
-};
-
-    onAuthStateChanged(auth, (user) => {
-      currentUser = user;
-      const authButtonText = document.getElementById("authButtonText");
-      if (user) {
-        authButtonText.textContent = user.displayName || t("Mi cuenta", "My account");
-        loadTransactionsFromFirestore();
-      } else {
-        authButtonText.textContent = t("Iniciar sesión", "Sign in");
-        if (unsubscribeTransactions) {
-          unsubscribeTransactions();
-          unsubscribeTransactions = null;
-        }
-        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-        renderCurrentView();
-        drawCategoryChart();
-      }
-    });
-
     function getCategoryLabel(esValue) {
-      const m = CATEGORY_OPTIONS.find(c => c.es === esValue);
-      return m ? (language === "es" ? m.es : m.en) : (esValue || "-");
+      const found = CATEGORY_OPTIONS.find(c => c.es === esValue);
+      return found ? (language === "es" ? found.es : found.en) : (esValue || "-");
+    }
+
+    function renderCurrentView() {
+      if (currentView === "input") {
+        document.getElementById("view-input").classList.add("active");
+      } else if (currentView === "year") {
+        renderYearView();
+      } else if (currentView === "month" && currentMonth !== null) {
+        renderMonthView(currentMonth);
+      }
+    }
+
+    function updateBreadcrumb(items) {
+      const breadcrumb = document.getElementById("breadcrumb");
+
+      if (!items.length) {
+        breadcrumb.innerHTML = "";
+        return;
+      }
+
+      breadcrumb.innerHTML = "";
+
+      items.forEach((item, index) => {
+        if (index > 0) {
+          const arrow = document.createElement("span");
+          arrow.textContent = "→";
+          breadcrumb.appendChild(arrow);
+        }
+
+        if (item.action) {
+          const a = document.createElement("a");
+          a.href = "#";
+          a.textContent = item.label;
+          a.onclick = (e) => {
+            e.preventDefault();
+            item.action();
+          };
+          breadcrumb.appendChild(a);
+        } else {
+          const span = document.createElement("span");
+          span.textContent = item.label;
+          breadcrumb.appendChild(span);
+        }
+      });
     }
 
     function computeCategoryData() {
       const categoryTotals = {};
       CATEGORY_OPTIONS.forEach(c => categoryTotals[c.es] = 0);
+
       let totalIncome = 0;
-      transactions.forEach(t => {
-        const d = new Date(t.date);
+
+      transactions.forEach(tx => {
+        const d = new Date(tx.date);
         if (d.getFullYear() === 2026) {
-          if (t.type === "expense") {
-            const key = t.category || "Otros";
+          if (tx.type === "expense") {
+            const key = tx.category || "Otros";
             if (!categoryTotals[key]) categoryTotals[key] = 0;
-            categoryTotals[key] += t.amount;
-          } else if (t.type === "income") {
-            totalIncome += t.amount;
+            categoryTotals[key] += tx.amount;
+          } else if (tx.type === "income") {
+            totalIncome += tx.amount;
           }
         }
       });
-      const totalExpenses = Object.values(categoryTotals).reduce((a,b)=>a+b,0);
+
+      const totalExpenses = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
       const totalProfit = totalIncome - totalExpenses;
+
       return { categoryTotals, totalProfit };
     }
 
-    google.charts.load("current", {packages:["corechart"]});
+    google.charts.load("current", { packages: ["corechart"] });
     google.charts.setOnLoadCallback(drawCategoryChart);
 
     function drawCategoryChart() {
       if (!window.google || !google.visualization) return;
+
       const { categoryTotals, totalProfit } = computeCategoryData();
       const data = new google.visualization.DataTable();
       data.addColumn("string", "Categoría");
       data.addColumn("number", "Monto");
-      Object.keys(categoryTotals).forEach(k => {
-        const v = categoryTotals[k];
-        if (v > 0) data.addRow([getCategoryLabel(k), v]);
+
+      Object.keys(categoryTotals).forEach(key => {
+        const value = categoryTotals[key];
+        if (value > 0) data.addRow([getCategoryLabel(key), value]);
       });
+
       if (totalProfit > 0) {
         data.addRow([language === "es" ? "Ganancia Neta" : "Net Profit", totalProfit]);
       }
+
       const el = document.getElementById("piechart_3d");
       if (data.getNumberOfRows() === 0) {
-        if (el) el.innerHTML = "";
+        el.innerHTML = "";
         return;
       }
+
       const options = {
         title: language === "es"
           ? "Gastos por categoría vs ganancias"
@@ -904,230 +1042,99 @@ window.showLoginOptions = function() {
         chartArea: { left: 80, top: 25, width: "70%", height: "70%" },
         backgroundColor: "transparent"
       };
+
       const chart = new google.visualization.PieChart(el);
       chart.draw(data, options);
     }
 
-    function renderCurrentView() {
-      if (currentView === "year") renderYearView();
-      else if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-    }
-
-    function applyLanguage() {
-      document.documentElement.lang = language;
-      document.getElementById("titleText").innerText = t("📊 Control de Finanzas 2026","📊 Finance Tracker 2026");
-      document.getElementById("subtitleText").innerText = t("Gestiona tus ingresos y gastos por día, mes y año.","Manage your income and expenses by day, month and year.");
-      document.getElementById("tabInput").innerText = t("📝 Registro Rápido","📝 Quick Entry");
-      document.getElementById("tabYear").innerText = t("📅 Vista Anual","📅 Year View");
-      document.getElementById("labelDate").innerText = t("Fecha","Date");
-      document.getElementById("labelType").innerText = t("Tipo","Type");
-      document.getElementById("labelAmount").innerText = t("Monto ($)","Amount ($)");
-      document.getElementById("labelDescription").innerText = t("Descripción","Description");
-      document.getElementById("labelCategory").innerText = t("Categoría (si es gasto)","Category (if expense)");
-      document.getElementById("optIncome").innerText = t("Ingreso","Income");
-      document.getElementById("optExpense").innerText = t("Gasto","Expense");
-      const catSelect = document.getElementById("category");
-      Array.from(catSelect.options).forEach(opt => {
-        const esText = opt.value;
-        const m = CATEGORY_OPTIONS.find(c => c.es === esText);
-        if (m) opt.textContent = language === "es" ? m.es : m.en;
-      });
-      document.getElementById("description").placeholder = t("Ej: Venta, Alquiler","Ex: Sale, Rent");
-      document.getElementById("btnSave").innerText = t("💾 Guardar","💾 Save");
-      document.getElementById("btnExport").innerText = t("📥 Exportar Datos","📥 Export Data");
-      document.getElementById("btnPrint").innerText = t("🖨 Imprimir","🖨 Print");
-      document.getElementById("btnClear").innerText = t("🗑 Borrar datos","🗑 Clear data");
-      document.getElementById("adSlot1").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)","Your ad code goes here (AdSense / Monetag)");
-      document.getElementById("adSlot2").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)","Your ad code goes here (AdSense / Monetag)");
-      document.getElementById("adSlot3").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)","Your ad code goes here (AdSense / Monetag)");
-      document.getElementById("thDay").innerText = t("Día","Day");
-      document.getElementById("thIncome").innerText = t("Ingresos","Income");
-      document.getElementById("thExpense").innerText = t("Gastos","Expenses");
-      document.getElementById("thCategory").innerText = t("Categoría","Category");
-      document.getElementById("thProfit").innerText = t("Ganancia","Profit");
-      document.getElementById("modalTitle").innerText = t("📥 Exportar Datos","📥 Export Data");
-      document.getElementById("optYearTitle").innerText = t("📅 Año Completo 2026","📅 Full Year 2026");
-      document.getElementById("optYearDesc").innerText = t("Exporta resumen de todos los meses del año","Export summary of all months in the year");
-      document.getElementById("optMonthTitle").innerText = t("📆 Mes Actual","📆 Current Month");
-      document.getElementById("optMonthDesc").innerText = t("Exporta detalles día por día del mes seleccionado","Export day by day details of selected month");
-      document.getElementById("optWeekTitle").innerText = t("📊 Semana Actual","📊 Current Week");
-      document.getElementById("optWeekDesc").innerText = t("Exporta los últimos 7 días de transacciones","Export last 7 days of transactions");
-      document.getElementById("btnCancel").innerText = t("Cancelar","Cancel");
-      document.getElementById("btnPDF").innerText = "📄 PDF";
-      document.getElementById("btnExcel").innerText = "📊 Excel";
-      document.getElementById("langToggleLabel").innerText = language === "es" ? "ES / EN" : "EN / ES";
-
-      const proBannerText = document.getElementById("proBannerText");
-      const proBannerButton = document.getElementById("proBannerButton");
-      proBannerText.innerHTML = language === "es"
-        ? '<span class="pro-badge">PRO</span>Controla tus finanzas como un profesional. Prueba la versión PRO 60 días gratis y guarda todos tus años, con copias de seguridad automáticas semanales.'
-        : '<span class="pro-badge">PRO</span>Take control of your money like a pro. Try the PRO version free for 60 days and keep unlimited years with weekly automatic backups.';
-      proBannerButton.textContent = language === "es"
-        ? "🚀 Empezar prueba PRO de 60 días"
-        : "🚀 Start 60‑day PRO trial";
-
-      document.getElementById("freePlanTitle").textContent = t("Plan gratuito","Free plan");
-      document.getElementById("freePlanPrice").textContent = t("0 USD / mes","0 USD / month");
-      document.getElementById("proPlanTitle").textContent = t("Plan PRO","PRO plan");
-      document.getElementById("proPlanPrice").textContent = t("4,99 USD / mes","4.99 USD / month");
-
-      const freePlanFeatures = document.getElementById("freePlanFeatures");
-      const proPlanFeatures = document.getElementById("proPlanFeatures");
-      freePlanFeatures.innerHTML = language === "es"
-        ? `<li>Uso sin registro (datos guardados solo en tu navegador).</li>
-           <li>Control de ingresos y gastos del año actual.</li>
-           <li>Gráficas y exportación a PDF/Excel.</li>
-           <li>Publicidad discreta dentro de la app.</li>`
-        : `<li>No registration required (data stored only in your browser).</li>
-           <li>Track income and expenses for the current year.</li>
-           <li>Charts and export to PDF/Excel.</li>
-           <li>Light ads inside the app.</li>`;
-      proPlanFeatures.innerHTML = language === "es"
-        ? `<li>Años ilimitados de historial financiero.</li>
-           <li>Copias de seguridad automáticas semanales en la nube.</li>
-           <li>Acceso desde varios dispositivos con tu cuenta.</li>
-           <li>Uso sin anuncios.</li>
-           <li>Prioridad en nuevas funciones y soporte.</li>`
-        : `<li>Unlimited years of financial history.</li>
-           <li>Automatic weekly cloud backups.</li>
-           <li>Access from multiple devices with your account.</li>
-           <li>Ad‑free experience.</li>
-           <li>Priority for new features and support.</li>`;
-
-      if (currentView === "year") renderYearView();
-      if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-      drawCategoryChart();
-    }
-
-    window.toggleLanguage = function() {
-      language = language === "es" ? "en" : "es";
-      localStorage.setItem("financeLang", language);
-      applyLanguage();
-    };
-
-    window.switchTab = function(view) {
-      currentView = view;
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-      if (view === "input") {
-        document.getElementById("tabInput").classList.add("active");
-        document.getElementById("view-input").classList.add("active");
-        updateBreadcrumb([]);
-      } else if (view === "year") {
-        document.getElementById("tabYear").classList.add("active");
-        document.getElementById("view-year").classList.add("active");
-        renderYearView();
-        updateBreadcrumb([{ label: t("Año 2026","Year 2026"), action: null }]);
-      }
-    };
-
-    window.showMonthView = function(monthIndex) {
-      currentMonth = monthIndex;
-      currentView = "month";
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-      document.getElementById("view-month").classList.add("active");
-      renderMonthView(monthIndex);
-      updateBreadcrumb([
-        { label: t("Año 2026","Year 2026"), action: () => window.switchTab("year") },
-        { label: getMonthNames()[monthIndex], action: null }
-      ]);
-    };
-
-    function updateBreadcrumb(items) {
-      const breadcrumb = document.getElementById("breadcrumb");
-      if (items.length === 0) {
-        breadcrumb.innerHTML = "";
-        return;
-      }
-      breadcrumb.innerHTML = items.map(item => {
-        if (item.action) {
-          return `<a onclick="event.preventDefault(); (${item.action.toString()})()">${item.label}</a>`;
-        }
-        return `<span>${item.label}</span>`;
-      }).join(' <span>→</span> ');
-    }
-
-    window.saveTransaction = async function(e) {
-      e.preventDefault();
-      const dateInput = document.getElementById("date").value;
-      const type = document.getElementById("type").value;
-      const amount = parseFloat(document.getElementById("amount").value) || 0;
-      const description = document.getElementById("description").value.trim();
-      const category = document.getElementById("category").value;
-      if (!dateInput || !amount) {
-        alert(t("Por favor ingresa fecha y monto.","Please enter date and amount."));
-        return;
-      }
-      const date = new Date(dateInput + "T00:00:00");
-      const transaction = {
-        date: date.toISOString(),
-        type,
-        amount,
-        description,
-        category: type === "expense" ? category : null
-      };
-      await saveTransactionToFirestore(transaction);
-      document.getElementById("amount").value = "";
-      document.getElementById("description").value = "";
-      alert(t("✅ Transacción guardada","✅ Transaction saved"));
-      drawCategoryChart();
-    };
-
     function calculateYearData() {
       const yearData = [];
+
       for (let m = 0; m < 12; m++) {
         let income = 0;
         let expense = 0;
-        transactions.forEach(t => {
-          const d = new Date(t.date);
+
+        transactions.forEach(tx => {
+          const d = new Date(tx.date);
           if (d.getMonth() === m && d.getFullYear() === 2026) {
-            if (t.type === "income") income += t.amount;
-            else expense += t.amount;
+            if (tx.type === "income") income += tx.amount;
+            else expense += tx.amount;
           }
         });
-        const profit = income - expense;
-        yearData.push({ income, expense, profit });
+
+        yearData.push({
+          income,
+          expense,
+          profit: income - expense
+        });
       }
+
       return yearData;
     }
 
     function calculateMonthData(monthIndex) {
       const daysInMonth = new Date(2026, monthIndex + 1, 0).getDate();
       const monthData = [];
+
       for (let d = 1; d <= daysInMonth; d++) {
         let income = 0;
         let expense = 0;
         const categoriesSet = new Set();
-        transactions.forEach(t => {
-          const td = new Date(t.date);
-          if (td.getFullYear() === 2026 && td.getMonth() === monthIndex && td.getDate() === d) {
-            if (t.type === "income") income += t.amount;
-            else {
-              expense += t.amount;
-              if (t.category) categoriesSet.add(t.category);
+
+        transactions.forEach(tx => {
+          const td = new Date(tx.date);
+          if (
+            td.getFullYear() === 2026 &&
+            td.getMonth() === monthIndex &&
+            td.getDate() === d
+          ) {
+            if (tx.type === "income") {
+              income += tx.amount;
+            } else {
+              expense += tx.amount;
+              if (tx.category) categoriesSet.add(tx.category);
             }
           }
         });
-        const profit = income - expense;
-        let categoryDisplay = "";
-        if (categoriesSet.size === 1) categoryDisplay = Array.from(categoriesSet)[0];
+
+        let categoryDisplay = "-";
+        if (categoriesSet.size === 1) categoryDisplay = [...categoriesSet][0];
         else if (categoriesSet.size > 1) categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
-        else categoryDisplay = "-";
-        monthData.push({ day: d, income, expense, profit, category: categoryDisplay });
+
+        monthData.push({
+          day: d,
+          income,
+          expense,
+          profit: income - expense,
+          category: categoryDisplay
+        });
       }
+
       return monthData;
     }
 
     function renderYearView() {
       const yearData = calculateYearData();
       const grid = document.getElementById("yearGrid");
-      grid.innerHTML = "";
       const monthNames = getMonthNames();
+
+      currentView = "year";
+
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById("view-year").classList.add("active");
+
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+      document.getElementById("tabYear").classList.add("active");
+
+      updateBreadcrumb([{ label: t("Año 2026", "Year 2026"), action: null }]);
+
+      grid.innerHTML = "";
+
       yearData.forEach((month, idx) => {
         const card = document.createElement("div");
         card.className = "month-card";
         const profitClass = month.profit >= 0 ? "stat-positive" : "stat-negative";
+
         card.innerHTML = `
           <h3>${monthNames[idx]}</h3>
           <div class="stat">
@@ -1148,17 +1155,19 @@ window.showLoginOptions = function() {
             <button class="btn btn-primary btn-month-excel">📊 Excel</button>
           </div>
         `;
-        card.querySelector(".btn-month-view").onclick = () => window.showMonthView(idx);
+
+        card.querySelector(".btn-month-view").onclick = () => showMonthView(idx);
         card.querySelector(".btn-month-pdf").onclick = () => {
+          currentMonth = idx;
           const { jsPDF } = window.jspdf;
           const docPdf = new jsPDF();
-          currentMonth = idx;
           exportMonthPDF(docPdf);
         };
         card.querySelector(".btn-month-excel").onclick = () => {
           currentMonth = idx;
           exportMonthExcel();
         };
+
         grid.appendChild(card);
       });
     }
@@ -1167,25 +1176,43 @@ window.showLoginOptions = function() {
       let display = currentCategory && currentCategory !== "-" && currentCategory !== "Múltiples"
         ? currentCategory
         : "Otros";
+
       const optsHtml = CATEGORY_OPTIONS.map(c => {
         const text = language === "es" ? c.es : c.en;
-        const selected = (c.es === display) ? "selected" : "";
+        const selected = c.es === display ? "selected" : "";
         return `<option value="${c.es}" ${selected}>${text}</option>`;
       }).join("");
+
       return `<select data-day="${day}" class="category-select">${optsHtml}</select>`;
     }
 
     function renderMonthView(monthIndex) {
+      currentView = "month";
+      currentMonth = monthIndex;
+
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById("view-month").classList.add("active");
+
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+
+      updateBreadcrumb([
+        { label: t("Año 2026", "Year 2026"), action: () => switchTab("year") },
+        { label: getMonthNames()[monthIndex], action: null }
+      ]);
+
       const monthData = calculateMonthData(monthIndex);
       const tbody = document.getElementById("monthTableBody");
       tbody.innerHTML = "";
+
       let totalIncome = 0;
       let totalExpense = 0;
       let totalProfit = 0;
+
       monthData.forEach(day => {
         totalIncome += day.income;
         totalExpense += day.expense;
         totalProfit += day.profit;
+
         const row = document.createElement("tr");
         row.innerHTML = `
           <td><strong>${day.day}</strong></td>
@@ -1196,6 +1223,7 @@ window.showLoginOptions = function() {
         `;
         tbody.appendChild(row);
       });
+
       const totalRow = document.createElement("tr");
       totalRow.className = "total-row";
       totalRow.innerHTML = `
@@ -1206,33 +1234,40 @@ window.showLoginOptions = function() {
         <td><strong>$${totalProfit.toFixed(2)}</strong></td>
       `;
       tbody.appendChild(totalRow);
+
       attachEditListeners();
       attachCategoryListeners();
     }
 
     function attachEditListeners() {
       document.querySelectorAll(".editable").forEach(cell => {
-        cell.addEventListener("click", function() {
-          const day = parseInt(this.dataset.day);
+        cell.addEventListener("click", function () {
+          const day = parseInt(this.dataset.day, 10);
           const field = this.dataset.field;
           const monthData = calculateMonthData(currentMonth);
           const dayData = monthData.find(d => d.day === day);
           const currentValue = dayData[field];
+
           const input = document.createElement("input");
           input.type = "number";
           input.className = "edit-input";
           input.value = currentValue.toFixed(2);
           input.step = "0.01";
+
           this.innerHTML = "";
           this.appendChild(input);
           input.focus();
-          input.addEventListener("blur", function() {
+
+          input.addEventListener("blur", async () => {
             const newValue = parseFloat(input.value) || 0;
-            updateDayValue(currentMonth, day, field, newValue);
+            await updateDayValue(currentMonth, day, field, newValue);
             renderMonthView(currentMonth);
           });
-          input.addEventListener("keydown", function(e) {
-            if (e.key === "Enter") input.blur();
+
+          input.addEventListener("keydown", async (e) => {
+            if (e.key === "Enter") {
+              input.blur();
+            }
           });
         });
       });
@@ -1240,192 +1275,181 @@ window.showLoginOptions = function() {
 
     function attachCategoryListeners() {
       document.querySelectorAll(".category-select").forEach(select => {
-        select.addEventListener("change", function() {
-          const day = parseInt(this.dataset.day);
+        select.addEventListener("change", async function () {
+          const day = parseInt(this.dataset.day, 10);
           const newCat = this.value;
-          updateDayCategory(currentMonth, day, newCat);
+          await updateDayCategory(currentMonth, day, newCat);
           renderMonthView(currentMonth);
         });
       });
     }
 
+    async function loadTransactionsFromFirestore() {
+      if (!currentUser) {
+        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        renderCurrentView();
+        drawCategoryChart();
+        return;
+      }
+
+      showSyncStatus("syncing", t("Sincronizando...", "Syncing..."));
+
+      if (unsubscribeTransactions) unsubscribeTransactions();
+
+      const userRef = doc(collection(db, "users"), currentUser.uid);
+      const txCol = collection(userRef, "transactions");
+
+      unsubscribeTransactions = onSnapshot(txCol, (snapshot) => {
+        transactions = [];
+        snapshot.forEach(d => {
+          transactions.push({ id: d.id, ...d.data() });
+        });
+
+        renderCurrentView();
+        drawCategoryChart();
+        showSyncStatus("success", t("Sincronizado", "Synced"));
+      }, (error) => {
+        console.error("Error loading transactions:", error);
+        showSyncStatus("error", t("Error de sincronización", "Sync error"));
+
+        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        renderCurrentView();
+        drawCategoryChart();
+      });
+    }
+
+    async function saveTransactionToFirestore(transaction) {
+      if (!currentUser) {
+        transactions.push(transaction);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        return;
+      }
+
+      showSyncStatus("syncing", t("Guardando...", "Saving..."));
+
+      try {
+        const userRef = doc(collection(db, "users"), currentUser.uid);
+        const txCol = collection(userRef, "transactions");
+        const data = {
+          ...transaction,
+          userId: currentUser.uid,
+          createdAt: serverTimestamp()
+        };
+
+        await addDoc(txCol, data);
+        showSyncStatus("success", t("Guardado", "Saved"));
+      } catch (e) {
+        console.error("Error saving transaction:", e);
+        showSyncStatus("error", t("Error al guardar", "Save error"));
+
+        transactions.push(transaction);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+      }
+    }
+
+    async function updateTransactionInFirestore(transactionId, updates) {
+      if (!currentUser) return;
+
+      try {
+        const userRef = doc(collection(db, "users"), currentUser.uid);
+        const txRef = doc(collection(userRef, "transactions"), transactionId);
+        await updateDoc(txRef, updates);
+      } catch (e) {
+        console.error("Error updating transaction:", e);
+      }
+    }
+
+    async function deleteTransactionFromFirestore(transactionId) {
+      if (!currentUser) return;
+
+      try {
+        const userRef = doc(collection(db, "users"), currentUser.uid);
+        const txRef = doc(collection(userRef, "transactions"), transactionId);
+        await deleteDoc(txRef);
+      } catch (e) {
+        console.error("Error deleting transaction:", e);
+      }
+    }
+
     async function updateDayValue(monthIndex, day, field, newValue) {
       const date = new Date(2026, monthIndex, day);
       const dateStr = date.toISOString().split("T")[0];
-      const toDelete = transactions.filter(t => {
-        const d = new Date(t.date);
+      const targetType = field === "income" ? "income" : "expense";
+
+      const toDelete = transactions.filter(tx => {
+        const d = new Date(tx.date);
         const ds = d.toISOString().split("T")[0];
-        return ds === dateStr && t.type === (field === "income" ? "income" : "expense");
+        return ds === dateStr && tx.type === targetType;
       });
+
       if (currentUser) {
-        for (const t of toDelete) {
-          if (t.id) await deleteTransactionFromFirestore(t.id);
+        for (const tx of toDelete) {
+          if (tx.id) await deleteTransactionFromFirestore(tx.id);
         }
       }
-      transactions = transactions.filter(t => {
-        const d = new Date(t.date);
+
+      transactions = transactions.filter(tx => {
+        const d = new Date(tx.date);
         const ds = d.toISOString().split("T")[0];
-        return !(ds === dateStr && t.type === (field === "income" ? "income" : "expense"));
+        return !(ds === dateStr && tx.type === targetType);
       });
+
       if (newValue > 0) {
         const newTx = {
           date: date.toISOString(),
-          type: field === "income" ? "income" : "expense",
+          type: targetType,
           amount: newValue,
-          description: `Ajuste manual ${field === "income" ? t("ingreso","income") : t("gasto","expense")}`,
-          category: field === "expense" ? "Otros" : null
+          description: `Ajuste manual ${targetType === "income" ? t("ingreso","income") : t("gasto","expense")}`,
+          category: targetType === "expense" ? "Otros" : null
         };
+
         if (currentUser) {
           await saveTransactionToFirestore(newTx);
         } else {
           transactions.push(newTx);
           localStorage.setItem("transactions", JSON.stringify(transactions));
         }
+      } else if (!currentUser) {
+        localStorage.setItem("transactions", JSON.stringify(transactions));
       }
+
       drawCategoryChart();
     }
 
     async function updateDayCategory(monthIndex, day, newCategory) {
       const date = new Date(2026, monthIndex, day);
       const dateStr = date.toISOString().split("T")[0];
+
       if (currentUser) {
-        const updates = transactions.filter(t => {
-          const d = new Date(t.date);
+        const updates = transactions.filter(tx => {
+          const d = new Date(tx.date);
           const ds = d.toISOString().split("T")[0];
-          return ds === dateStr && t.type === "expense";
+          return ds === dateStr && tx.type === "expense";
         });
-        for (const t of updates) {
-          if (t.id) await updateTransactionInFirestore(t.id, { category: newCategory });
+
+        for (const tx of updates) {
+          if (tx.id) await updateTransactionInFirestore(tx.id, { category: newCategory });
         }
       }
-      transactions = transactions.map(t => {
-        const d = new Date(t.date);
+
+      transactions = transactions.map(tx => {
+        const d = new Date(tx.date);
         const ds = d.toISOString().split("T")[0];
-        if (ds === dateStr && t.type === "expense") {
-          return { ...t, category: newCategory };
+        if (ds === dateStr && tx.type === "expense") {
+          return { ...tx, category: newCategory };
         }
-        return t;
+        return tx;
       });
+
       if (!currentUser) {
         localStorage.setItem("transactions", JSON.stringify(transactions));
       }
+
       drawCategoryChart();
-    }
-
-    window.showExportModal = function() {
-      document.getElementById("exportModal").classList.add("active");
-      selectedExportOption = "year";
-      document.querySelectorAll(".export-option").forEach(el => el.classList.remove("selected"));
-    };
-
-    window.closeExportModal = function() {
-      document.getElementById("exportModal").classList.remove("active");
-    };
-
-    window.selectExportOption = function(option, el) {
-      selectedExportOption = option;
-      document.querySelectorAll(".export-option").forEach(e => e.classList.remove("selected"));
-      if (el) el.classList.add("selected");
-    };
-
-    window.exportPDF = function() {
-      const { jsPDF } = window.jspdf;
-      const docPdf = new jsPDF();
-      if (selectedExportOption === "year") {
-        exportYearPDF(docPdf);
-      } else if (selectedExportOption === "month") {
-        if (currentMonth === null) {
-          alert(t("Por favor selecciona un mes primero desde la vista anual","Please select a month first from the year view"));
-          return;
-        }
-        exportMonthPDF(docPdf);
-      } else if (selectedExportOption === "week") {
-        exportWeekPDF(docPdf);
-      }
-      closeExportModal();
-    };
-
-    function exportYearPDF(docPdf) {
-      docPdf.setFontSize(16);
-      docPdf.text(t("Reporte Financiero Anual 2026","Annual Financial Report 2026"), 10, 10);
-      const yearData = calculateYearData();
-      const tableData = [];
-      const monthNames = getMonthNames();
-      yearData.forEach((m, idx) => {
-        tableData.push([
-          monthNames[idx],
-          `$${m.income.toFixed(2)}`,
-          `$${m.expense.toFixed(2)}`,
-          `$${m.profit.toFixed(2)}`
-        ]);
-      });
-      const totalIncome = yearData.reduce((s,m)=>s+m.income,0);
-      const totalExpense = yearData.reduce((s,m)=>s+m.expense,0);
-      const totalProfit = yearData.reduce((s,m)=>s+m.profit,0);
-      tableData.push([
-        t("TOTAL","TOTAL"),
-        `$${totalIncome.toFixed(2)}`,
-        `$${totalExpense.toFixed(2)}`,
-        `$${totalProfit.toFixed(2)}`
-      ]);
-      docPdf.autoTable({
-        head: [[
-          t("Mes","Month"),
-          t("Ingresos","Income"),
-          t("Gastos","Expenses"),
-          t("Ganancia","Profit")
-        ]],
-        body: tableData,
-        startY: 20,
-        theme: "grid"
-      });
-      docPdf.save(language === "es" ? "reporte-anual-2026.pdf" : "annual-report-2026.pdf");
-    }
-
-    function exportMonthPDF(docPdf) {
-      const monthNames = getMonthNames();
-      docPdf.setFontSize(16);
-      docPdf.text(
-        t("Reporte Mensual - ","Monthly Report - ") + monthNames[currentMonth] + " 2026",
-        10, 10
-      );
-      const monthData = calculateMonthData(currentMonth);
-      const tableData = [];
-      monthData.forEach(day => {
-        tableData.push([
-          `${day.day}`,
-          `$${day.income.toFixed(2)}`,
-          `$${day.expense.toFixed(2)}`,
-          day.category,
-          `$${day.profit.toFixed(2)}`
-        ]);
-      });
-      const totalIncome = monthData.reduce((s,d)=>s+d.income,0);
-      const totalExpense = monthData.reduce((s,d)=>s+d.expense,0);
-      const totalProfit = monthData.reduce((s,d)=>s+d.profit,0);
-      tableData.push([
-        t("TOTAL","TOTAL"),
-        `$${totalIncome.toFixed(2)}`,
-        `$${totalExpense.toFixed(2)}`,
-        "",
-        `$${totalProfit.toFixed(2)}`
-      ]);
-      docPdf.autoTable({
-        head: [[
-          t("Día","Day"),
-          t("Ingresos","Income"),
-          t("Gastos","Expenses"),
-          t("Categoría","Category"),
-          t("Ganancia","Profit")
-        ]],
-        body: tableData,
-        startY: 20,
-        theme: "grid"
-      });
-      const filename = language === "es"
-        ? `reporte-${monthNames[currentMonth].toLowerCase()}-2026.pdf`
-        : `report-${monthNames[currentMonth].toLowerCase()}-2026.pdf`;
-      docPdf.save(filename);
     }
 
     function calculateWeekData() {
@@ -1433,101 +1457,191 @@ window.showLoginOptions = function() {
       const weekAgo = new Date(today);
       weekAgo.setDate(today.getDate() - 6);
       const weekData = [];
+
       for (let i = 0; i < 7; i++) {
         const date = new Date(weekAgo);
         date.setDate(weekAgo.getDate() + i);
+
         let income = 0;
         let expense = 0;
-        transactions.forEach(t => {
-          const d = new Date(t.date);
+
+        transactions.forEach(tx => {
+          const d = new Date(tx.date);
           if (d.toDateString() === date.toDateString()) {
-            if (t.type === "income") income += t.amount;
-            else expense += t.amount;
+            if (tx.type === "income") income += tx.amount;
+            else expense += tx.amount;
           }
         });
-        const profit = income - expense;
+
         weekData.push({
-          date: language === "es" ? date.toLocaleDateString("es-ES") : date.toLocaleDateString("en-US"),
+          date: language === "es"
+            ? date.toLocaleDateString("es-ES")
+            : date.toLocaleDateString("en-US"),
           income,
           expense,
-          profit
+          profit: income - expense
         });
       }
+
       return weekData;
     }
 
-    function exportWeekPDF(docPdf) {
+    function exportYearPDF(docPdf) {
       docPdf.setFontSize(16);
-      docPdf.text(t("Reporte Semanal - Últimos 7 días","Weekly Report - Last 7 days"), 10, 10);
-      const weekData = calculateWeekData();
-      const tableData = [];
-      weekData.forEach(day => {
-        tableData.push([
-          day.date,
-          `$${day.income.toFixed(2)}`,
-          `$${day.expense.toFixed(2)}`,
-          `$${day.profit.toFixed(2)}`
-        ]);
-      });
-      const totalIncome = weekData.reduce((s,d)=>s+d.income,0);
-      const totalExpense = weekData.reduce((s,d)=>s+d.expense,0);
-      const totalProfit = weekData.reduce((s,d)=>s+d.profit,0);
+      docPdf.text(t("Reporte Financiero Anual 2026", "Annual Financial Report 2026"), 10, 10);
+
+      const yearData = calculateYearData();
+      const monthNames = getMonthNames();
+
+      const tableData = yearData.map((m, idx) => [
+        monthNames[idx],
+        `$${m.income.toFixed(2)}`,
+        `$${m.expense.toFixed(2)}`,
+        `$${m.profit.toFixed(2)}`
+      ]);
+
+      const totalIncome = yearData.reduce((s, m) => s + m.income, 0);
+      const totalExpense = yearData.reduce((s, m) => s + m.expense, 0);
+      const totalProfit = yearData.reduce((s, m) => s + m.profit, 0);
+
       tableData.push([
-        t("TOTAL","TOTAL"),
+        t("TOTAL", "TOTAL"),
         `$${totalIncome.toFixed(2)}`,
         `$${totalExpense.toFixed(2)}`,
         `$${totalProfit.toFixed(2)}`
       ]);
+
       docPdf.autoTable({
         head: [[
-          t("Fecha","Date"),
-          t("Ingresos","Income"),
-          t("Gastos","Expenses"),
-          t("Ganancia","Profit")
+          t("Mes", "Month"),
+          t("Ingresos", "Income"),
+          t("Gastos", "Expenses"),
+          t("Ganancia", "Profit")
         ]],
         body: tableData,
         startY: 20,
         theme: "grid"
       });
-      docPdf.save(language === "es" ? "reporte-semanal.pdf" : "weekly-report.pdf");
+
+      docPdf.save(language === "es" ? "reporte-anual-2026.pdf" : "annual-report-2026.pdf");
     }
 
-    window.exportExcel = function() {
-      if (selectedExportOption === "year") {
-        exportYearExcel();
-      } else if (selectedExportOption === "month") {
-        if (currentMonth === null) {
-          alert(t("Por favor selecciona un mes primero desde la vista anual","Please select a month first from the year view"));
-          return;
-        }
-        exportMonthExcel();
-      } else if (selectedExportOption === "week") {
-        exportWeekExcel();
+    function exportMonthPDF(docPdf) {
+      if (currentMonth === null) {
+        alert(t("Selecciona un mes primero.", "Select a month first."));
+        return;
       }
-      closeExportModal();
-    };
+
+      const monthNames = getMonthNames();
+
+      docPdf.setFontSize(16);
+      docPdf.text(
+        t("Reporte Mensual - ", "Monthly Report - ") + monthNames[currentMonth] + " 2026",
+        10,
+        10
+      );
+
+      const monthData = calculateMonthData(currentMonth);
+
+      const tableData = monthData.map(day => [
+        `${day.day}`,
+        `$${day.income.toFixed(2)}`,
+        `$${day.expense.toFixed(2)}`,
+        day.category,
+        `$${day.profit.toFixed(2)}`
+      ]);
+
+      const totalIncome = monthData.reduce((s, d) => s + d.income, 0);
+      const totalExpense = monthData.reduce((s, d) => s + d.expense, 0);
+      const totalProfit = monthData.reduce((s, d) => s + d.profit, 0);
+
+      tableData.push([
+        t("TOTAL", "TOTAL"),
+        `$${totalIncome.toFixed(2)}`,
+        `$${totalExpense.toFixed(2)}`,
+        "",
+        `$${totalProfit.toFixed(2)}`
+      ]);
+
+      docPdf.autoTable({
+        head: [[
+          t("Día", "Day"),
+          t("Ingresos", "Income"),
+          t("Gastos", "Expenses"),
+          t("Categoría", "Category"),
+          t("Ganancia", "Profit")
+        ]],
+        body: tableData,
+        startY: 20,
+        theme: "grid"
+      });
+
+      const filename = language === "es"
+        ? `reporte-${monthNames[currentMonth].toLowerCase()}-2026.pdf`
+        : `report-${monthNames[currentMonth].toLowerCase()}-2026.pdf`;
+
+      docPdf.save(filename);
+    }
+
+    function exportWeekPDF(docPdf) {
+      docPdf.setFontSize(16);
+      docPdf.text(t("Reporte Semanal - Últimos 7 días", "Weekly Report - Last 7 days"), 10, 10);
+
+      const weekData = calculateWeekData();
+      const tableData = weekData.map(day => [
+        day.date,
+        `$${day.income.toFixed(2)}`,
+        `$${day.expense.toFixed(2)}`,
+        `$${day.profit.toFixed(2)}`
+      ]);
+
+      const totalIncome = weekData.reduce((s, d) => s + d.income, 0);
+      const totalExpense = weekData.reduce((s, d) => s + d.expense, 0);
+      const totalProfit = weekData.reduce((s, d) => s + d.profit, 0);
+
+      tableData.push([
+        t("TOTAL", "TOTAL"),
+        `$${totalIncome.toFixed(2)}`,
+        `$${totalExpense.toFixed(2)}`,
+        `$${totalProfit.toFixed(2)}`
+      ]);
+
+      docPdf.autoTable({
+        head: [[
+          t("Fecha", "Date"),
+          t("Ingresos", "Income"),
+          t("Gastos", "Expenses"),
+          t("Ganancia", "Profit")
+        ]],
+        body: tableData,
+        startY: 20,
+        theme: "grid"
+      });
+
+      docPdf.save(language === "es" ? "reporte-semanal.pdf" : "weekly-report.pdf");
+    }
 
     function exportYearExcel() {
       const yearData = calculateYearData();
       const monthNames = getMonthNames();
+
       const data = [[
-        t("Mes","Month"),
-        t("Ingresos","Income"),
-        t("Gastos","Expenses"),
-        t("Ganancia","Profit")
+        t("Mes", "Month"),
+        t("Ingresos", "Income"),
+        t("Gastos", "Expenses"),
+        t("Ganancia", "Profit")
       ]];
+
       yearData.forEach((m, idx) => {
-        data.push([
-          monthNames[idx],
-          m.income,
-          m.expense,
-          m.profit
-        ]);
+        data.push([monthNames[idx], m.income, m.expense, m.profit]);
       });
-      const totalIncome = yearData.reduce((s,m)=>s+m.income,0);
-      const totalExpense = yearData.reduce((s,m)=>s+m.expense,0);
-      const totalProfit = yearData.reduce((s,m)=>s+m.profit,0);
-      data.push([t("TOTAL","TOTAL"), totalIncome, totalExpense, totalProfit]);
+
+      const totalIncome = yearData.reduce((s, m) => s + m.income, 0);
+      const totalExpense = yearData.reduce((s, m) => s + m.expense, 0);
+      const totalProfit = yearData.reduce((s, m) => s + m.profit, 0);
+
+      data.push([t("TOTAL", "TOTAL"), totalIncome, totalExpense, totalProfit]);
+
       const ws = XLSX.utils.aoa_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, language === "es" ? "Año 2026" : "Year 2026");
@@ -1535,195 +1649,451 @@ window.showLoginOptions = function() {
     }
 
     function exportMonthExcel() {
+      if (currentMonth === null) {
+        alert(t("Selecciona un mes primero.", "Select a month first."));
+        return;
+      }
+
       const monthData = calculateMonthData(currentMonth);
+      const monthNames = getMonthNames();
+
       const data = [[
-        t("Día","Day"),
-        t("Ingresos","Income"),
-        t("Gastos","Expenses"),
-        t("Categoría","Category"),
-        t("Ganancia","Profit")
+        t("Día", "Day"),
+        t("Ingresos", "Income"),
+        t("Gastos", "Expenses"),
+        t("Categoría", "Category"),
+        t("Ganancia", "Profit")
       ]];
+
       monthData.forEach(day => {
-        data.push([
-          day.day,
-          day.income,
-          day.expense,
-          day.category,
-          day.profit
-        ]);
+        data.push([day.day, day.income, day.expense, day.category, day.profit]);
       });
-      const totalIncome = monthData.reduce((s,d)=>s+d.income,0);
-      const totalExpense = monthData.reduce((s,d)=>s+d.expense,0);
-      const totalProfit = monthData.reduce((s,d)=>s+d.profit,0);
-      data.push([t("TOTAL","TOTAL"), totalIncome, totalExpense, "", totalProfit]);
+
+      const totalIncome = monthData.reduce((s, d) => s + d.income, 0);
+      const totalExpense = monthData.reduce((s, d) => s + d.expense, 0);
+      const totalProfit = monthData.reduce((s, d) => s + d.profit, 0);
+
+      data.push([t("TOTAL", "TOTAL"), totalIncome, totalExpense, "", totalProfit]);
+
       const ws = XLSX.utils.aoa_to_sheet(data);
       const wb = XLSX.utils.book_new();
-      const monthNames = getMonthNames();
+
       XLSX.utils.book_append_sheet(wb, ws, monthNames[currentMonth]);
-      XLSX.writeFile(wb, language === "es"
-        ? `reporte-${monthNames[currentMonth].toLowerCase()}-2026.xlsx`
-        : `report-${monthNames[currentMonth].toLowerCase()}-2026.xlsx`);
+
+      XLSX.writeFile(
+        wb,
+        language === "es"
+          ? `reporte-${monthNames[currentMonth].toLowerCase()}-2026.xlsx`
+          : `report-${monthNames[currentMonth].toLowerCase()}-2026.xlsx`
+      );
     }
 
     function exportWeekExcel() {
       const weekData = calculateWeekData();
+
       const data = [[
-        t("Fecha","Date"),
-        t("Ingresos","Income"),
-        t("Gastos","Expenses"),
-        t("Ganancia","Profit")
+        t("Fecha", "Date"),
+        t("Ingresos", "Income"),
+        t("Gastos", "Expenses"),
+        t("Ganancia", "Profit")
       ]];
+
       weekData.forEach(day => {
-        data.push([
-          day.date,
-          day.income,
-          day.expense,
-          day.profit
-        ]);
+        data.push([day.date, day.income, day.expense, day.profit]);
       });
-      const totalIncome = weekData.reduce((s,d)=>s+d.income,0);
-      const totalExpense = weekData.reduce((s,d)=>s+d.expense,0);
-      const totalProfit = weekData.reduce((s,d)=>s+d.profit,0);
-      data.push([t("TOTAL","TOTAL"), totalIncome, totalExpense, totalProfit]);
+
+      const totalIncome = weekData.reduce((s, d) => s + d.income, 0);
+      const totalExpense = weekData.reduce((s, d) => s + d.expense, 0);
+      const totalProfit = weekData.reduce((s, d) => s + d.profit, 0);
+
+      data.push([t("TOTAL", "TOTAL"), totalIncome, totalExpense, totalProfit]);
+
       const ws = XLSX.utils.aoa_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, language === "es" ? "Semana" : "Week");
+
       XLSX.writeFile(wb, language === "es" ? "reporte-semanal.xlsx" : "weekly-report.xlsx");
     }
 
-    window.clearData = async function() {
-      if (!confirm(t("¿Seguro que quieres borrar todos los datos?","Are you sure you want to delete all data?"))) return;
+    function applyLanguage() {
+      document.documentElement.lang = language;
+
+      document.getElementById("titleText").innerText = t("📊 Control de Finanzas 2026", "📊 Finance Tracker 2026");
+      document.getElementById("subtitleText").innerText = t(
+        "Gestiona tus ingresos y gastos por día, mes y año.",
+        "Manage your income and expenses by day, month and year."
+      );
+
+      document.getElementById("tabInput").innerText = t("📝 Registro Rápido", "📝 Quick Entry");
+      document.getElementById("tabYear").innerText = t("📅 Vista Anual", "📅 Year View");
+
+      document.getElementById("labelDate").innerText = t("Fecha", "Date");
+      document.getElementById("labelType").innerText = t("Tipo", "Type");
+      document.getElementById("labelAmount").innerText = t("Monto ($)", "Amount ($)");
+      document.getElementById("labelDescription").innerText = t("Descripción", "Description");
+      document.getElementById("labelCategory").innerText = t("Categoría (si es gasto)", "Category (if expense)");
+
+      document.getElementById("optIncome").innerText = t("Ingreso", "Income");
+      document.getElementById("optExpense").innerText = t("Gasto", "Expense");
+
+      const catSelect = document.getElementById("category");
+      Array.from(catSelect.options).forEach(opt => {
+        const found = CATEGORY_OPTIONS.find(c => c.es === opt.value);
+        if (found) opt.textContent = language === "es" ? found.es : found.en;
+      });
+
+      document.getElementById("description").placeholder = t("Ej: Venta, Alquiler", "Ex: Sale, Rent");
+      document.getElementById("btnSave").innerText = t("💾 Guardar", "💾 Save");
+      document.getElementById("btnExport").innerText = t("📥 Exportar Datos", "📥 Export Data");
+      document.getElementById("btnPrint").innerText = t("🖨 Imprimir", "🖨 Print");
+      document.getElementById("btnClear").innerText = t("🗑 Borrar datos", "🗑 Clear data");
+
+      document.getElementById("adSlot1").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
+      document.getElementById("adSlot2").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
+      document.getElementById("adSlot3").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
+
+      document.getElementById("thDay").innerText = t("Día", "Day");
+      document.getElementById("thIncome").innerText = t("Ingresos", "Income");
+      document.getElementById("thExpense").innerText = t("Gastos", "Expenses");
+      document.getElementById("thCategory").innerText = t("Categoría", "Category");
+      document.getElementById("thProfit").innerText = t("Ganancia", "Profit");
+
+      document.getElementById("modalTitle").innerText = t("📥 Exportar Datos", "📥 Export Data");
+      document.getElementById("optYearTitle").innerText = t("📅 Año Completo 2026", "📅 Full Year 2026");
+      document.getElementById("optYearDesc").innerText = t("Exporta resumen de todos los meses del año", "Export summary of all months in the year");
+      document.getElementById("optMonthTitle").innerText = t("📆 Mes Actual", "📆 Current Month");
+      document.getElementById("optMonthDesc").innerText = t("Exporta detalles día por día del mes seleccionado", "Export day by day details of selected month");
+      document.getElementById("optWeekTitle").innerText = t("📊 Semana Actual", "📊 Current Week");
+      document.getElementById("optWeekDesc").innerText = t("Exporta los últimos 7 días de transacciones", "Export last 7 days of transactions");
+
+      document.getElementById("btnCancel").innerText = t("Cancelar", "Cancel");
+      document.getElementById("btnPDF").innerText = "📄 PDF";
+      document.getElementById("btnExcel").innerText = "📊 Excel";
+      document.getElementById("langToggleLabel").innerText = language === "es" ? "ES / EN" : "EN / ES";
+
+      const proBannerText = document.getElementById("proBannerText");
+      const proBannerButton = document.getElementById("proBannerButton");
+
+      proBannerText.innerHTML = language === "es"
+        ? '<span class="pro-badge">PRO</span>Controla tus finanzas como un profesional. Prueba la versión PRO 60 días gratis y guarda todos tus años, con copias de seguridad automáticas semanales.'
+        : '<span class="pro-badge">PRO</span>Take control of your money like a pro. Try the PRO version free for 60 days and keep unlimited years with weekly automatic backups.';
+
+      proBannerButton.textContent = language === "es"
+        ? "🚀 Empezar prueba PRO de 60 días"
+        : "🚀 Start 60-day PRO trial";
+
+      document.getElementById("freePlanTitle").textContent = t("Plan gratuito", "Free plan");
+      document.getElementById("freePlanPrice").textContent = t("0 USD / mes", "0 USD / month");
+      document.getElementById("proPlanTitle").textContent = t("Plan PRO", "PRO plan");
+      document.getElementById("proPlanPrice").textContent = t("4,99 USD / mes", "4.99 USD / month");
+
+      document.getElementById("freePlanFeatures").innerHTML = language === "es"
+        ? `<li>Uso sin registro (datos guardados solo en tu navegador).</li>
+           <li>Control de ingresos y gastos del año actual.</li>
+           <li>Gráficas y exportación a PDF/Excel.</li>
+           <li>Publicidad discreta dentro de la app.</li>`
+        : `<li>No registration required (data stored only in your browser).</li>
+           <li>Track income and expenses for the current year.</li>
+           <li>Charts and export to PDF/Excel.</li>
+           <li>Light ads inside the app.</li>`;
+
+      document.getElementById("proPlanFeatures").innerHTML = language === "es"
+        ? `<li>Años ilimitados de historial financiero.</li>
+           <li>Copias de seguridad automáticas semanales en la nube.</li>
+           <li>Acceso desde varios dispositivos con tu cuenta.</li>
+           <li>Uso sin anuncios.</li>
+           <li>Prioridad en nuevas funciones y soporte.</li>`
+        : `<li>Unlimited years of financial history.</li>
+           <li>Automatic weekly cloud backups.</li>
+           <li>Access from multiple devices with your account.</li>
+           <li>Ad-free experience.</li>
+           <li>Priority for new features and support.</li>`;
+
+      document.getElementById("loginModalTitle").textContent = t("🔐 Iniciar sesión", "🔐 Sign in");
+      document.getElementById("loginEmailLabel").textContent = t("Correo electrónico", "Email");
+      document.getElementById("loginPasswordLabel").textContent = t("Contraseña", "Password");
+      document.getElementById("btnTogglePassword").textContent = t("👁 Ver", "👁 Show");
+      document.getElementById("btnLoginEmail").textContent = t("✉️ Entrar", "✉️ Login");
+      document.getElementById("btnRegisterEmail").textContent = t("🆕 Crear cuenta", "🆕 Create account");
+      document.getElementById("btnLoginGoogle").textContent = "🔵 Google";
+      document.getElementById("btnCloseLogin").textContent = t("Cerrar", "Close");
+      document.getElementById("loginNote").textContent = t(
+        "Tus datos se sincronizan en la nube cuando inicias sesión.",
+        "Your data syncs to the cloud when you sign in."
+      );
+
+      drawCategoryChart();
+
+      if (currentView === "year") renderYearView();
+      if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
+    }
+
+    window.toggleLanguage = function () {
+      language = language === "es" ? "en" : "es";
+      localStorage.setItem("financeLang", language);
+      applyLanguage();
+    };
+
+    window.switchTab = function (view) {
+      currentView = view;
+
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+
+      if (view === "input") {
+        document.getElementById("tabInput").classList.add("active");
+        document.getElementById("view-input").classList.add("active");
+        updateBreadcrumb([]);
+      } else if (view === "year") {
+        renderYearView();
+      }
+    };
+
+    window.showMonthView = function (monthIndex) {
+      renderMonthView(monthIndex);
+    };
+
+    window.saveTransaction = async function (e) {
+      e.preventDefault();
+
+      const dateInput = document.getElementById("date").value;
+      const type = document.getElementById("type").value;
+      const amount = parseFloat(document.getElementById("amount").value) || 0;
+      const description = document.getElementById("description").value.trim();
+      const category = document.getElementById("category").value;
+
+      if (!dateInput || !amount) {
+        alert(t("Por favor ingresa fecha y monto.", "Please enter date and amount."));
+        return;
+      }
+
+      const date = new Date(dateInput + "T00:00:00");
+
+      const transaction = {
+        date: date.toISOString(),
+        type,
+        amount,
+        description,
+        category: type === "expense" ? category : null
+      };
+
+      await saveTransactionToFirestore(transaction);
+
+      document.getElementById("amount").value = "";
+      document.getElementById("description").value = "";
+
+      alert(t("✅ Transacción guardada", "✅ Transaction saved"));
+      drawCategoryChart();
+    };
+
+    window.showExportModal = function () {
+      document.getElementById("exportModal").classList.add("active");
+      selectedExportOption = "year";
+      document.querySelectorAll(".export-option").forEach(el => el.classList.remove("selected"));
+    };
+
+    window.closeExportModal = function () {
+      document.getElementById("exportModal").classList.remove("active");
+    };
+
+    window.selectExportOption = function (option, el) {
+      selectedExportOption = option;
+      document.querySelectorAll(".export-option").forEach(e => e.classList.remove("selected"));
+      if (el) el.classList.add("selected");
+    };
+
+    window.exportPDF = function () {
+      const { jsPDF } = window.jspdf;
+      const docPdf = new jsPDF();
+
+      if (selectedExportOption === "year") {
+        exportYearPDF(docPdf);
+      } else if (selectedExportOption === "month") {
+        if (currentMonth === null) {
+          alert(t("Por favor selecciona un mes primero desde la vista anual", "Please select a month first from the year view"));
+          return;
+        }
+        exportMonthPDF(docPdf);
+      } else if (selectedExportOption === "week") {
+        exportWeekPDF(docPdf);
+      }
+
+      closeExportModal();
+    };
+
+    window.exportExcel = function () {
+      if (selectedExportOption === "year") {
+        exportYearExcel();
+      } else if (selectedExportOption === "month") {
+        if (currentMonth === null) {
+          alert(t("Por favor selecciona un mes primero desde la vista anual", "Please select a month first from the year view"));
+          return;
+        }
+        exportMonthExcel();
+      } else if (selectedExportOption === "week") {
+        exportWeekExcel();
+      }
+
+      closeExportModal();
+    };
+
+    window.clearData = async function () {
+      if (!confirm(t("¿Seguro que quieres borrar todos los datos?", "Are you sure you want to delete all data?"))) {
+        return;
+      }
+
       if (currentUser) {
         showSyncStatus("syncing", t("Borrando...", "Deleting..."));
+
         const userRef = doc(collection(db, "users"), currentUser.uid);
         const txCol = collection(userRef, "transactions");
         const snapshot = await getDocs(txCol);
         const batchIds = [];
+
         snapshot.forEach(d => batchIds.push(d.id));
+
         for (const id of batchIds) {
           await deleteTransactionFromFirestore(id);
         }
       }
+
       transactions = [];
       localStorage.removeItem("transactions");
-      alert(t("✅ Datos eliminados","✅ Data deleted"));
-      renderCurrentView();
+
+      alert(t("✅ Datos eliminados", "✅ Data deleted"));
+
+      if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
+      else if (currentView === "year") renderYearView();
+      else {
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        document.getElementById("view-input").classList.add("active");
+      }
+
       drawCategoryChart();
       showSyncStatus("success", t("Datos eliminados", "Data deleted"));
     };
 
+    window.openLogin = function () {
+      if (currentUser) {
+        const confirmText = t("¿Cerrar sesión?", "Sign out?");
+        if (confirm(confirmText)) {
+          signOut(auth)
+            .then(() => {
+              alert(t("Sesión cerrada", "Signed out"));
+            })
+            .catch(err => {
+              console.error(err);
+              alert(err.message);
+            });
+        }
+      } else {
+        document.getElementById("loginModal").classList.add("active");
+      }
+    };
+
+    window.closeLogin = function () {
+      document.getElementById("loginModal").classList.remove("active");
+    };
+
+    window.togglePassword = function () {
+      const pass = document.getElementById("loginPassword");
+      pass.type = pass.type === "password" ? "text" : "password";
+    };
+
+    window.loginEmail = function () {
+      const email = document.getElementById("loginEmail").value.trim();
+      const pass = document.getElementById("loginPassword").value;
+
+      if (!email || !pass) {
+        alert(t("Ingresa correo y contraseña.", "Enter email and password."));
+        return;
+      }
+
+      signInWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+          closeLogin();
+        })
+        .catch(err => {
+          console.error(err);
+          alert(err.message);
+        });
+    };
+
+    window.registerEmail = function () {
+      const email = document.getElementById("loginEmail").value.trim();
+      const pass = document.getElementById("loginPassword").value;
+
+      if (!email || !pass) {
+        alert(t("Ingresa correo y contraseña.", "Enter email and password."));
+        return;
+      }
+
+      if (pass.length < 6) {
+        alert(t("La contraseña debe tener al menos 6 caracteres.", "Password must be at least 6 characters."));
+        return;
+      }
+
+      createUserWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+          closeLogin();
+        })
+        .catch(err => {
+          console.error(err);
+          alert(err.message);
+        });
+    };
+
+    window.loginGoogle = function () {
+      const provider = new GoogleAuthProvider();
+
+      signInWithPopup(auth, provider)
+        .then(() => {
+          closeLogin();
+        })
+        .catch(err => {
+          console.error(err);
+          alert(err.message);
+        });
+    };
+
+    document.getElementById("loginModal").addEventListener("click", (e) => {
+      if (e.target.id === "loginModal") closeLogin();
+    });
+
+    document.getElementById("exportModal").addEventListener("click", (e) => {
+      if (e.target.id === "exportModal") closeExportModal();
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      const authButtonText = document.getElementById("authButtonText");
+
+      if (user) {
+        authButtonText.textContent = user.displayName || user.email || t("Mi cuenta", "My account");
+        loadTransactionsFromFirestore();
+      } else {
+        authButtonText.textContent = t("Iniciar sesión", "Sign in");
+
+        if (unsubscribeTransactions) {
+          unsubscribeTransactions();
+          unsubscribeTransactions = null;
+        }
+
+        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+        if (currentView === "year") renderYearView();
+        else if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
+        else {
+          document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+          document.getElementById("view-input").classList.add("active");
+        }
+
+        drawCategoryChart();
+      }
+    });
+
     applyLanguage();
+    switchTab("input");
   </script>
-window.openLogin = function(){
-
-if(currentUser){
-
-if(confirm("¿Cerrar sesión?")){
-signOut(auth);
-}
-
-}else{
-
-document.getElementById("loginModal").classList.add("active");
-
-}
-
-}
-
-window.closeLogin=function(){
-document.getElementById("loginModal").classList.remove("active");
-}
-
-window.togglePassword=function(){
-
-const pass=document.getElementById("loginPassword");
-
-pass.type = pass.type === "password" ? "text" : "password";
-
-}
-
-window.loginEmail=function(){
-
-const email=document.getElementById("loginEmail").value;
-const pass=document.getElementById("loginPassword").value;
-
-signInWithEmailAndPassword(auth,email,pass)
-
-.then(()=>{
-
-closeLogin();
-
-})
-
-.catch(e=>alert(e.message));
-
-}
-
-window.registerEmail=function(){
-
-const email=document.getElementById("loginEmail").value;
-const pass=document.getElementById("loginPassword").value;
-
-createUserWithEmailAndPassword(auth,email,pass)
-
-.then(()=>{
-
-closeLogin();
-
-})
-
-.catch(e=>alert(e.message));
-
-}
-
-window.loginGoogle=function(){
-
-const provider=new GoogleAuthProvider();
-
-signInWithPopup(auth,provider)
-
-.then(()=>{
-
-closeLogin();
-
-})
-
-.catch(e=>alert(e.message));
-
-}
-
-window.registerEmail=function(){
-
-const email=document.getElementById("loginEmail").value;
-const pass=document.getElementById("loginPassword").value;
-
-createUserWithEmailAndPassword(auth,email,pass)
-
-.then(()=>{
-
-closeLogin();
-
-})
-
-.catch(e=>alert(e.message));
-
-}
-
-window.loginGoogle=function(){
-
-const provider=new GoogleAuthProvider();
-
-signInWithPopup(auth,provider)
-
-.then(()=>{
-
-closeLogin();
-
-})
-
-.catch(e=>alert(e.message));
-
-}
 </body>
 </html>
-
