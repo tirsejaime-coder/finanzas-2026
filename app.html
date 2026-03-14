@@ -877,7 +877,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-      const CURRENT_YEAR = new Date().getFullYear();
+    const CURRENT_YEAR = new Date().getFullYear();
 
     const monthNamesEs = [
       "Enero","Febrero","Marzo","Abril","Mayo","Junio",
@@ -1646,7 +1646,7 @@
       const ws = XLSX.utils.aoa_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, language === "es" ? `Año ${CURRENT_YEAR}` : `Year ${CURRENT_YEAR}`);
-      XLSX.writeFile(wb, language === "es" ? "reporte-anual-${CURRENT_YEAR}.xlsx` : "annual-report-${CURRENT_YEAR}.xlsx`);
+      XLSX.writeFile(wb, language === "es" ? `reporte-anual-${CURRENT_YEAR}.xlsx` : `annual-report-${CURRENT_YEAR}.xlsx`);
     }
 
     function exportMonthExcel() {
