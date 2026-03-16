@@ -1981,7 +1981,7 @@ async function handleStripeReturn() {
     function applyLanguage() {
       document.documentElement.lang = language;
 
-      document.getElementById("titleText").innerText = "💡 LumensSave";
+      document.querySelector("#titleText .logo-text").innerText = "LumensSave";
       document.getElementById("subtitleText").innerText = t(
         "Gestiona tus ingresos y gastos por día, mes y año.",
         "Manage your income and expenses by day, month and year."
