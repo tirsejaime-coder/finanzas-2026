@@ -621,10 +621,24 @@
       }
     }
 
+    .logo-icon {
+      font-size: 1.4rem;
+      margin-right: 4px;
+    }
+
+    .logo-text {
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
     .btn, .tab, .export-option {
       touch-action: manipulation;
     }
   </style>
+
+  <!-- Disqometer (1 sola instancia de cada script) -->
+  <script src="https://api.disqometer.com/8ee4ea609a6346c4cf34c2b621ac79ba.js?nc=NjM5MjQw"></script>
+  <script src="https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw"></script>
 </head>
 <body>
   <div class="container">
@@ -640,13 +654,13 @@
     <div id="piechart_3d" style="position:absolute; top:10px; right:170px; width:260px; height:260px; z-index:10;"></div>
 
     <h1 id="titleText">
-  <span class="logo-icon">💡</span>
-  <span class="logo-text">LumensSave</span>
-</h1>
+      <span class="logo-icon">💡</span>
+      <span class="logo-text">LumensSave</span>
+    </h1>
 
-<p class="desc" id="subtitleText">
-  Smart personal finance tracker
-</p>
+    <p class="desc" id="subtitleText">
+      Smart personal finance tracker
+    </p>
 
     <div class="breadcrumb" id="breadcrumb"></div>
 
@@ -907,7 +921,7 @@
     ];
 
     let language = localStorage.getItem("financeLang") || "es";
-let isProUser = false;
+    let isProUser = false;
     let transactions = [];
     let currentView = "input";
     let currentMonth = null;
@@ -918,10 +932,9 @@ let isProUser = false;
     let syncTimeout = null;
     let currentPlan = "free";
     const PRO_TRIAL_DAYS = 60;
-    const STRIPE_PAYMENT_LINK = "REEMPLAZA_AQUI_TU_PAYMENT_LINK_DE_STRIPE";
+    const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_cNieV6009aKl5tqcucgjC00";
     const STRIPE_SUCCESS_PARAM = "stripe_success";
     const STRIPE_CANCEL_PARAM = "stripe_cancel";
-
 
     function getFutureDateISO(days) {
       const d = new Date();
@@ -1085,81 +1098,80 @@ let isProUser = false;
         : "✅ Your 60-day PRO trial is now active.");
     }
 
+    function getAppReturnUrl(extraParams = {}) {
+      const url = new URL(window.location.href);
+      url.search = "";
+      Object.entries(extraParams).forEach(([key, value]) => {
+        url.searchParams.set(key, value);
+      });
+      return url.toString();
+    }
 
-function getAppReturnUrl(extraParams = {}) {
-  const url = new URL(window.location.href);
-  url.search = "";
-  Object.entries(extraParams).forEach(([key, value]) => {
-    url.searchParams.set(key, value);
-  });
-  return url.toString();
-}
+    function buildStripeCheckoutUrl() {
+      if (!STRIPE_PAYMENT_LINK || STRIPE_PAYMENT_LINK.includes("REEMPLAZA_AQUI")) {
+        return null;
+      }
 
-function buildStripeCheckoutUrl() {
-  if (!STRIPE_PAYMENT_LINK || STRIPE_PAYMENT_LINK.includes("REEMPLAZA_AQUI")) {
-    return null;
-  }
+      const url = new URL(STRIPE_PAYMENT_LINK);
 
-  const url = new URL(STRIPE_PAYMENT_LINK);
+      if (currentUser?.email) {
+        url.searchParams.set("prefilled_email", currentUser.email);
+      }
 
-  if (currentUser?.email) {
-    url.searchParams.set("prefilled_email", currentUser.email);
-  }
+      if (currentUser?.uid) {
+        url.searchParams.set("client_reference_id", currentUser.uid);
+      }
 
-  if (currentUser?.uid) {
-    url.searchParams.set("client_reference_id", currentUser.uid);
-  }
+      url.searchParams.set("after_completion[redirect][url]", getAppReturnUrl({
+        [STRIPE_SUCCESS_PARAM]: "1"
+      }));
 
-  url.searchParams.set("after_completion[redirect][url]", getAppReturnUrl({
-    [STRIPE_SUCCESS_PARAM]: "1"
-  }));
+      return url.toString();
+    }
 
-  return url.toString();
-}
+    async function startPaidProCheckout() {
+      if (!currentUser) {
+        alert(language === "es"
+          ? "Primero inicia sesión para continuar con PRO."
+          : "Please sign in first to continue with PRO.");
+        return;
+      }
 
-async function startPaidProCheckout() {
-  if (!currentUser) {
-    alert(language === "es"
-      ? "Primero inicia sesión para continuar con PRO."
-      : "Please sign in first to continue with PRO.");
-    return;
-  }
+      const checkoutUrl = buildStripeCheckoutUrl();
 
-  const checkoutUrl = buildStripeCheckoutUrl();
+      if (!checkoutUrl) {
+        alert(language === "es"
+          ? "Falta configurar tu enlace de Stripe en STRIPE_PAYMENT_LINK."
+          : "You still need to configure your Stripe link in STRIPE_PAYMENT_LINK.");
+        return;
+      }
 
-  if (!checkoutUrl) {
-    alert(language === "es"
-      ? "Falta configurar tu enlace de Stripe en STRIPE_PAYMENT_LINK."
-      : "You still need to configure your Stripe link in STRIPE_PAYMENT_LINK.");
-    return;
-  }
+      window.location.href = checkoutUrl;
+    }
 
-  window.location.href = checkoutUrl;
-}
+    async function handleStripeReturn() {
+      const url = new URL(window.location.href);
+      const hasSuccess = url.searchParams.get(STRIPE_SUCCESS_PARAM) === "1";
+      const hasCancel = url.searchParams.get(STRIPE_CANCEL_PARAM) === "1";
 
-async function handleStripeReturn() {
-  const url = new URL(window.location.href);
-  const hasSuccess = url.searchParams.get(STRIPE_SUCCESS_PARAM) === "1";
-  const hasCancel = url.searchParams.get(STRIPE_CANCEL_PARAM) === "1";
+      if (hasSuccess) {
+        alert(language === "es"
+          ? "Pago recibido. Ahora Stripe debe confirmar el pago en tu backend para activar PRO automáticamente."
+          : "Payment received. Stripe must now confirm the payment in your backend to activate PRO automatically.");
 
-  if (hasSuccess) {
-    alert(language === "es"
-      ? "Pago recibido. Ahora Stripe debe confirmar el pago en tu backend para activar PRO automáticamente."
-      : "Payment received. Stripe must now confirm the payment in your backend to activate PRO automatically.");
+        url.searchParams.delete(STRIPE_SUCCESS_PARAM);
+        window.history.replaceState({}, "", url.toString());
+      }
 
-    url.searchParams.delete(STRIPE_SUCCESS_PARAM);
-    window.history.replaceState({}, "", url.toString());
-  }
+      if (hasCancel) {
+        alert(language === "es"
+          ? "Pago cancelado. Tu plan sigue en FREE."
+          : "Payment canceled. Your plan remains FREE.");
 
-  if (hasCancel) {
-    alert(language === "es"
-      ? "Pago cancelado. Tu plan sigue en FREE."
-      : "Payment canceled. Your plan remains FREE.");
-
-    url.searchParams.delete(STRIPE_CANCEL_PARAM);
-    window.history.replaceState({}, "", url.toString());
-  }
-}
+        url.searchParams.delete(STRIPE_CANCEL_PARAM);
+        window.history.replaceState({}, "", url.toString());
+      }
+    }
 
     const syncStatus = document.getElementById("syncStatus");
     const syncMessage = document.getElementById("syncMessage");
@@ -1240,7 +1252,6 @@ async function handleStripeReturn() {
     function computeCategoryData() {
       const categoryTotals = {};
       CATEGORY_OPTIONS.forEach(c => categoryTotals[c.es] = 0);
-
       let totalIncome = 0;
 
       transactions.forEach(tx => {
@@ -2097,7 +2108,7 @@ async function handleStripeReturn() {
       language = language === "es" ? "en" : "es";
       localStorage.setItem("financeLang", language);
       handleStripeReturn();
-    applyLanguage();
+      applyLanguage();
     };
 
     window.switchTab = function (view) {
@@ -2152,27 +2163,24 @@ async function handleStripeReturn() {
       drawCategoryChart();
     };
 
-    
+    window.showProExportMessage = function () {
+      alert(
+        language === "es"
+          ? "La exportación de documentos es una función PRO.\n\nPuedes imprimir gratis usando el botón 🖨 Imprimir."
+          : "Document export is a PRO feature.\n\nYou can still print for free using the 🖨 Print button."
+      );
+    };
 
-window.showProExportMessage = function () {
-  alert(
-    language === "es"
-      ? "La exportación de documentos es una función PRO.\n\nPuedes imprimir gratis usando el botón 🖨 Imprimir."
-      : "Document export is a PRO feature.\n\nYou can still print for free using the 🖨 Print button."
-  );
-};
+    window.checkExportAccess = function () {
+      if (!isProUser) {
+        showProExportMessage();
+        return;
+      }
 
-window.checkExportAccess = function () {
+      showExportModal();
+    };
 
-  if (!isProUser) {
-    showProExportMessage();
-    return;
-  }
-
-  showExportModal();
-};
-
-window.showExportModal = function () {
+    window.showExportModal = function () {
       document.getElementById("exportModal").classList.add("active");
       selectedExportOption = "year";
       document.querySelectorAll(".export-option").forEach(el => el.classList.remove("selected"));
@@ -2189,15 +2197,14 @@ window.showExportModal = function () {
     };
 
     window.exportPDF = function () {
-
-  if (!isProUser) {
-    alert(
-      language === "es"
-        ? "Exportar documentos es una función PRO."
-        : "Document export is a PRO feature."
-    );
-    return;
-  }
+      if (!isProUser) {
+        alert(
+          language === "es"
+            ? "Exportar documentos es una función PRO."
+            : "Document export is a PRO feature."
+        );
+        return;
+      }
 
       const { jsPDF } = window.jspdf;
       const docPdf = new jsPDF();
@@ -2218,15 +2225,14 @@ window.showExportModal = function () {
     };
 
     window.exportExcel = function () {
-
-  if (!isProUser) {
-    alert(
-      language === "es"
-        ? "Exportar documentos es una función PRO."
-        : "Document export is a PRO feature."
-    );
-    return;
-  }
+      if (!isProUser) {
+        alert(
+          language === "es"
+            ? "Exportar documentos es una función PRO."
+            : "Document export is a PRO feature."
+        );
+        return;
+      }
 
       if (selectedExportOption === "year") {
         exportYearExcel();
@@ -2362,9 +2368,18 @@ window.showExportModal = function () {
         });
     };
 
-
     document.getElementById("proBannerButton").addEventListener("click", async () => {
-      await startProTrial();
+      if (!currentUser) {
+        alert("Primero inicia sesión");
+        return;
+      }
+
+      // 🔥 SI YA USÓ EL TRIAL → PAGO
+      if (currentPlan === "pro_trial" || currentPlan === "free") {
+        await startPaidProCheckout();
+      } else {
+        await startProTrial();
+      }
     });
 
     document.getElementById("loginModal").addEventListener("click", (e) => {
