@@ -932,7 +932,7 @@
     let syncTimeout = null;
     let currentPlan = "free";
     const PRO_TRIAL_DAYS = 60;
-    const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_cNieV6009aKl5tqcucgjC00";
+    
     const STRIPE_SUCCESS_PARAM = "stripe_success";
     const STRIPE_CANCEL_PARAM = "stripe_cancel";
 
@@ -1098,56 +1098,46 @@
         : "✅ Your 60-day PRO trial is now active.");
     }
 
-    function getAppReturnUrl(extraParams = {}) {
-      const url = new URL(window.location.href);
-      url.search = "";
-      Object.entries(extraParams).forEach(([key, value]) => {
-        url.searchParams.set(key, value);
-      });
-      return url.toString();
+
+
+
+
+async function startPaidProCheckout() {
+  if (!currentUser) {
+    alert(language === "es"
+      ? "Primero inicia sesión para continuar con PRO."
+      : "Please sign in first to continue with PRO.");
+    return;
+  }
+
+  try {
+    const response = await fetch("https://us-central1-finanzas-2026-a6d48.cloudfunctions.net/api/create-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        customer_email: currentUser.email,
+        uid: currentUser.uid
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error("No se recibió URL de Stripe");
     }
 
-    function buildStripeCheckoutUrl() {
-      if (!STRIPE_PAYMENT_LINK || STRIPE_PAYMENT_LINK.includes("REEMPLAZA_AQUI")) {
-        return null;
-      }
+  } catch (error) {
+    console.error("Error iniciando checkout:", error);
 
-      const url = new URL(STRIPE_PAYMENT_LINK);
-
-      if (currentUser?.email) {
-        url.searchParams.set("prefilled_email", currentUser.email);
-      }
-
-      if (currentUser?.uid) {
-        url.searchParams.set("client_reference_id", currentUser.uid);
-      }
-
-      url.searchParams.set("after_completion[redirect][url]", getAppReturnUrl({
-        [STRIPE_SUCCESS_PARAM]: "1"
-      }));
-
-      return url.toString();
-    }
-
-    async function startPaidProCheckout() {
-      if (!currentUser) {
-        alert(language === "es"
-          ? "Primero inicia sesión para continuar con PRO."
-          : "Please sign in first to continue with PRO.");
-        return;
-      }
-
-      const checkoutUrl = buildStripeCheckoutUrl();
-
-      if (!checkoutUrl) {
-        alert(language === "es"
-          ? "Falta configurar tu enlace de Stripe en STRIPE_PAYMENT_LINK."
-          : "You still need to configure your Stripe link in STRIPE_PAYMENT_LINK.");
-        return;
-      }
-
-      window.location.href = checkoutUrl;
-    }
+    alert(language === "es"
+      ? "Error al iniciar el pago. Intenta de nuevo."
+      : "Error starting checkout. Try again.");
+  }
+}
 
     async function handleStripeReturn() {
       const url = new URL(window.location.href);
