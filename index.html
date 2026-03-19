@@ -1146,8 +1146,18 @@ async function startPaidProCheckout() {
 
       if (hasSuccess) {
         alert(language === "es"
-          ? "Pago recibido. Ahora Stripe debe confirmar el pago en tu backend para activar PRO automáticamente."
-          : "Payment received. Stripe must now confirm the payment in your backend to activate PRO automatically.");
+                ? "Pago exitoso 🎉 PRO activado"
+                : "Payment successful 🎉 PRO activated");
+        
+    if (currentUser) {
+      const userRef = doc(collection(db, "users"), currentUser.uid);
+
+      await setDoc(userRef, {
+        plan: "pro",
+        proUntil: null,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    }
 
         url.searchParams.delete(STRIPE_SUCCESS_PARAM);
         window.history.replaceState({}, "", url.toString());
