@@ -1145,11 +1145,14 @@ async function startPaidProCheckout() {
       const hasCancel = url.searchParams.get(cancel_PARAM) === "true";
 
       if (hasSuccess) {
-        alert(language === "es"
-                ? "Pago exitoso 🎉 PRO activado"
-                : "Payment successful 🎉 PRO activated");
-        
+  const waitForUser = setInterval(async () => {
     if (currentUser) {
+      clearInterval(waitForUser);
+
+      alert(language === "es"
+        ? "Pago exitoso 🎉 PRO activado"
+        : "Payment successful 🎉 PRO activated");
+
       const userRef = doc(collection(db, "users"), currentUser.uid);
 
       await setDoc(userRef, {
@@ -1157,7 +1160,13 @@ async function startPaidProCheckout() {
         proUntil: null,
         updatedAt: serverTimestamp()
       }, { merge: true });
+
+      const url = new URL(window.location.href);
+      url.searchParams.delete(success_PARAM);
+      window.history.replaceState({}, "", url.toString());
     }
+  }, 500);
+}
 
         url.searchParams.delete(success_PARAM);
         window.history.replaceState({}, "", url.toString());
