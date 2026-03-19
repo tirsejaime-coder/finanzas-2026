@@ -933,8 +933,8 @@
     let currentPlan = "free";
     const PRO_TRIAL_DAYS = 60;
     
-    const success_PARAM = "success";
-    const cancel_PARAM = "cancel";
+    const STRIPE_SUCCESS_PARAM = "stripe_success";
+    const STRIPE_CANCEL_PARAM = "stripe_cancel";
 
     function getFutureDateISO(days) {
       const d = new Date();
@@ -1141,34 +1141,15 @@ async function startPaidProCheckout() {
 
     async function handleStripeReturn() {
       const url = new URL(window.location.href);
-      const hasSuccess = url.searchParams.get(success_PARAM) === "true";
-      const hasCancel = url.searchParams.get(cancel_PARAM) === "true";
+      const hasSuccess = url.searchParams.get(STRIPE_SUCCESS_PARAM) === "1";
+      const hasCancel = url.searchParams.get(STRIPE_CANCEL_PARAM) === "1";
 
       if (hasSuccess) {
-  const waitForUser = setInterval(async () => {
-    if (currentUser) {
-      clearInterval(waitForUser);
+        alert(language === "es"
+          ? "Pago recibido. Ahora Stripe debe confirmar el pago en tu backend para activar PRO automáticamente."
+          : "Payment received. Stripe must now confirm the payment in your backend to activate PRO automatically.");
 
-      alert(language === "es"
-        ? "Pago exitoso 🎉 PRO activado"
-        : "Payment successful 🎉 PRO activated");
-
-      const userRef = doc(collection(db, "users"), currentUser.uid);
-
-      await setDoc(userRef, {
-        plan: "pro",
-        proUntil: null,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-
-      const url = new URL(window.location.href);
-      url.searchParams.delete(success_PARAM);
-      window.history.replaceState({}, "", url.toString());
-    }
-  }, 500);
-}
-
-        url.searchParams.delete(success_PARAM);
+        url.searchParams.delete(STRIPE_SUCCESS_PARAM);
         window.history.replaceState({}, "", url.toString());
       }
 
@@ -1177,7 +1158,7 @@ async function startPaidProCheckout() {
           ? "Pago cancelado. Tu plan sigue en FREE."
           : "Payment canceled. Your plan remains FREE.");
 
-        url.searchParams.delete(cancel_PARAM);
+        url.searchParams.delete(STRIPE_CANCEL_PARAM);
         window.history.replaceState({}, "", url.toString());
       }
     }
