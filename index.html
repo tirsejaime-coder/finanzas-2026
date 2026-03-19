@@ -1141,8 +1141,8 @@ async function startPaidProCheckout() {
 
     async function handleStripeReturn() {
       const url = new URL(window.location.href);
-      const hasSuccess = url.searchParams.get(success_PARAM) === "1";
-      const hasCancel = url.searchParams.get(cancel_PARAM) === "1";
+      const hasSuccess = url.searchParams.get(success_PARAM) === "true";
+      const hasCancel = url.searchParams.get(cancel_PARAM) === "true";
 
       if (hasSuccess) {
         alert(language === "es"
