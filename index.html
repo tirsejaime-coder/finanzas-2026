@@ -933,8 +933,8 @@
     let currentPlan = "free";
     const PRO_TRIAL_DAYS = 60;
     
-    const STRIPE_SUCCESS_PARAM = "stripe_success";
-    const STRIPE_CANCEL_PARAM = "stripe_cancel";
+    const success_PARAM = "success";
+    const cancel_PARAM = "cancel";
 
     function getFutureDateISO(days) {
       const d = new Date();
@@ -1141,8 +1141,8 @@ async function startPaidProCheckout() {
 
     async function handleStripeReturn() {
       const url = new URL(window.location.href);
-      const hasSuccess = url.searchParams.get(STRIPE_SUCCESS_PARAM) === "1";
-      const hasCancel = url.searchParams.get(STRIPE_CANCEL_PARAM) === "1";
+      const hasSuccess = url.searchParams.get(success_PARAM) === "1";
+      const hasCancel = url.searchParams.get(cancel_PARAM) === "1";
 
       if (hasSuccess) {
         alert(language === "es"
@@ -1159,7 +1159,7 @@ async function startPaidProCheckout() {
       }, { merge: true });
     }
 
-        url.searchParams.delete(STRIPE_SUCCESS_PARAM);
+        url.searchParams.delete(success_PARAM);
         window.history.replaceState({}, "", url.toString());
       }
 
@@ -1168,7 +1168,7 @@ async function startPaidProCheckout() {
           ? "Pago cancelado. Tu plan sigue en FREE."
           : "Payment canceled. Your plan remains FREE.");
 
-        url.searchParams.delete(STRIPE_CANCEL_PARAM);
+        url.searchParams.delete(cancel_PARAM);
         window.history.replaceState({}, "", url.toString());
       }
     }
