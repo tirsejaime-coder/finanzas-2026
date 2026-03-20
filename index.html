@@ -1638,6 +1638,29 @@ async function startPaidProCheckout() {
         drawCategoryChart();
         return;
       }
+      function renderCategorySelectors() {
+  const incomeSelect = document.getElementById("incomeCategory");
+  const expenseSelect = document.getElementById("expenseCategory");
+
+  if (!incomeSelect || !expenseSelect) return;
+
+  incomeSelect.innerHTML = "";
+  expenseSelect.innerHTML = "";
+
+  incomeCategories.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    incomeSelect.appendChild(opt);
+  });
+
+  expenseCategories.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    expenseSelect.appendChild(opt);
+  });
+}
 
       showSyncStatus("syncing", t("Guardando...", "Saving..."));
 
