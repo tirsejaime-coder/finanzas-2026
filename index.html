@@ -681,34 +681,34 @@
       <form class="quick-form" onsubmit="saveTransaction(event)">
 
         <div class="field">
-          <label for="type" id="labelType">Tipo</label>
-          <select id="type">
-            <option value="income" id="optIncome">Ingreso</option>
-            <option value="expense" id="optExpense">Gasto</option>
-          </select>
-        </div>
+  <label for="date" id="labelDate">Fecha</label>
+  <input type="date" id="date" required />
+</div>
 
-        <div class="field">
-          <label for="amount" id="labelAmount">Monto ($)</label>
-          <input type="number" id="amount" step="0.01" placeholder="0.00" required />
-        </div>
+<div class="field">
+  <label for="type" id="labelType">Tipo</label>
+  <select id="type">
+    <option value="income" id="optIncome">Ingreso</option>
+    <option value="expense" id="optExpense">Gasto</option>
+  </select>
+</div>
 
-        <div class="field">
-          <label for="description" id="labelDescription">Descripción</label>
-          <input type="text" id="description" placeholder="Ej: Venta, Alquiler" />
-        </div>
+<div class="field">
+  <label for="amount" id="labelAmount">Monto ($)</label>
+  <input type="number" id="amount" step="0.01" placeholder="0.00" required />
+</div>
 
-        <div class="field">
-          <label for="category" id="labelCategory">Categoría (si es gasto)</label>
-          <select id="category">
-            <option value="Alimentos">Alimentos</option>
-            <option value="Renta">Renta</option>
-            <option value="Servicios">Servicios</option>
-            <option value="Auto">Auto</option>
-            <option value="Entretenimiento">Entretenimiento</option>
-            <option value="Otros">Otros</option>
-          </select>
-        </div>
+<div class="field">
+  <label for="category" id="labelCategory">Categoría (si es gasto)</label>
+  <select id="category">
+    <option value="Alimentos">Alimentos</option>
+    <option value="Renta">Renta</option>
+    <option value="Servicios">Servicios</option>
+    <option value="Auto">Auto</option>
+    <option value="Entretenimiento">Entretenimiento</option>
+    <option value="Otros">Otros</option>
+  </select>
+</div>
 
         <div class="field" style="justify-content:flex-end;">
           <label>&nbsp;</label>
