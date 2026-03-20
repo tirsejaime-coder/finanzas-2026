@@ -2168,7 +2168,7 @@ async function startPaidProCheckout() {
       const dateInput = document.getElementById("date").value;
       const type = document.getElementById("type").value;
       const amount = parseFloat(document.getElementById("amount").value) || 0;
-      const description = document.getElementById("description").value.trim();
+      const description = "";
       const category = document.getElementById("category").value;
 
       if (!dateInput || !amount) {
