@@ -2395,13 +2395,19 @@ async function startPaidProCheckout() {
   currentUser = user;
 
   if (user) {
-    // 🔐 Usuario logueado
-    await ensureUserProfile(user);
-    watchUserProfile(user);
-    await loadTransactionsFromFirestore();
+  await ensureUserProfile(user);
+  watchUserProfile(user);
+  await loadTransactionsFromFirestore();
 
-    // 🔥 ACTIVAR PRO SI VIENE DE STRIPE
-    await handleStripeReturn();
+  // 🔥 MOSTRAR USUARIO
+  const authButtonText = document.getElementById("authButtonText");
+  authButtonText.textContent =
+    user.displayName ||
+    user.email ||
+    "Usuario";
+
+  await handleStripeReturn();
+}
 
   } else {
     // ❌ Usuario no logueado
