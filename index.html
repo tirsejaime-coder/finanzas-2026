@@ -699,21 +699,15 @@
 </div>
 
 <div class="field">
-  <label id="labelCategory">Categoría</label>
-
-  <div style="display:flex; gap:8px;">
-    <select id="category">
-  <option value="Alimentos">Alimentos</option>
-  <option value="Renta">Renta</option>
-  <option value="Servicios">Servicios</option>
-  <option value="Auto">Auto</option>
-  <option value="Entretenimiento">Entretenimiento</option>
-  <option value="Otros">Otros</option>
-</select>
-
-<button type="button" onclick="addCategoryPrompt()">➕</button>
-    </button>
-  </div>
+  <label for="category" id="labelCategory">Categoría (si es gasto)</label>
+  <select id="category">
+    <option value="Alimentos">Alimentos</option>
+    <option value="Renta">Renta</option>
+    <option value="Servicios">Servicios</option>
+    <option value="Auto">Auto</option>
+    <option value="Entretenimiento">Entretenimiento</option>
+    <option value="Otros">Otros</option>
+  </select>
 </div>
 
         <div class="field" style="justify-content:flex-end;">
@@ -979,30 +973,6 @@
           ? `Prueba PRO activa hasta ${endDate}`
           : `PRO trial active until ${endDate}`;
       }
-
-      function addCategoryPrompt() {
-  const newCat = prompt("Nueva categoría:");
-
-  if (!newCat) return;
-
-  const select = document.getElementById("category");
-
-  const option = document.createElement("option");
-  option.value = newCat;
-  option.textContent = newCat;
-
-  select.appendChild(option);
-  select.value = newCat;
-}
-
-
-  const option = document.createElement("option");
-  option.value = newCat;
-  option.textContent = newCat;
-
-  select.appendChild(option);
-  select.value = newCat;
-}
 
       return language === "es" ? "Plan PRO activo" : "PRO plan active";
     }
