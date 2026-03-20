@@ -996,6 +996,32 @@
     }
   }
 
+        function saveCategories() {
+  const select = document.getElementById("category");
+  const categories = [];
+
+  for (let i = 0; i < select.options.length; i++) {
+    categories.push(select.options[i].value);
+  }
+
+  localStorage.setItem("categories", JSON.stringify(categories));
+}
+
+function loadCategories() {
+  const saved = JSON.parse(localStorage.getItem("categories"));
+  if (!saved) return;
+
+  const select = document.getElementById("category");
+  select.innerHTML = "";
+
+  saved.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    select.appendChild(opt);
+  });
+}
+
   const option = document.createElement("option");
   option.value = newCat;
   option.textContent = newCat;
