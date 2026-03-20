@@ -987,15 +987,27 @@
   const proBannerButton = document.getElementById("proBannerButton");
   const plansWrapper = document.getElementById("plansWrapper");
 
+  // 🔥 ANUNCIOS
+  const ad1 = document.getElementById("adSlot1");
+  const ad2 = document.getElementById("adSlot2");
+  const ad3 = document.getElementById("adSlot3");
+
   isProUser = isProfilePro(profile);
   currentPlan = profile?.plan || "free";
 
-  // 🔥 SI ES PRO
+  // =========================
+  // 🔥 USUARIO PRO
+  // =========================
   if (isProUser) {
-    // ocultar planes
+    // ❌ ocultar planes
     if (plansWrapper) {
       plansWrapper.style.display = "none";
     }
+
+    // ❌ ocultar anuncios
+    [ad1, ad2, ad3].forEach(ad => {
+      if (ad) ad.style.display = "none";
+    });
 
     proBanner.style.display = "flex";
     proBannerText.innerHTML = language === "es"
@@ -1013,10 +1025,19 @@
     return;
   }
 
-  // 🔄 SI NO ES PRO (FREE)
+  // =========================
+  // 🔄 USUARIO FREE
+  // =========================
+
+  // ✅ mostrar planes
   if (plansWrapper) {
     plansWrapper.style.display = "grid";
   }
+
+  // ✅ mostrar anuncios
+  [ad1, ad2, ad3].forEach(ad => {
+    if (ad) ad.style.display = "flex";
+  });
 
   proBanner.style.display = "flex";
   proBannerText.innerHTML = language === "es"
