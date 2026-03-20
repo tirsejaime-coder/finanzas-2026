@@ -908,15 +908,20 @@
       "July","August","September","October","November","December"
     ];
 
-    const CATEGORY_OPTIONS = [
-      { es: "Alimentos", en: "Food" },
-      { es: "Renta", en: "Rent" },
-      { es: "Servicios", en: "Bills" },
-      { es: "Auto", en: "Car" },
-      { es: "Entretenimiento", en: "Entertainment" },
-      { es: "Otros", en: "Other" }
-    ];
+    let incomeCategories = JSON.parse(localStorage.getItem("incomeCategories")) || [
+  "Salario",
+  "Freelance",
+  "Inversión"
+];
 
+let expenseCategories = JSON.parse(localStorage.getItem("expenseCategories")) || [
+  "Alimentos",
+  "Renta",
+  "Servicios",
+  "Auto",
+  "Entretenimiento",
+  "Otros"
+];
     let language = localStorage.getItem("financeLang") || "es";
     let isProUser = false;
     let transactions = [];
