@@ -986,22 +986,14 @@
       const proBannerText = document.getElementById("proBannerText");
       const proBannerButton = document.getElementById("proBannerButton");
 
-      const isTempPro = localStorage.getItem("tempPro") === "true";
-      isProUser = isProfilePro(profile) || isTempPro;
+      isProUser = isProfilePro(profile);
       currentPlan = profile?.plan || "free";
 
       if (isProUser) {
-                  proBanner.style.display = "flex";
-
-if (isTempPro && (!profile || profile.plan !== "pro")) {
-  proBannerText.innerHTML = language === "es"
-    ? `<span class="pro-badge">PRO</span>Pago confirmado. Activando PRO...`
-    : `<span class="pro-badge">PRO</span>Payment confirmed. Activating PRO...`;
-} else {
-  proBannerText.innerHTML = language === "es"
-    ? `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. Ya tienes exportación PDF/Excel y funciones premium activas.`
-    : `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. PDF/Excel export and premium features are already active.`;
-}
+        proBanner.style.display = "flex";
+        proBannerText.innerHTML = language === "es"
+          ? `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. Ya tienes exportación PDF/Excel y funciones premium activas.`
+          : `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. PDF/Excel export and premium features are already active.`;
 
         proBannerButton.textContent = language === "es"
           ? "✅ PRO activo"
