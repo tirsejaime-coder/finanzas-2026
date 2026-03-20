@@ -981,6 +981,29 @@
           : `PRO trial active until ${endDate}`;
       }
 
+      function addCategoryPrompt() {
+  const newCat = prompt("Nueva categoría:");
+
+  if (!newCat) return;
+
+  const select = document.getElementById("category");
+
+  // evitar duplicados
+  for (let i = 0; i < select.options.length; i++) {
+    if (select.options[i].value.toLowerCase() === newCat.toLowerCase()) {
+      alert("Esa categoría ya existe");
+      return;
+    }
+  }
+
+  const option = document.createElement("option");
+  option.value = newCat;
+  option.textContent = newCat;
+
+  select.appendChild(option);
+  select.value = newCat;
+}
+
       return language === "es" ? "Plan PRO activo" : "PRO plan active";
     }
 
