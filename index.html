@@ -990,19 +990,27 @@
       currentPlan = profile?.plan || "free";
 
       if (isProUser) {
-        proBanner.style.display = "flex";
-        proBannerText.innerHTML = language === "es"
-          ? `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. Ya tienes exportación PDF/Excel y funciones premium activas.`
-          : `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. PDF/Excel export and premium features are already active.`;
+  const plansWrapper = document.getElementById("plansWrapper");
 
-        proBannerButton.textContent = language === "es"
-          ? "✅ PRO activo"
-          : "✅ PRO active";
-        proBannerButton.disabled = true;
-        proBannerButton.style.opacity = "0.7";
-        proBannerButton.style.cursor = "default";
-        return;
-      }
+  // 🔥 OCULTAR PLANES
+  if (plansWrapper) {
+    plansWrapper.style.display = "none";
+  }
+
+  proBanner.style.display = "flex";
+  proBannerText.innerHTML = language === "es"
+    ? `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. Ya tienes exportación PDF/Excel y funciones premium activas.`
+    : `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. PDF/Excel export and premium features are already active.`;
+
+  proBannerButton.textContent = language === "es"
+    ? "✅ PRO activo"
+    : "✅ PRO active";
+
+  proBannerButton.disabled = true;
+  proBannerButton.style.opacity = "0.7";
+  proBannerButton.style.cursor = "default";
+  return;
+}
 
       proBanner.style.display = "flex";
       proBannerText.innerHTML = language === "es"
