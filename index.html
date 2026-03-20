@@ -982,59 +982,65 @@
     }
 
     function updatePlanUI(profile = null) {
-      const proBanner = document.getElementById("proBanner");
-      const proBannerText = document.getElementById("proBannerText");
-      const proBannerButton = document.getElementById("proBannerButton");
-
-      isProUser = isProfilePro(profile);
-      currentPlan = profile?.plan || "free";
-
-      if (isProUser) {
+  const proBanner = document.getElementById("proBanner");
+  const proBannerText = document.getElementById("proBannerText");
+  const proBannerButton = document.getElementById("proBannerButton");
   const plansWrapper = document.getElementById("plansWrapper");
 
-  // 🔥 OCULTAR PLANES
+  isProUser = isProfilePro(profile);
+  currentPlan = profile?.plan || "free";
+
+  // 🔥 SI ES PRO
+  if (isProUser) {
+    // ocultar planes
+    if (plansWrapper) {
+      plansWrapper.style.display = "none";
+    }
+
+    proBanner.style.display = "flex";
+    proBannerText.innerHTML = language === "es"
+      ? `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. Ya tienes exportación PDF/Excel y funciones premium activas.`
+      : `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. PDF/Excel export and premium features are already active.`;
+
+    proBannerButton.textContent = language === "es"
+      ? "✅ PRO activo"
+      : "✅ PRO active";
+
+    proBannerButton.disabled = true;
+    proBannerButton.style.opacity = "0.7";
+    proBannerButton.style.cursor = "default";
+
+    return;
+  }
+
+  // 🔄 SI NO ES PRO (FREE)
   if (plansWrapper) {
-    plansWrapper.style.display = "none";
+    plansWrapper.style.display = "grid";
   }
 
   proBanner.style.display = "flex";
   proBannerText.innerHTML = language === "es"
-    ? `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. Ya tienes exportación PDF/Excel y funciones premium activas.`
-    : `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. PDF/Excel export and premium features are already active.`;
+    ? '<span class="pro-badge">PRO</span>Controla tus finanzas como un profesional. Prueba la versión PRO 60 días gratis y guarda todos tus años, con copias de seguridad automáticas semanales.'
+    : '<span class="pro-badge">PRO</span>Take control of your money like a pro. Try the PRO version free for 60 days and keep unlimited years with weekly automatic backups.';
 
-  proBannerButton.textContent = language === "es"
-    ? "✅ PRO activo"
-    : "✅ PRO active";
+  if (!currentUser) {
+    proBannerButton.textContent = language === "es"
+      ? "🔐 Inicia sesión para activar PRO"
+      : "🔐 Sign in to activate PRO";
+  } else if (profile?.trialUsed) {
+    proBannerButton.textContent = language === "es"
+      ? "💳 Activar PRO de pago"
+      : "💳 Activate paid PRO";
+  } else {
+    proBannerButton.textContent = language === "es"
+      ? "🚀 Empezar prueba PRO de 60 días"
+      : "🚀 Start 60-day PRO trial";
+  }
 
-  proBannerButton.disabled = true;
-  proBannerButton.style.opacity = "0.7";
-  proBannerButton.style.cursor = "default";
-  return;
+  proBannerButton.disabled = false;
+  proBannerButton.style.opacity = "1";
+  proBannerButton.style.cursor = "pointer";
 }
-
-      proBanner.style.display = "flex";
-      proBannerText.innerHTML = language === "es"
-        ? '<span class="pro-badge">PRO</span>Controla tus finanzas como un profesional. Prueba la versión PRO 60 días gratis y guarda todos tus años, con copias de seguridad automáticas semanales.'
-        : '<span class="pro-badge">PRO</span>Take control of your money like a pro. Try the PRO version free for 60 days and keep unlimited years with weekly automatic backups.';
-
-      if (!currentUser) {
-        proBannerButton.textContent = language === "es"
-          ? "🔐 Inicia sesión para activar PRO"
-          : "🔐 Sign in to activate PRO";
-      } else if (profile?.trialUsed) {
-        proBannerButton.textContent = language === "es"
-          ? "💳 Activar PRO de pago"
-          : "💳 Activate paid PRO";
-      } else {
-        proBannerButton.textContent = language === "es"
-          ? "🚀 Empezar prueba PRO de 60 días"
-          : "🚀 Start 60-day PRO trial";
-      }
-
-      proBannerButton.disabled = false;
-      proBannerButton.style.opacity = "1";
-      proBannerButton.style.cursor = "pointer";
-    }
 
     async function ensureUserProfile(user) {
       const userRef = doc(collection(db, "users"), user.uid);
