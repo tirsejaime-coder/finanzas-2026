@@ -2036,7 +2036,6 @@ async function startPaidProCheckout() {
       document.getElementById("labelDate").innerText = t("Fecha", "Date");
       document.getElementById("labelType").innerText = t("Tipo", "Type");
       document.getElementById("labelAmount").innerText = t("Monto ($)", "Amount ($)");
-      document.getElementById("labelDescription").innerText = t("Descripción", "Description");
       document.getElementById("labelCategory").innerText = t("Categoría (si es gasto)", "Category (if expense)");
 
       document.getElementById("optIncome").innerText = t("Ingreso", "Income");
@@ -2048,7 +2047,6 @@ async function startPaidProCheckout() {
         if (found) opt.textContent = language === "es" ? found.es : found.en;
       });
 
-      document.getElementById("description").placeholder = t("Ej: Venta, Alquiler", "Ex: Sale, Rent");
       document.getElementById("btnSave").innerText = t("💾 Guardar", "💾 Save");
       document.getElementById("btnExport").innerText = t("📥 Exportar Datos", "📥 Export Data");
       document.getElementById("btnPrint").innerText = t("🖨 Imprimir", "🖨 Print");
