@@ -986,10 +986,16 @@
       const proBannerText = document.getElementById("proBannerText");
       const proBannerButton = document.getElementById("proBannerButton");
 
-      isProUser = isProfilePro(profile);
+      const isTempPro = localStorage.getItem("tempPro") === "true";
+      isProUser = isProfilePro(profile) || isTempPro;
       currentPlan = profile?.plan || "free";
 
       if (isProUser) {
+                  if (isTempPro && (!profile || profile.plan !== "pro")) {
+                                proBannerText.innerHTML = language === "es"
+                                  ? `<span class="pro-badge">PRO</span>Pago confirmado. Activando PRO...`
+                                                : `<span class="pro-badge">PRO</span>Payment confirmed. Activating PRO...`;
+                              }
         proBanner.style.display = "flex";
         proBannerText.innerHTML = language === "es"
           ? `<span class="pro-badge">PRO</span>${getProfileStatusText(profile)}. Ya tienes exportación PDF/Excel y funciones premium activas.`
