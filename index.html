@@ -993,6 +993,7 @@
     if (select.options[i].value.toLowerCase() === newCat.toLowerCase()) {
       alert("Esa categoría ya existe");
       return;
+     saveCategories(); 
     }
   }
 
@@ -1265,6 +1266,7 @@ async function startPaidProCheckout() {
     const syncMessage = document.getElementById("syncMessage");
 
     document.getElementById("date").valueAsDate = new Date();
+    loadCategories();
 
     function getMonthNames() {
       return language === "es" ? monthNamesEs : monthNamesEn;
