@@ -1219,7 +1219,7 @@ async function startPaidProCheckout() {
       return language === "es" ? monthNamesEs : monthNamesEn;
     }
 
-    function addCategoryPrompt() {
+    window.addCategoryPrompt = function () {
   const newCat = prompt(language === "es" ? "Nueva categoría:" : "New category:");
 
   if (!newCat) return;
@@ -1238,14 +1238,14 @@ async function startPaidProCheckout() {
     }
   }
 
+  // ✅ AQUÍ FALTABA ESTO
   const option = document.createElement("option");
   option.value = cleanCat;
   option.textContent = cleanCat;
 
   select.appendChild(option);
   select.value = cleanCat;
-}
-
+};
     function t(es, en) {
       return language === "es" ? es : en;
     }
