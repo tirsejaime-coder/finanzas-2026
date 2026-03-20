@@ -2394,23 +2394,25 @@ async function startPaidProCheckout() {
     onAuthStateChanged(auth, async (user) => {
   currentUser = user;
 
-  if (user) {
-  await ensureUserProfile(user);
-  watchUserProfile(user);
-  await loadTransactionsFromFirestore();
-
-  // 🔥 MOSTRAR USUARIO
   const authButtonText = document.getElementById("authButtonText");
-  authButtonText.textContent =
-    user.displayName ||
-    user.email ||
-    "Usuario";
 
-  await handleStripeReturn();
-}
+  if (user) {
+    // 🔐 Usuario logueado
+    await ensureUserProfile(user);
+    watchUserProfile(user);
+    await loadTransactionsFromFirestore();
+
+    // 🔥 MOSTRAR NOMBRE / EMAIL
+    authButtonText.textContent =
+      user.displayName ||
+      user.email ||
+      "Usuario";
+
+    await handleStripeReturn();
 
   } else {
-    // ❌ Usuario no logueado
+    // ❌ Usuario NO logueado
+
     if (unsubscribeTransactions) {
       unsubscribeTransactions();
       unsubscribeTransactions = null;
@@ -2426,7 +2428,11 @@ async function startPaidProCheckout() {
     drawCategoryChart();
     updatePlanUI(null);
 
-    // 🔥 TAMBIÉN MANEJA STRIPE AQUÍ (por si vuelve sin sesión)
+    // 🔥 AQUÍ VA EXACTAMENTE 👇
+    authButtonText.textContent = language === "es"
+      ? "Iniciar sesión"
+      : "Sign in";
+
     await handleStripeReturn();
   }
 });
