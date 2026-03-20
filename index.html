@@ -680,24 +680,27 @@
     <div id="view-input" class="view active">
       <form class="quick-form" onsubmit="saveTransaction(event)">
         <div class="field">
-  <label id="labelIncomeCategory">Categoría (ingreso)</label>
-  <select id="incomeCategory"></select>
-</div>
+          <label for="date" id="labelDate">Fecha</label>
+          <input type="date" id="date" required />
+        </div>
 
-<div class="field">
-  <label id="labelExpenseCategory">Categoría (gasto)</label>
-  <select id="expenseCategory"></select>
-</div>
+        <div class="field">
+          <label for="type" id="labelType">Tipo</label>
+          <select id="type">
+            <option value="income" id="optIncome">Ingreso</option>
+            <option value="expense" id="optExpense">Gasto</option>
+          </select>
+        </div>
 
-<div class="field">
-  <label>+ Nueva categoría</label>
-  <input type="text" id="newCategoryInput" placeholder="Ej: Freelance, Inversión" />
-</div>
+        <div class="field">
+          <label for="amount" id="labelAmount">Monto ($)</label>
+          <input type="number" id="amount" step="0.01" placeholder="0.00" required />
+        </div>
 
-<div class="field" style="justify-content:flex-end;">
-  <label>&nbsp;</label>
-  <button type="button" class="btn btn-outline" onclick="addNewCategory()">➕ Añadir</button>
-</div>
+        <div class="field">
+          <label for="description" id="labelDescription">Descripción</label>
+          <input type="text" id="description" placeholder="Ej: Venta, Alquiler" />
+        </div>
 
         <div class="field">
           <label for="category" id="labelCategory">Categoría (si es gasto)</label>
@@ -908,20 +911,15 @@
       "July","August","September","October","November","December"
     ];
 
-    let incomeCategories = JSON.parse(localStorage.getItem("incomeCategories")) || [
-  "Salario",
-  "Freelance",
-  "Inversión"
-];
+    const CATEGORY_OPTIONS = [
+      { es: "Alimentos", en: "Food" },
+      { es: "Renta", en: "Rent" },
+      { es: "Servicios", en: "Bills" },
+      { es: "Auto", en: "Car" },
+      { es: "Entretenimiento", en: "Entertainment" },
+      { es: "Otros", en: "Other" }
+    ];
 
-let expenseCategories = JSON.parse(localStorage.getItem("expenseCategories")) || [
-  "Alimentos",
-  "Renta",
-  "Servicios",
-  "Auto",
-  "Entretenimiento",
-  "Otros"
-];
     let language = localStorage.getItem("financeLang") || "es";
     let isProUser = false;
     let transactions = [];
@@ -1214,14 +1212,7 @@ async function startPaidProCheckout() {
     const syncStatus = document.getElementById("syncStatus");
     const syncMessage = document.getElementById("syncMessage");
 
-    window.addEventListener("DOMContentLoaded", () => {
-  const dateInput = document.getElementById("date");
-  if (dateInput) {
-    dateInput.valueAsDate = new Date();
-  }
-
-  renderCategorySelectors();
-});
+    document.getElementById("date").valueAsDate = new Date();
 
     function getMonthNames() {
       return language === "es" ? monthNamesEs : monthNamesEn;
@@ -1645,29 +1636,6 @@ async function startPaidProCheckout() {
         drawCategoryChart();
         return;
       }
-      function renderCategorySelectors() {
-  const incomeSelect = document.getElementById("incomeCategory");
-  const expenseSelect = document.getElementById("expenseCategory");
-
-  if (!incomeSelect || !expenseSelect) return;
-
-  incomeSelect.innerHTML = "";
-  expenseSelect.innerHTML = "";
-
-  incomeCategories.forEach(cat => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    incomeSelect.appendChild(opt);
-  });
-
-  expenseCategories.forEach(cat => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    expenseSelect.appendChild(opt);
-  });
-}
 
       showSyncStatus("syncing", t("Guardando...", "Saving..."));
 
