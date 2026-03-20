@@ -2392,40 +2392,38 @@ async function startPaidProCheckout() {
     });
 
     onAuthStateChanged(auth, async (user) => {
-      currentUser = user;
-      const authButtonText = document.getElementById("authButtonText");
+  currentUser = user;
 
-      if (user) {
-        authButtonText.textContent = user.displayName || user.email || t("Mi cuenta", "My account");
-        await ensureUserProfile(user);
-        watchUserProfile(user);
-        loadTransactionsFromFirestore();
-      } else {
-        authButtonText.textContent = t("Iniciar sesión", "Sign in");
+  if (user) {
+    // 🔐 Usuario logueado
+    await ensureUserProfile(user);
+    watchUserProfile(user);
+    await loadTransactionsFromFirestore();
 
-        if (unsubscribeTransactions) {
-          unsubscribeTransactions();
-          unsubscribeTransactions = null;
-        }
+    // 🔥 ACTIVAR PRO SI VIENE DE STRIPE
+    await handleStripeReturn();
 
-        if (unsubscribeUserProfile) {
-          unsubscribeUserProfile();
-          unsubscribeUserProfile = null;
-        }
+  } else {
+    // ❌ Usuario no logueado
+    if (unsubscribeTransactions) {
+      unsubscribeTransactions();
+      unsubscribeTransactions = null;
+    }
 
-        updatePlanUI(null);
-        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+    if (unsubscribeUserProfile) {
+      unsubscribeUserProfile();
+      unsubscribeUserProfile = null;
+    }
 
-        if (currentView === "year") renderYearView();
-        else if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-        else {
-          document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-          document.getElementById("view-input").classList.add("active");
-        }
+    transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+    renderCurrentView();
+    drawCategoryChart();
+    updatePlanUI(null);
 
-        drawCategoryChart();
-      }
-    });
+    // 🔥 TAMBIÉN MANEJA STRIPE AQUÍ (por si vuelve sin sesión)
+    await handleStripeReturn();
+  }
+});
 
     handleStripeReturn();
     applyLanguage();
