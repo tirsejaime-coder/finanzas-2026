@@ -699,15 +699,22 @@
 </div>
 
 <div class="field">
-  <label for="category" id="labelCategory">Categoría (si es gasto)</label>
-  <select id="category">
-    <option value="Alimentos">Alimentos</option>
-    <option value="Renta">Renta</option>
-    <option value="Servicios">Servicios</option>
-    <option value="Auto">Auto</option>
-    <option value="Entretenimiento">Entretenimiento</option>
-    <option value="Otros">Otros</option>
-  </select>
+  <label id="labelCategory">Categoría</label>
+
+  <div style="display:flex; gap:8px;">
+    <select id="category" style="flex:1;">
+      <option value="Alimentos">Alimentos</option>
+      <option value="Renta">Renta</option>
+      <option value="Servicios">Servicios</option>
+      <option value="Auto">Auto</option>
+      <option value="Entretenimiento">Entretenimiento</option>
+      <option value="Otros">Otros</option>
+    </select>
+
+    <button type="button" onclick="addCategoryPrompt()" class="btn btn-outline">
+      ➕
+    </button>
+  </div>
 </div>
 
         <div class="field" style="justify-content:flex-end;">
