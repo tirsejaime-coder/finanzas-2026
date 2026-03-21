@@ -1558,6 +1558,7 @@ async function startPaidProCheckout() {
       for (let d = 1; d <= daysInMonth; d++) {
         let income = 0;
         let expense = 0;
+        let incomeCategory = null;
         const categoriesSet = new Set();
 
         transactions.forEach(tx => {
@@ -1568,10 +1569,16 @@ async function startPaidProCheckout() {
             td.getDate() === d
           ) {
             if (tx.type === "income") {
-              income += tx.amount;
+  income += tx.amount;
+  if (tx.category) incomeCategory = tx.category;
+}
             } else {
               expense += tx.amount;
               if (tx.category) categoriesSet.add(tx.category);
+              if (tx.type === "income") {
+  income += tx.amount;
+  if (tx.category) incomeCategory = tx.category;
+}
             }
           }
         });
@@ -1581,12 +1588,13 @@ async function startPaidProCheckout() {
         else if (categoriesSet.size > 1) categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
 
         monthData.push({
-          day: d,
-          income,
-          expense,
-          profit: income - expense,
-          category: categoryDisplay
-        });
+  day: d,
+  income,
+  expense,
+  profit: income - expense,
+  category: categoryDisplay,
+  incomeCategory
+});
       }
 
       return monthData;
@@ -1741,7 +1749,7 @@ function renderMonthView(monthIndex) {
         row.innerHTML = `
           <td><strong>${day.day}</strong></td>
           <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
-          <td>${renderIncomeCategorySelect('-', day.day)}</td>
+          <td>${renderIncomeCategorySelect(day.incomeCategory, day.day)}</td>
           <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
           <td class="editable-category" data-day="${day.day}">${renderCategorySelect(day.category, day.day)}</td>
           <td>$${day.profit.toFixed(2)}</td>
