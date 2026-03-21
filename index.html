@@ -1763,6 +1763,18 @@ function renderMonthView(monthIndex) {
       attachEditListeners();
       attachCategoryListeners();
       attachIncomeCategoryListeners();
+
+      function attachIncomeCategoryListeners() {
+  document.querySelectorAll(".income-category-select").forEach(select => {
+    select.addEventListener("change", async function () {
+      const day = parseInt(this.dataset.day, 10);
+      const newCat = this.value;
+
+      await updateIncomeCategory(currentMonth, day, newCat);
+      renderMonthView(currentMonth);
+    });
+  });
+}
     }
 
     function attachEditListeners() {
