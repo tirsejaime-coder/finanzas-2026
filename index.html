@@ -2142,37 +2142,48 @@ function renderMonthView(monthIndex) {
       drawCategoryChart();
     }
 
-    async function updateDayCategory(monthIndex, day, newCategory) {
-      const date = new Date(CURRENT_YEAR, monthIndex, day);
-      const dateStr = date.toISOString().split("T")[0];
+    async function updateIncomeCategory(monthIndex, day, newCategory) {
+  const date = new Date(CURRENT_YEAR, monthIndex, day);
+  const dateStr = date.toISOString().split("T")[0];
 
-      if (currentUser) {
-        const updates = transactions.filter(tx => {
-          const d = new Date(tx.date);
-          const ds = d.toISOString().split("T")[0];
-          return ds === dateStr && tx.type === "expense";
+  // 🔥 actualizar Firebase
+  if (currentUser) {
+    const updates = transactions.filter(tx => {
+      const d = new Date(tx.date);
+      return (
+        d.toISOString().split("T")[0] === dateStr &&
+        tx.type === "income"
+      );
+    });
+
+    for (const tx of updates) {
+      if (tx.id) {
+        await updateTransactionInFirestore(tx.id, {
+          category: newCategory
         });
-
-        for (const tx of updates) {
-          if (tx.id) await updateTransactionInFirestore(tx.id, { category: newCategory });
-        }
       }
-
-      transactions = transactions.map(tx => {
-        const d = new Date(tx.date);
-        const ds = d.toISOString().split("T")[0];
-        if (ds === dateStr && tx.type === "expense") {
-          return { ...tx, category: newCategory };
-        }
-        return tx;
-      });
-
-      if (!currentUser) {
-        localStorage.setItem("transactions", JSON.stringify(transactions));
-      }
-
-      drawCategoryChart();
     }
+  }
+
+  // 🔥 actualizar memoria local
+  transactions = transactions.map(tx => {
+    const d = new Date(tx.date);
+    if (
+      d.toISOString().split("T")[0] === dateStr &&
+      tx.type === "income"
+    ) {
+      return { ...tx, category: newCategory };
+    }
+    return tx;
+  });
+
+  // 🔥 guardar local si no hay login
+  if (!currentUser) {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+  }
+
+  drawCategoryChart();
+}
 
     function calculateWeekData() {
       const today = new Date();
