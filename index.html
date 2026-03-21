@@ -1771,7 +1771,6 @@ function renderMonthView(monthIndex) {
       const newCat = this.value;
 
       await updateIncomeCategory(currentMonth, day, newCat);
-      renderMonthView(currentMonth);
     });
   });
 }
@@ -1799,7 +1798,6 @@ function renderMonthView(monthIndex) {
           input.addEventListener("blur", async () => {
             const newValue = parseFloat(input.value) || 0;
             await updateDayValue(currentMonth, day, field, newValue);
-            renderMonthView(currentMonth);
           });
 
           input.addEventListener("keydown", async (e) => {
@@ -1817,7 +1815,6 @@ function renderMonthView(monthIndex) {
           const day = parseInt(this.dataset.day, 10);
           const newCat = this.value;
           await updateDayCategory(currentMonth, day, newCat);
-          renderMonthView(currentMonth);
         });
       });
     }
