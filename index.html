@@ -602,6 +602,109 @@
       line-height: 1.5;
     }
 
+    .category-manager {
+      margin-top: 14px;
+      padding: 14px;
+      background: #f9fafb;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+    }
+
+    .category-manager-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .category-manager-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .category-limit {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+    }
+
+    .category-groups {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .category-group {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .category-group-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .category-group-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .category-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: #1f2937;
+    }
+
+    .category-chip button {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+      color: #6b7280;
+      padding: 0;
+    }
+
+    .category-chip button:hover {
+      color: var(--color-danger);
+    }
+
+    .category-add-btn {
+      border: 1px dashed var(--color-primary);
+      background: white;
+      color: var(--color-primary);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .category-add-btn:hover {
+      background: #eff6ff;
+    }
+
+
     @media (max-width: 768px) {
       .container { padding: 18px 14px 24px; }
       h1 { font-size: 1.4rem; }
@@ -639,6 +742,7 @@
   <!-- Disqometer (1 sola instancia de cada script) -->
   <script src="https://api.disqometer.com/8ee4ea609a6346c4cf34c2b621ac79ba.js?nc=NjM5MjQw"></script>
   <script src="https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw"></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NTkyNDYzOTc2OTczNzU5MDg1OTI3MDI="></script>
 </head>
 <body>
   <div class="container">
@@ -699,15 +803,8 @@
 </div>
 
 <div class="field">
-  <label for="category" id="labelCategory">Categoría (si es gasto)</label>
-  <select id="category">
-    <option value="Alimentos">Alimentos</option>
-    <option value="Renta">Renta</option>
-    <option value="Servicios">Servicios</option>
-    <option value="Auto">Auto</option>
-    <option value="Entretenimiento">Entretenimiento</option>
-    <option value="Otros">Otros</option>
-  </select>
+  <label for="category" id="labelCategory">Categoría</label>
+  <select id="category"></select>
 </div>
 
         <div class="field" style="justify-content:flex-end;">
@@ -715,6 +812,8 @@
           <button type="submit" class="btn btn-primary" id="btnSave">💾 Guardar</button>
         </div>
       </form>
+
+      <div class="category-manager" id="categoryManager"></div>
 
       <div class="buttons-row">
         <button class="btn btn-secondary" onclick="checkExportAccess()" id="btnExport">📥 Exportar Datos</button>
@@ -908,18 +1007,29 @@
     ];
 
     const DEFAULT_CATEGORIES = [
-  { name: "Alimentos", type: "expense" },
-  { name: "Renta", type: "expense" },
-  { name: "Servicios", type: "expense" },
-  { name: "Auto", type: "expense" },
-  { name: "Entretenimiento", type: "expense" },
-  { name: "Otros", type: "expense" },
+      { name: "Alimentos", type: "expense" },
+      { name: "Renta", type: "expense" },
+      { name: "Servicios", type: "expense" },
+      { name: "Auto", type: "expense" },
+      { name: "Entretenimiento", type: "expense" },
+      { name: "Otros", type: "expense" },
+      { name: "Salario", type: "income" },
+      { name: "Freelance", type: "income" }
+    ];
 
-  { name: "Salario", type: "income" },
-  { name: "Freelance", type: "income" }
-];
+    const DEFAULT_CATEGORY_TRANSLATIONS = {
+      Alimentos: { es: "Alimentos", en: "Food" },
+      Renta: { es: "Renta", en: "Rent" },
+      Servicios: { es: "Servicios", en: "Bills" },
+      Auto: { es: "Auto", en: "Car" },
+      Entretenimiento: { es: "Entretenimiento", en: "Entertainment" },
+      Otros: { es: "Otros", en: "Other" },
+      Salario: { es: "Salario", en: "Salary" },
+      Freelance: { es: "Freelance", en: "Freelance" }
+    };
 
-let userCategories = [];
+    let userCategories = [];
+    let unsubscribeCategories = null;
 
     let language = localStorage.getItem("financeLang") || "es";
     let isProUser = false;
@@ -936,6 +1046,66 @@ let userCategories = [];
     
     const STRIPE_SUCCESS_PARAM = "success";
     const STRIPE_CANCEL_PARAM = "cancel";
+
+
+    function cloneDefaultCategories() {
+      return DEFAULT_CATEGORIES.map(category => ({ ...category }));
+    }
+
+    function normalizeCategory(raw) {
+      if (!raw) return null;
+
+      if (typeof raw === "string") {
+        return { name: raw.trim(), type: "expense" };
+      }
+
+      const name = String(raw.name || raw.es || "").trim();
+      const type = raw.type === "income" ? "income" : "expense";
+
+      if (!name) return null;
+      return { name, type };
+    }
+
+    function normalizeCategories(list) {
+      const source = Array.isArray(list) ? list : [];
+      const normalized = [];
+      const seen = new Set();
+
+      source.forEach(item => {
+        const category = normalizeCategory(item);
+        if (!category) return;
+
+        const key = `${category.type}::${category.name.toLowerCase()}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        normalized.push(category);
+      });
+
+      const defaultExpenseFallback = normalized.find(c => c.type === "expense" && c.name === "Otros");
+      if (!defaultExpenseFallback) {
+        normalized.push({ name: "Otros", type: "expense" });
+      }
+
+      return normalized;
+    }
+
+    function getCategoriesByType(type) {
+      return userCategories.filter(category => category.type === type);
+    }
+
+    function getTranslatedCategoryName(name) {
+      const found = DEFAULT_CATEGORY_TRANSLATIONS[name];
+      if (!found) return name || "-";
+      return language === "es" ? found.es : found.en;
+    }
+
+    function getEditableCategoryLimit() {
+      return isProUser ? Infinity : 10;
+    }
+
+    function getCategoryUsageCount() {
+      return userCategories.length;
+    }
 
     function getFutureDateISO(days) {
       const d = new Date();
@@ -1023,6 +1193,7 @@ let userCategories = [];
     proBannerButton.style.opacity = "0.7";
     proBannerButton.style.cursor = "default";
 
+    renderCategoryManager();
     return;
   }
 
@@ -1062,6 +1233,8 @@ let userCategories = [];
   proBannerButton.disabled = false;
   proBannerButton.style.opacity = "1";
   proBannerButton.style.cursor = "pointer";
+
+  renderCategoryManager();
 }
 
     async function ensureUserProfile(user) {
@@ -1237,9 +1410,8 @@ async function startPaidProCheckout() {
       }
     }
 
-    function getCategoryLabel(esValue) {
-      const found = CATEGORY_OPTIONS.find(c => c.es === esValue);
-      return found ? (language === "es" ? found.es : found.en) : (esValue || "-");
+    function getCategoryLabel(name) {
+      return getTranslatedCategoryName(name);
     }
 
     function renderCurrentView() {
@@ -1288,7 +1460,9 @@ async function startPaidProCheckout() {
 
     function computeCategoryData() {
       const categoryTotals = {};
-      CATEGORY_OPTIONS.forEach(c => categoryTotals[c.es] = 0);
+      getCategoriesByType("expense").forEach(c => {
+        categoryTotals[c.name] = 0;
+      });
       let totalIncome = 0;
 
       transactions.forEach(tx => {
@@ -1484,14 +1658,18 @@ async function startPaidProCheckout() {
     }
 
     function renderCategorySelect(currentCategory, day) {
-      let display = currentCategory && currentCategory !== "-" && currentCategory !== "Múltiples"
+      const expenseCategories = getCategoriesByType("expense");
+      let display = currentCategory && currentCategory !== "-" && currentCategory !== "Múltiples" && currentCategory !== "Multiple"
         ? currentCategory
         : "Otros";
 
-      const optsHtml = CATEGORY_OPTIONS.map(c => {
-        const text = language === "es" ? c.es : c.en;
-        const selected = c.es === display ? "selected" : "";
-        return `<option value="${c.es}" ${selected}>${text}</option>`;
+      if (!expenseCategories.some(c => c.name === display)) {
+        display = expenseCategories.some(c => c.name === "Otros") ? "Otros" : (expenseCategories[0]?.name || display);
+      }
+
+      const optsHtml = expenseCategories.map(c => {
+        const selected = c.name === display ? "selected" : "";
+        return `<option value="${c.name}" ${selected}>${getTranslatedCategoryName(c.name)}</option>`;
       }).join("");
 
       return `<select data-day="${day}" class="category-select">${optsHtml}</select>`;
@@ -1629,7 +1807,204 @@ async function startPaidProCheckout() {
       });
     }
 
-    // 🔄 Cargar categorías según estado de sesión   async function loadCategories() {     // 🔓 NO LOGUEADO → localStorage     if (!currentUser) {       const saved = JSON.parse(localStorage.getItem("categories"));        if (saved && saved.length) {         userCategories = saved;       } else {         userCategories = [...DEFAULT_CATEGORIES];         localStorage.setItem("categories", JSON.stringify(userCategories));       }        renderCategorySelects();       return;     }      // ☁️ LOGUEADO → Firebase     const colRef = collection(db, "users", currentUser.uid, "categories");      onSnapshot(colRef, (snapshot) => {       userCategories = [];        snapshot.forEach(doc => {         userCategories.push(doc.data());       });        // fallback si está vacío       if (userCategories.length === 0) {         userCategories = [...DEFAULT_CATEGORIES];       }        renderCategorySelects();     });   }    async function saveTransactionToFirestore(transaction) {
+    function renderCategorySelects() {
+      const select = document.getElementById("category");
+      const typeSelect = document.getElementById("type");
+      if (!select || !typeSelect) return;
+
+      const type = typeSelect.value;
+      const categories = getCategoriesByType(type);
+
+      if (!categories.length) {
+        select.innerHTML = `<option value="">${t("Sin categorías", "No categories")}</option>`;
+        select.disabled = true;
+        return;
+      }
+
+      select.disabled = false;
+      select.innerHTML = categories.map(category => (
+        `<option value="${category.name}">${getTranslatedCategoryName(category.name)}</option>`
+      )).join("");
+    }
+
+    function renderCategoryManager() {
+      const container = document.getElementById("categoryManager");
+      if (!container) return;
+
+      const expenseCategories = getCategoriesByType("expense");
+      const incomeCategories = getCategoriesByType("income");
+      const limit = getEditableCategoryLimit();
+      const usageText = limit === Infinity
+        ? t(`${getCategoryUsageCount()} categorías`, `${getCategoryUsageCount()} categories`)
+        : t(`${getCategoryUsageCount()} / ${limit} categorías`, `${getCategoryUsageCount()} / ${limit} categories`);
+
+      const groupHtml = (title, type, categories) => `
+        <div class="category-group">
+          <div class="category-group-head">
+            <div class="category-group-title">${title}</div>
+            <button type="button" class="category-add-btn" onclick="addCategoryPrompt('${type}')">➕ ${t("Agregar", "Add")}</button>
+          </div>
+          <div class="chips-wrap">
+            ${categories.map(category => `
+              <span class="category-chip">
+                <span>${getTranslatedCategoryName(category.name)}</span>
+                ${category.name === "Otros" ? "" : `<button type="button" onclick="deleteCategory('${category.name.replace(/'/g, "\'")}')">✕</button>`}
+              </span>
+            `).join("")}
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = `
+        <div class="category-manager-header">
+          <div class="category-manager-title">${t("Gestionar categorías", "Manage categories")}</div>
+          <div class="category-limit">${isProUser ? t("PRO ilimitado", "Unlimited PRO") : t(`Plan FREE: máximo ${limit}`, `FREE plan: max ${limit}`)} · ${usageText}</div>
+        </div>
+        <div class="category-groups">
+          ${groupHtml(`📉 ${t("Gastos", "Expenses")}`, "expense", expenseCategories)}
+          ${groupHtml(`📈 ${t("Ingresos", "Income")}`, "income", incomeCategories)}
+        </div>
+      `;
+    }
+
+    async function seedDefaultCategoriesToFirestore() {
+      if (!currentUser) return;
+      const colRef = collection(db, "users", currentUser.uid, "categories");
+      const snapshot = await getDocs(colRef);
+      if (!snapshot.empty) return;
+
+      for (const category of cloneDefaultCategories()) {
+        await addDoc(colRef, {
+          ...category,
+          createdAt: serverTimestamp()
+        });
+      }
+    }
+
+    async function loadCategories() {
+      if (!currentUser) {
+        const saved = JSON.parse(localStorage.getItem("categories"));
+        userCategories = normalizeCategories(saved && saved.length ? saved : cloneDefaultCategories());
+        localStorage.setItem("categories", JSON.stringify(userCategories));
+        renderCategorySelects();
+        renderCategoryManager();
+        if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
+        drawCategoryChart();
+        return;
+      }
+
+      if (unsubscribeCategories) {
+        unsubscribeCategories();
+        unsubscribeCategories = null;
+      }
+
+      await seedDefaultCategoriesToFirestore();
+      const colRef = collection(db, "users", currentUser.uid, "categories");
+
+      unsubscribeCategories = onSnapshot(colRef, (snapshot) => {
+        userCategories = normalizeCategories(snapshot.docs.map(docItem => ({ id: docItem.id, ...docItem.data() })));
+        renderCategorySelects();
+        renderCategoryManager();
+        if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
+        drawCategoryChart();
+      }, (error) => {
+        console.error("Error loading categories:", error);
+      });
+    }
+
+    async function saveCategoryToStorage(category) {
+      userCategories = normalizeCategories([...userCategories, category]);
+      localStorage.setItem("categories", JSON.stringify(userCategories));
+      renderCategorySelects();
+      renderCategoryManager();
+      if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
+      drawCategoryChart();
+    }
+
+    async function addCategoryPrompt(type) {
+      const label = type === "income" ? t("Nueva categoría de ingreso:", "New income category:") : t("Nueva categoría de gasto:", "New expense category:");
+      const newCat = prompt(label);
+      if (!newCat) return;
+
+      const cleanName = newCat.trim();
+      if (!cleanName) return;
+
+      const duplicate = userCategories.some(category => category.type === type && category.name.toLowerCase() === cleanName.toLowerCase());
+      if (duplicate) {
+        alert(t("Esa categoría ya existe.", "That category already exists."));
+        return;
+      }
+
+      if (!isProUser && getCategoryUsageCount() >= getEditableCategoryLimit()) {
+        alert(t("El plan FREE permite hasta 10 categorías editables.", "The FREE plan allows up to 10 editable categories."));
+        return;
+      }
+
+      const category = { name: cleanName, type };
+
+      if (!currentUser) {
+        await saveCategoryToStorage(category);
+        return;
+      }
+
+      await addDoc(collection(db, "users", currentUser.uid, "categories"), {
+        ...category,
+        createdAt: serverTimestamp()
+      });
+    }
+
+    async function replaceCategoryInTransactions(oldName, newName = "Otros") {
+      const matches = transactions.filter(tx => tx.type === "expense" && tx.category === oldName);
+      if (!matches.length) return;
+
+      transactions = transactions.map(tx => (
+        tx.type === "expense" && tx.category === oldName
+          ? { ...tx, category: newName }
+          : tx
+      ));
+
+      if (!currentUser) {
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        return;
+      }
+
+      for (const tx of matches) {
+        if (tx.id) {
+          await updateTransactionInFirestore(tx.id, { category: newName });
+        }
+      }
+    }
+
+    async function deleteCategory(name) {
+      if (name === "Otros") {
+        alert(t("No puedes eliminar la categoría 'Otros'.", "You cannot delete the 'Other' category."));
+        return;
+      }
+
+      const confirmDelete = confirm(t(`¿Eliminar la categoría "${name}"? Sus movimientos pasarán a "Otros".`, `Delete the category "${name}"? Its transactions will be moved to "Other".`));
+      if (!confirmDelete) return;
+
+      await replaceCategoryInTransactions(name, "Otros");
+
+      if (!currentUser) {
+        userCategories = normalizeCategories(userCategories.filter(category => category.name !== name));
+        localStorage.setItem("categories", JSON.stringify(userCategories));
+        renderCategorySelects();
+        renderCategoryManager();
+        renderCurrentView();
+        drawCategoryChart();
+        return;
+      }
+
+      const matches = userCategories.filter(category => category.name === name);
+      for (const category of matches) {
+        if (category.id) {
+          await deleteDoc(doc(db, "users", currentUser.uid, "categories", category.id));
+        }
+      }
+    }
+
+    async function saveTransactionToFirestore(transaction) {
       if (!currentUser) {
         transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
@@ -1715,7 +2090,7 @@ async function startPaidProCheckout() {
           type: targetType,
           amount: newValue,
           description: `Ajuste manual ${targetType === "income" ? t("ingreso","income") : t("gasto","expense")}`,
-          category: targetType === "expense" ? "Otros" : null
+          category: targetType === "expense" ? "Otros" : "Salario"
         };
 
         if (currentUser) {
@@ -2041,16 +2416,13 @@ async function startPaidProCheckout() {
       document.getElementById("labelDate").innerText = t("Fecha", "Date");
       document.getElementById("labelType").innerText = t("Tipo", "Type");
       document.getElementById("labelAmount").innerText = t("Monto ($)", "Amount ($)");
-      document.getElementById("labelCategory").innerText = t("Categoría (si es gasto)", "Category (if expense)");
+      document.getElementById("labelCategory").innerText = t("Categoría", "Category");
 
       document.getElementById("optIncome").innerText = t("Ingreso", "Income");
       document.getElementById("optExpense").innerText = t("Gasto", "Expense");
 
-      const catSelect = document.getElementById("category");
-      Array.from(catSelect.options).forEach(opt => {
-        const found = CATEGORY_OPTIONS.find(c => c.es === opt.value);
-        if (found) opt.textContent = language === "es" ? found.es : found.en;
-      });
+      renderCategorySelects();
+      renderCategoryManager();
 
       document.getElementById("btnSave").innerText = t("💾 Guardar", "💾 Save");
       document.getElementById("btnExport").innerText = t("📥 Exportar Datos", "📥 Export Data");
@@ -2165,6 +2537,9 @@ async function startPaidProCheckout() {
       renderMonthView(monthIndex);
     };
 
+    window.addCategoryPrompt = addCategoryPrompt;
+    window.deleteCategory = deleteCategory;
+
     window.saveTransaction = async function (e) {
       e.preventDefault();
 
@@ -2181,18 +2556,20 @@ async function startPaidProCheckout() {
 
       const date = new Date(dateInput + "T00:00:00");
 
+      const selectedCategory = category || (type === "expense" ? "Otros" : "Salario");
+
       const transaction = {
         date: date.toISOString(),
         type,
         amount,
         description,
-        category: type === "expense" ? category : null
+        category: selectedCategory
       };
 
       await saveTransactionToFirestore(transaction);
 
       document.getElementById("amount").value = "";
-      document.getElementById("description").value = "";
+      renderCategorySelects();
 
       alert(t("✅ Transacción guardada", "✅ Transaction saved"));
       drawCategoryChart();
@@ -2417,6 +2794,10 @@ async function startPaidProCheckout() {
       }
     });
 
+    document.getElementById("type").addEventListener("change", () => {
+      renderCategorySelects();
+    });
+
     document.getElementById("loginModal").addEventListener("click", (e) => {
       if (e.target.id === "loginModal") closeLogin();
     });
@@ -2434,6 +2815,7 @@ async function startPaidProCheckout() {
     // 🔐 Usuario logueado
     await ensureUserProfile(user);
     watchUserProfile(user);
+    await loadCategories();
     await loadTransactionsFromFirestore();
 
     // 🔥 MOSTRAR NOMBRE / EMAIL
@@ -2457,7 +2839,13 @@ async function startPaidProCheckout() {
       unsubscribeUserProfile = null;
     }
 
+    if (unsubscribeCategories) {
+      unsubscribeCategories();
+      unsubscribeCategories = null;
+    }
+
     transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+    await loadCategories();
     renderCurrentView();
     drawCategoryChart();
     updatePlanUI(null);
@@ -2472,6 +2860,7 @@ async function startPaidProCheckout() {
 });
 
     handleStripeReturn();
+    loadCategories();
     applyLanguage();
     switchTab("input");
   </script>
