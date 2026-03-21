@@ -1680,7 +1680,25 @@ async function startPaidProCheckout() {
     
 function renderIncomeCategorySelect(currentCategory, day) {
   const cats = getCategoriesByType("income");
-  let display = currentCategory && currentCategory !== "-" ? currentCategory : (cats[0]?.name || "Salario");
+
+  // 🔥 buscar categoría real del día
+  const date = new Date(CURRENT_YEAR, currentMonth, day);
+  const dateStr = date.toISOString().split("T")[0];
+
+  let realCategory = null;
+
+  transactions.forEach(tx => {
+    const d = new Date(tx.date);
+    if (
+      d.toISOString().split("T")[0] === dateStr &&
+      tx.type === "income"
+    ) {
+      realCategory = tx.category;
+    }
+  });
+
+  let display = realCategory || cats[0]?.name || "Salario";
+
   return `
     <select data-day="${day}" class="income-category-select">
       ${cats.map(c => `
