@@ -743,6 +743,7 @@
   <script src="https://api.disqometer.com/8ee4ea609a6346c4cf34c2b621ac79ba.js?nc=NjM5MjQw"></script>
   <script src="https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw"></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NTkyNDYzOTc2OTczNzU5MDg1OTI3MDI="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NTkyNDYzOTc2OTczNzU5MDg1OTI3MDI="></script>
 </head>
 <body>
   <div class="container">
@@ -865,6 +866,7 @@
             <tr>
               <th id="thDay">Día</th>
               <th id="thIncome">Ingresos</th>
+              <th id="thIncomeCategory">Cat. Ingreso</th>
               <th id="thExpense">Gastos</th>
               <th id="thCategory">Categoría</th>
               <th id="thProfit">Ganancia</th>
@@ -1675,7 +1677,22 @@ async function startPaidProCheckout() {
       return `<select data-day="${day}" class="category-select">${optsHtml}</select>`;
     }
 
-    function renderMonthView(monthIndex) {
+    
+function renderIncomeCategorySelect(currentCategory, day) {
+  const cats = getCategoriesByType("income");
+  let display = currentCategory && currentCategory !== "-" ? currentCategory : (cats[0]?.name || "Salario");
+  return `
+    <select data-day="${day}" class="income-category-select">
+      ${cats.map(c => `
+        <option value="${c.name}" ${c.name === display ? "selected" : ""}>
+          ${c.name}
+        </option>
+      `).join("")}
+    </select>
+  `;
+}
+
+function renderMonthView(monthIndex) {
       currentView = "month";
       currentMonth = monthIndex;
 
@@ -1706,6 +1723,7 @@ async function startPaidProCheckout() {
         row.innerHTML = `
           <td><strong>${day.day}</strong></td>
           <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
+          <td>${renderIncomeCategorySelect('-', day.day)}</td>
           <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
           <td class="editable-category" data-day="${day.day}">${renderCategorySelect(day.category, day.day)}</td>
           <td>$${day.profit.toFixed(2)}</td>
