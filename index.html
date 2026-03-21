@@ -699,26 +699,21 @@
 </div>
 
 <div class="field">
-  <label for="category" id="labelCategory">Categoría</label>
-
-  <div style="display:flex; gap:8px;">
-    <select id="category">
-      <option value="Alimentos">Alimentos</option>
-      <option value="Renta">Renta</option>
-      <option value="Servicios">Servicios</option>
-      <option value="Auto">Auto</option>
-      <option value="Entretenimiento">Entretenimiento</option>
-      <option value="Otros">Otros</option>
-    </select>
-
-    <button type="button" onclick="addCategoryPrompt()" class="btn btn-outline">➕</button>
-  </div>
+  <label for="category" id="labelCategory">Categoría (si es gasto)</label>
+  <select id="category">
+    <option value="Alimentos">Alimentos</option>
+    <option value="Renta">Renta</option>
+    <option value="Servicios">Servicios</option>
+    <option value="Auto">Auto</option>
+    <option value="Entretenimiento">Entretenimiento</option>
+    <option value="Otros">Otros</option>
+  </select>
 </div>
 
-<div class="field" style="justify-content:flex-end;">
-  <label>&nbsp;</label>
-  <button type="submit" class="btn btn-primary" id="btnSave">💾 Guardar</button>
-</div>
+        <div class="field" style="justify-content:flex-end;">
+          <label>&nbsp;</label>
+          <button type="submit" class="btn btn-primary" id="btnSave">💾 Guardar</button>
+        </div>
       </form>
 
       <div class="buttons-row">
@@ -1219,33 +1214,6 @@ async function startPaidProCheckout() {
       return language === "es" ? monthNamesEs : monthNamesEn;
     }
 
-    window.addCategoryPrompt = function () {
-  const newCat = prompt(language === "es" ? "Nueva categoría:" : "New category:");
-
-  if (!newCat) return;
-
-  const cleanCat = newCat.trim();
-  if (!cleanCat) return;
-
-  const select = document.getElementById("category");
-  if (!select) return;
-
-  // evitar duplicados
-  for (let i = 0; i < select.options.length; i++) {
-    if (select.options[i].value.toLowerCase() === cleanCat.toLowerCase()) {
-      select.value = select.options[i].value;
-      return;
-    }
-  }
-
-  // ✅ AQUÍ FALTABA ESTO
-  const option = document.createElement("option");
-  option.value = cleanCat;
-  option.textContent = cleanCat;
-
-  select.appendChild(option);
-  select.value = cleanCat;
-};
     function t(es, en) {
       return language === "es" ? es : en;
     }
