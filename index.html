@@ -603,12 +603,11 @@
     }
 
     .category-manager {
-      margin-top: 16px;
-      padding: 20px;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-        box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+      margin-top: 14px;
+      padding: 14px;
+      background: #f9fafb;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
     }
 
     .category-manager-header {
@@ -638,11 +637,11 @@
     }
 
     .category-group {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 14px;
-}
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 12px;
+    }
 
     .category-group-head {
       display: flex;
@@ -665,16 +664,16 @@
     }
 
     .category-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  background: #eef2ff; /* 🔥 CAMBIO CLAVE */
-  border: none; /* 🔥 QUITA borde */
-  border-radius: 999px;
-  font-size: 0.82rem;
-  color: #3730a3; /* 🔥 color más premium */
-}
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: #1f2937;
+    }
 
     .category-chip button {
       border: none;
@@ -738,15 +737,6 @@
     .btn, .tab, .export-option {
       touch-action: manipulation;
     }
-.dashboard { margin-top: 20px; }
-.kpi-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 12px; margin-bottom: 20px; }
-.kpi-card { background: var(--card-bg, #1e1e2e); border-radius: 10px; padding: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-.kpi-label { font-size: 0.78rem; color: var(--text-muted, #aaa); margin-bottom: 6px; }
-.kpi-value { font-size: 1.3rem; font-weight: 700; color: var(--accent, #4fc3f7); }
-.kpi-value.negative { color: #f44336; }
-.charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 16px; }
-.chart-box { background: var(--card-bg, #1e1e2e); border-radius: 10px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-.chart-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; color: var(--text-muted, #aaa); }
   </style>
 
   <!-- Disqometer (1 sola instancia de cada script) -->
@@ -829,37 +819,6 @@
         <button class="btn btn-secondary" onclick="checkExportAccess()" id="btnExport">📥 Exportar Datos</button>
         <button class="btn btn-outline" onclick="window.print()" id="btnPrint">🖨 Imprimir</button>
         <button class="btn btn-danger" onclick="clearData()" id="btnClear">🗑 Borrar datos</button>
-      </div>
-      
-      <div class="dashboard" id="dashboard">
-        <div class="kpi-cards">
-          <div class="kpi-card">
-            <div class="kpi-label">💰 Ingresos del Año</div>
-            <div class="kpi-value" id="kpiIncome">$0.00</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">💸 Gastos del Año</div>
-            <div class="kpi-value negative" id="kpiExpense">$0.00</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">📈 Balance Neto</div>
-            <div class="kpi-value" id="kpiBalance">$0.00</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">📅 Mejor Mes</div>
-            <div class="kpi-value" id="kpiBestMonth">-</div>
-          </div>
-        </div>
-        <div class="charts-grid">
-          <div class="chart-box">
-            <div class="chart-title">Gastos por Categoría</div>
-            <div id="dashPieChart" style="width:100%;height:220px;"></div>
-          </div>
-          <div class="chart-box">
-            <div class="chart-title">Ingresos vs Gastos por Mes</div>
-            <div id="dashMonthChart" style="width:100%;height:220px;"></div>
-          </div>
-        </div>
       </div>
 
       <div class="plans-wrapper" id="plansWrapper">
@@ -1059,7 +1018,6 @@
       transactions = JSON.parse(localStorage.getItem("transactions")) || [];
       renderCurrentView();
       drawCategoryChart();
-      renderDashboard();
     }
 
   } else {
@@ -1069,7 +1027,7 @@
     transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
     renderCurrentView();
-    drawCategoryChart();       renderDashboard();
+    drawCategoryChart();
   }
 });
     const CURRENT_YEAR = new Date().getFullYear();
@@ -1858,6 +1816,7 @@ async function startPaidProCheckout() {
           await updateIncomeCategory(currentMonth, day, newCat);
           if (!currentUser) renderMonthView(currentMonth);
         });
+      });
     }
 
     function attachEditListeners() {
@@ -1891,6 +1850,8 @@ async function startPaidProCheckout() {
               input.blur();
             }
           });
+        });
+      });
     }
 
     function attachCategoryListeners() {
@@ -1901,13 +1862,14 @@ async function startPaidProCheckout() {
           await updateDayCategory(currentMonth, day, newCat);
           renderMonthView(currentMonth);
         });
+      });
     }
 
     async function loadTransactionsFromFirestore() {
       if (!currentUser) {
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
-        drawCategoryChart();       renderDashboard();
+        drawCategoryChart();
         return;
       }
 
@@ -1925,7 +1887,7 @@ async function startPaidProCheckout() {
         });
 
         renderCurrentView();
-        drawCategoryChart();       renderDashboard();
+        drawCategoryChart();
         showSyncStatus("success", t("Sincronizado", "Synced"));
       }, (error) => {
         console.error("Error loading transactions:", error);
@@ -1933,7 +1895,7 @@ async function startPaidProCheckout() {
 
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
-        drawCategoryChart();       renderDashboard();
+        drawCategoryChart();
       });
     }
 
@@ -1958,50 +1920,44 @@ async function startPaidProCheckout() {
     }
 
     function renderCategoryManager() {
-  const container = document.getElementById("categoryManager");
-  if (!container) return;
+      const container = document.getElementById("categoryManager");
+      if (!container) return;
 
-  const expenseCategories = getCategoriesByType("expense");
-  const incomeCategories = getCategoriesByType("income");
-  const limit = getEditableCategoryLimit();
-  const usageText = limit === Infinity
-    ? t(`${getCategoryUsageCount()} categorías`, `${getCategoryUsageCount()} categories`)
-    : t(`${getCategoryUsageCount()} / ${limit} categorías`, `${getCategoryUsageCount()} / ${limit} categories`);
+      const expenseCategories = getCategoriesByType("expense");
+      const incomeCategories = getCategoriesByType("income");
+      const limit = getEditableCategoryLimit();
+      const usageText = limit === Infinity
+        ? t(`${getCategoryUsageCount()} categorías`, `${getCategoryUsageCount()} categories`)
+        : t(`${getCategoryUsageCount()} / ${limit} categorías`, `${getCategoryUsageCount()} / ${limit} categories`);
 
-  const groupHtml = (title, type, categories) => `
-    <div class="category-group">
-      <div class="category-group-head">
-        <div class="category-group-title">${title}</div>
-        <button type="button" class="category-add-btn" onclick="addCategoryPrompt('${type}')">➕ ${t("Agregar", "Add")}</button>
-      </div>
-      <div class="chips-wrap">
-        ${categories.map(category => `
-          <span class="category-chip">
-            <span>${getTranslatedCategoryName(category.name)}</span>
-            ${category.name === "Otros" && category.type === "expense"
-              ? ""
-              : `<button type="button" onclick="deleteCategory('${category.name}', '${category.type}')">✕</button>`}
-          </span>
-        `).join("")}
-      </div>
-    </div>
-  `;
+      const groupHtml = (title, type, categories) => `
+        <div class="category-group">
+          <div class="category-group-head">
+            <div class="category-group-title">${title}</div>
+            <button type="button" class="category-add-btn" onclick="addCategoryPrompt('${type}')">➕ ${t("Agregar", "Add")}</button>
+          </div>
+          <div class="chips-wrap">
+            ${categories.map(category => `
+              <span class="category-chip">
+                <span>${getTranslatedCategoryName(category.name)}</span>
+                ${category.name === "Otros" ? "" : `<button type="button" onclick="deleteCategory('${category.name.replace(/'/g, "\'")}')">✕</button>`}
+              </span>
+            `).join("")}
+          </div>
+        </div>
+      `;
 
-  container.innerHTML = `
-    <div class="category-manager-header">
-      <div class="category-manager-title">${t("Gestionar categorías", "Manage categories")}</div>
-      <div class="category-limit">
-        ${isProUser
-          ? t("PRO ilimitado", "Unlimited PRO")
-          : t(`Plan FREE: máximo ${limit}`, `FREE plan: max ${limit}`)} · ${usageText}
-      </div>
-    </div>
-    <div class="category-groups">
-      ${groupHtml(`📉 ${t("Gastos", "Expenses")}`, "expense", expenseCategories)}
-      ${groupHtml(`📈 ${t("Ingresos", "Income")}`, "income", incomeCategories)}
-    </div>
-  `;
-}
+      container.innerHTML = `
+        <div class="category-manager-header">
+          <div class="category-manager-title">${t("Gestionar categorías", "Manage categories")}</div>
+          <div class="category-limit">${isProUser ? t("PRO ilimitado", "Unlimited PRO") : t(`Plan FREE: máximo ${limit}`, `FREE plan: max ${limit}`)} · ${usageText}</div>
+        </div>
+        <div class="category-groups">
+          ${groupHtml(`📉 ${t("Gastos", "Expenses")}`, "expense", expenseCategories)}
+          ${groupHtml(`📈 ${t("Ingresos", "Income")}`, "income", incomeCategories)}
+        </div>
+      `;
+    }
 
     async function seedDefaultCategoriesToFirestore() {
       if (!currentUser) return;
@@ -2014,6 +1970,7 @@ async function startPaidProCheckout() {
           ...category,
           createdAt: serverTimestamp()
         });
+      }
     }
 
     async function loadCategories() {
@@ -2024,7 +1981,7 @@ async function startPaidProCheckout() {
         renderCategorySelects();
         renderCategoryManager();
         if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-        drawCategoryChart();       renderDashboard();
+        drawCategoryChart();
         return;
       }
 
@@ -2041,7 +1998,7 @@ async function startPaidProCheckout() {
         renderCategorySelects();
         renderCategoryManager();
         if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-        drawCategoryChart();       renderDashboard();
+        drawCategoryChart();
       }, (error) => {
         console.error("Error loading categories:", error);
       });
@@ -2053,7 +2010,7 @@ async function startPaidProCheckout() {
       renderCategorySelects();
       renderCategoryManager();
       if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-      drawCategoryChart();       renderDashboard();
+      drawCategoryChart();
     }
 
     async function addCategoryPrompt(type) {
@@ -2107,50 +2064,44 @@ async function startPaidProCheckout() {
         if (tx.id) {
           await updateTransactionInFirestore(tx.id, { category: newName });
         }
+      }
     }
 
-    async function deleteCategory(name, type) {
-  if (name === "Otros" && type === "expense") {
-    alert(t("No puedes eliminar la categoría 'Otros'.", "You cannot delete the 'Other' category."));
-    return;
-  }
+    async function deleteCategory(name) {
+      if (name === "Otros") {
+        alert(t("No puedes eliminar la categoría 'Otros'.", "You cannot delete the 'Other' category."));
+        return;
+      }
 
-  const confirmDelete = confirm(
-    t(
-      `¿Eliminar la categoría "${name}"?`,
-      `Delete category "${name}"?`
-    )
-  );
+      const confirmDelete = confirm(t(`¿Eliminar la categoría "${name}"? Sus movimientos pasarán a "Otros".`, `Delete the category "${name}"? Its transactions will be moved to "Other".`));
+      if (!confirmDelete) return;
 
-  if (!confirmDelete) return;
+      await replaceCategoryInTransactions(name, "Otros");
 
-  if (!currentUser) {
-    userCategories = normalizeCategories(
-      userCategories.filter(c => !(c.name === name && c.type === type))
-    );
+      if (!currentUser) {
+        userCategories = normalizeCategories(userCategories.filter(category => category.name !== name));
+        localStorage.setItem("categories", JSON.stringify(userCategories));
+        renderCategorySelects();
+        renderCategoryManager();
+        renderCurrentView();
+        drawCategoryChart();
+        return;
+      }
 
-    localStorage.setItem("categories", JSON.stringify(userCategories));
-    renderCategorySelects();
-    renderCategoryManager();
-    renderCurrentView();
-    drawCategoryChart();       renderDashboard();
-    return;
-  }
-
-  const matches = userCategories.filter(c => c.name === name && c.type === type);
-
-  for (const cat of matches) {
-    if (cat.id) {
-      await deleteDoc(doc(db, "users", currentUser.uid, "categories", cat.id));
-    
-}
+      const matches = userCategories.filter(category => category.name === name);
+      for (const category of matches) {
+        if (category.id) {
+          await deleteDoc(doc(db, "users", currentUser.uid, "categories", category.id));
+        }
+      }
+    }
 
     async function saveTransactionToFirestore(transaction) {
       if (!currentUser) {
         transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
         renderCurrentView();
-        drawCategoryChart();       renderDashboard();
+        drawCategoryChart();
         return;
       }
 
@@ -2174,9 +2125,9 @@ async function startPaidProCheckout() {
         transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
         renderCurrentView();
-        drawCategoryChart();       renderDashboard();
+        drawCategoryChart();
       }
-    
+    }
 
     async function updateTransactionInFirestore(transactionId, updates) {
       if (!currentUser) return;
@@ -2188,7 +2139,7 @@ async function startPaidProCheckout() {
       } catch (e) {
         console.error("Error updating transaction:", e);
       }
-    
+    }
 
     async function deleteTransactionFromFirestore(transactionId) {
       if (!currentUser) return;
@@ -2200,7 +2151,7 @@ async function startPaidProCheckout() {
       } catch (e) {
         console.error("Error deleting transaction:", e);
       }
-    
+    }
 
     async function updateDayValue(monthIndex, day, field, newValue) {
       const targetDate = new Date(CURRENT_YEAR, monthIndex, day);
@@ -2221,7 +2172,7 @@ async function startPaidProCheckout() {
         for (const tx of matches) {
           if (tx.id) await deleteTransactionFromFirestore(tx.id);
         }
-      
+      }
 
       transactions = transactions.filter(tx => {
         const d = new Date(tx.date);
@@ -2247,7 +2198,7 @@ async function startPaidProCheckout() {
         localStorage.setItem("transactions", JSON.stringify(transactions));
       }
 
-      drawCategoryChart();       renderDashboard();
+      drawCategoryChart();
     }
 
     async function updateDayCategory(monthIndex, day, newCategory) {
@@ -2262,7 +2213,7 @@ async function startPaidProCheckout() {
         for (const tx of updates) {
           if (tx.id) await updateTransactionInFirestore(tx.id, { category: newCategory });
         }
-      
+      }
 
       transactions = transactions.map(tx => {
         const d = new Date(tx.date);
@@ -2276,7 +2227,7 @@ async function startPaidProCheckout() {
         localStorage.setItem("transactions", JSON.stringify(transactions));
       }
 
-      drawCategoryChart();       renderDashboard();
+      drawCategoryChart();
     }
 
     async function updateIncomeCategory(monthIndex, day, newCategory) {
@@ -2291,7 +2242,7 @@ async function startPaidProCheckout() {
         for (const tx of updates) {
           if (tx.id) await updateTransactionInFirestore(tx.id, { category: newCategory });
         }
-      
+      }
 
       transactions = transactions.map(tx => {
         const d = new Date(tx.date);
@@ -2305,7 +2256,7 @@ async function startPaidProCheckout() {
         localStorage.setItem("transactions", JSON.stringify(transactions));
       }
 
-      drawCategoryChart();       renderDashboard();
+      drawCategoryChart();
     }
 
     function calculateWeekData() {
@@ -2674,7 +2625,7 @@ async function startPaidProCheckout() {
         "Your data syncs to the cloud when you sign in."
       );
 
-      drawCategoryChart();       renderDashboard();
+      drawCategoryChart();
       updatePlanUI(currentUser ? { plan: currentPlan } : null);
 
       if (currentView === "year") renderYearView();
@@ -2742,7 +2693,7 @@ async function startPaidProCheckout() {
       renderCategorySelects();
 
       alert(t("✅ Transacción guardada", "✅ Transaction saved"));
-      drawCategoryChart();       renderDashboard();
+      drawCategoryChart();
     };
 
     window.showProExportMessage = function () {
@@ -2863,7 +2814,7 @@ async function startPaidProCheckout() {
         document.getElementById("view-input").classList.add("active");
       }
 
-      drawCategoryChart();       renderDashboard();
+      drawCategoryChart();
       showSyncStatus("success", t("Datos eliminados", "Data deleted"));
     };
 
@@ -3017,7 +2968,7 @@ async function startPaidProCheckout() {
     transactions = JSON.parse(localStorage.getItem("transactions")) || [];
     await loadCategories();
     renderCurrentView();
-    drawCategoryChart();       renderDashboard();
+    drawCategoryChart();
     updatePlanUI(null);
 
     // 🔥 AQUÍ VA EXACTAMENTE 👇
@@ -3033,146 +2984,6 @@ async function startPaidProCheckout() {
     loadCategories();
     applyLanguage();
     switchTab("input");
-function renderDashboard() {
-  const dash = document.getElementById('dashboard');
-  if (!dash) return;
-  const txs = transactions || [];
-  let income = 0, expense = 0;
-  const now = new Date();
-  const thisMonth = txs.filter(t => { const d = new Date(t.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
-  thisMonth.forEach(t => { if (t.type === 'income') income += t.amount; else expense += t.amount; });
-  const balance = income - expense;
-  const allIncome = txs.filter(t => t.type === 'income').reduce((a,b) => a + b.amount, 0);
-  const allExpense = txs.filter(t => t.type === 'expense').reduce((a,b) => a + b.amount, 0);
-  const fmt = n => '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  const setKpi = (id, val, neg) => { const el = document.getElementById(id); if (el) { el.textContent = fmt(Math.abs(val)); el.className = 'kpi-value' + (neg && val < 0 ? ' negative' : ''); } };
-  setKpi('kpi-income', income);
-  setKpi('kpi-expense', expense);
-  setKpi('kpi-balance', balance, true);
-  setKpi('kpi-total-income', allIncome);
-  setKpi('kpi-total-expense', allExpense);
-  setKpi('kpi-net', allIncome - allExpense, true);
-  drawPieChart(txs);
-  drawMonthlyChart(txs);
-}
-
-function drawPieChart(txs) {
-  const el = document.getElementById('dash-pie');
-  if (!el || !window.google || !google.visualization) return;
-  const cats = {};
-  txs.filter(t => t.type === 'expense').forEach(t => { const c = t.category || 'Otros'; cats[c] = (cats[c] || 0) + t.amount; });
-  const data = new google.visualization.DataTable();
-  data.addColumn('string', 'Categoría');
-  data.addColumn('number', 'Monto');
-  Object.entries(cats).forEach(([k,v]) => data.addRow([k, v]));
-  if (data.getNumberOfRows() === 0) { el.innerHTML = ''; return; }
-  new google.visualization.PieChart(el).draw(data, { backgroundColor: 'transparent', legend: { textStyle: { color: '#aaa' } }, pieSliceTextStyle: { color: '#fff' } });
-}
-
-function drawMonthlyChart(txs) {
-  const el = document.getElementById('dash-monthly');
-  if (!el || !window.google || !google.visualization) return;
-  const months = {};
-  txs.forEach(t => { const d = new Date(t.date); const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); if (!months[key]) months[key] = {income:0,expense:0}; if (t.type==='income') months[key].income += t.amount; else months[key].expense += t.amount; });
-  const keys = Object.keys(months).sort().slice(-6);
-  const data = new google.visualization.DataTable();
-  data.addColumn('string', 'Mes');
-  data.addColumn('number', 'Ingresos');
-  data.addColumn('number', 'Gastos');
-  keys.forEach(k => data.addRow([k, months[k].income, months[k].expense]));
-  if (data.getNumberOfRows() === 0) { el.innerHTML = ''; return; }
-  new google.visualization.BarChart(el).draw(data, { backgroundColor: 'transparent', legend: { textStyle: { color: '#aaa' } }, hAxis: { textStyle: { color: '#aaa' } }, vAxis: { textStyle: { color: '#aaa' } }, colors: ['#4fc3f7','#f44336'] });
-}
-
-function renderDashboard() {
-  if (!google || !google.visualization) return;
-
-  let totalIncome = 0;
-  let totalExpense = 0;
-
-  const expenseByCategory = {};
-  const monthlyData = Array(12).fill(0);
-
-  transactions.forEach(tx => {
-    const date = new Date(tx.date);
-    const month = date.getMonth();
-
-    if (date.getFullYear() !== CURRENT_YEAR) return;
-
-    if (tx.type === "income") {
-      totalIncome += tx.amount;
-      monthlyData[month] += tx.amount;
-    } else {
-      totalExpense += tx.amount;
-
-      const cat = tx.category || "Otros";
-      expenseByCategory[cat] = (expenseByCategory[cat] || 0) + tx.amount;
-
-      monthlyData[month] -= tx.amount;
-    }
-  });
-
-  const balance = totalIncome - totalExpense;
-
-  document.getElementById("kpiIncome").innerText = `$${totalIncome.toFixed(2)}`;
-  document.getElementById("kpiExpense").innerText = `$${totalExpense.toFixed(2)}`;
-  document.getElementById("kpiBalance").innerText = `$${balance.toFixed(2)}`;
-
-  let bestMonthIndex = monthlyData.indexOf(Math.max(...monthlyData));
-  document.getElementById("kpiBestMonth").innerText =
-    getMonthNames()[bestMonthIndex] || "-";
-
-  drawDashboardPie(expenseByCategory);
-  drawDashboardMonthly(monthlyData);
-}
-
-function drawDashboardPie(dataObj) {
-  const dataArray = [["Categor\u00eda", "Monto"]];
-
-  Object.entries(dataObj).forEach(([cat, val]) => {
-    dataArray.push([cat, val]);
-  });
-
-  if (dataArray.length <= 1) return;
-
-  const data = google.visualization.arrayToDataTable(dataArray);
-
-  const options = {
-    pieHole: 0.4,
-    legend: { position: "right" }
-  };
-
-  const chart = new google.visualization.PieChart(
-    document.getElementById("dashPieChart")
-  );
-
-  chart.draw(data, options);
-}
-
-function drawDashboardMonthly(monthlyIncome, monthlyExpense) {
-  const el = document.getElementById("dashMonthChart");
-  if (!el || !google || !google.visualization) return;
-
-  const months = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-
-  const dataArray = [["Mes", "Ingresos", "Gastos"]];
-
-  months.forEach((m, i) => {
-    dataArray.push([
-      m,
-      monthlyIncome[i] || 0,
-      monthlyExpense[i] || 0
-    ]);
-  });
-
-  const data = google.visualization.arrayToDataTable(dataArray);
-
-  const chart = new google.visualization.ColumnChart(el);
-  chart.draw(data, {
-    legend: { position: "bottom" }
-  });
-}
-
   </script>
 </body>
 </html>
