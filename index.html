@@ -743,7 +743,6 @@
   <script src="https://api.disqometer.com/8ee4ea609a6346c4cf34c2b621ac79ba.js?nc=NjM5MjQw"></script>
   <script src="https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw"></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NTkyNDYzOTc2OTczNzU5MDg1OTI3MDI="></script>
-<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NTkyNDYzOTc2OTczNzU5MDg1OTI3MDI="></script>
 </head>
 <body>
   <div class="container">
@@ -1551,6 +1550,14 @@ async function startPaidProCheckout() {
       return yearData;
     }
 
+    function isSameLocalDay(dateA, dateB) {
+      return (
+        dateA.getFullYear() === dateB.getFullYear() &&
+        dateA.getMonth() === dateB.getMonth() &&
+        dateA.getDate() === dateB.getDate()
+      );
+    }
+
     function calculateMonthData(monthIndex) {
       const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
       const monthData = [];
@@ -1569,16 +1576,11 @@ async function startPaidProCheckout() {
             td.getDate() === d
           ) {
             if (tx.type === "income") {
-  income += tx.amount;
-  if (tx.category) incomeCategory = tx.category;
-}
+              income += tx.amount;
+              if (tx.category) incomeCategory = tx.category;
             } else {
               expense += tx.amount;
               if (tx.category) categoriesSet.add(tx.category);
-              if (tx.type === "income") {
-  income += tx.amount;
-  if (tx.category) incomeCategory = tx.category;
-}
             }
           }
         });
@@ -1588,18 +1590,19 @@ async function startPaidProCheckout() {
         else if (categoriesSet.size > 1) categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
 
         monthData.push({
-  day: d,
-  income,
-  expense,
-  profit: income - expense,
-  category: categoryDisplay,
-  incomeCategory
-});
+          day: d,
+          income,
+          incomeCategory,
+          expense,
+          profit: income - expense,
+          category: categoryDisplay
+        });
       }
 
       return monthData;
     }
 
+    function renderYearView() {
     function renderYearView() {
       const yearData = calculateYearData();
       const grid = document.getElementById("yearGrid");
@@ -1685,40 +1688,36 @@ async function startPaidProCheckout() {
       return `<select data-day="${day}" class="category-select">${optsHtml}</select>`;
     }
 
-    
-function renderIncomeCategorySelect(currentCategory, day) {
-  const cats = getCategoriesByType("income");
+    function renderIncomeCategorySelect(currentCategory, day) {
+      const incomeCategories = getCategoriesByType("income");
+      if (!incomeCategories.length) {
+        return `<select data-day="${day}" class="income-category-select" disabled><option value="">${t("Sin categorías", "No categories")}</option></select>`;
+      }
 
-  // 🔥 buscar categoría real del día
-  const date = new Date(CURRENT_YEAR, currentMonth, day);
-  const dateStr = date.toISOString().split("T")[0];
+      let display = currentCategory && currentCategory !== "-" ? currentCategory : null;
 
-  let realCategory = null;
+      if (!display) {
+        const targetDate = new Date(CURRENT_YEAR, currentMonth, day);
+        const existingIncome = transactions.find(tx => {
+          const d = new Date(tx.date);
+          return tx.type === "income" && isSameLocalDay(d, targetDate);
+        });
+        display = existingIncome?.category || incomeCategories[0]?.name || "Salario";
+      }
 
-  transactions.forEach(tx => {
-    const d = new Date(tx.date);
-    if (
-      d.toISOString().split("T")[0] === dateStr &&
-      tx.type === "income"
-    ) {
-      realCategory = tx.category;
+      if (!incomeCategories.some(c => c.name === display)) {
+        display = incomeCategories[0]?.name || "Salario";
+      }
+
+      const optsHtml = incomeCategories.map(c => {
+        const selected = c.name === display ? "selected" : "";
+        return `<option value="${c.name}" ${selected}>${getTranslatedCategoryName(c.name)}</option>`;
+      }).join("");
+
+      return `<select data-day="${day}" class="income-category-select">${optsHtml}</select>`;
     }
-  });
 
-  let display = realCategory || cats[0]?.name || "Salario";
-
-  return `
-    <select data-day="${day}" class="income-category-select">
-      ${cats.map(c => `
-        <option value="${c.name}" ${c.name === display ? "selected" : ""}>
-          ${c.name}
-        </option>
-      `).join("")}
-    </select>
-  `;
-}
-
-function renderMonthView(monthIndex) {
+    function renderMonthView(monthIndex) {
       currentView = "month";
       currentMonth = monthIndex;
 
@@ -1762,6 +1761,7 @@ function renderMonthView(monthIndex) {
       totalRow.innerHTML = `
         <td><strong>${t("TOTAL","TOTAL")}</strong></td>
         <td><strong>$${totalIncome.toFixed(2)}</strong></td>
+        <td></td>
         <td><strong>$${totalExpense.toFixed(2)}</strong></td>
         <td></td>
         <td><strong>$${totalProfit.toFixed(2)}</strong></td>
@@ -1771,19 +1771,20 @@ function renderMonthView(monthIndex) {
       attachEditListeners();
       attachCategoryListeners();
       attachIncomeCategoryListeners();
-
-      function attachIncomeCategoryListeners() {
-  document.querySelectorAll(".income-category-select").forEach(select => {
-    select.addEventListener("change", async function () {
-      const day = parseInt(this.dataset.day, 10);
-      const newCat = this.value;
-
-      await updateIncomeCategory(currentMonth, day, newCat);
-    });
-  });
-}
     }
 
+    function attachIncomeCategoryListeners() {
+      document.querySelectorAll(".income-category-select").forEach(select => {
+        select.addEventListener("change", async function () {
+          const day = parseInt(this.dataset.day, 10);
+          const newCat = this.value;
+          await updateIncomeCategory(currentMonth, day, newCat);
+          if (!currentUser) renderMonthView(currentMonth);
+        });
+      });
+    }
+
+    function attachEditListeners() {
     function attachEditListeners() {
       document.querySelectorAll(".editable").forEach(cell => {
         cell.addEventListener("click", function () {
@@ -1806,6 +1807,7 @@ function renderMonthView(monthIndex) {
           input.addEventListener("blur", async () => {
             const newValue = parseFloat(input.value) || 0;
             await updateDayValue(currentMonth, day, field, newValue);
+            renderMonthView(currentMonth);
           });
 
           input.addEventListener("keydown", async (e) => {
@@ -1823,6 +1825,7 @@ function renderMonthView(monthIndex) {
           const day = parseInt(this.dataset.day, 10);
           const newCat = this.value;
           await updateDayCategory(currentMonth, day, newCat);
+          renderMonthView(currentMonth);
         });
       });
     }
@@ -2116,35 +2119,38 @@ function renderMonthView(monthIndex) {
     }
 
     async function updateDayValue(monthIndex, day, field, newValue) {
-      const date = new Date(CURRENT_YEAR, monthIndex, day);
-      const dateStr = date.toISOString().split("T")[0];
+      const targetDate = new Date(CURRENT_YEAR, monthIndex, day);
       const targetType = field === "income" ? "income" : "expense";
 
-      const toDelete = transactions.filter(tx => {
+      const matches = transactions.filter(tx => {
         const d = new Date(tx.date);
-        const ds = d.toISOString().split("T")[0];
-        return ds === dateStr && tx.type === targetType;
+        return tx.type === targetType && isSameLocalDay(d, targetDate);
       });
 
+      const preservedCategory =
+        matches.find(tx => tx.category)?.category ||
+        (targetType === "income"
+          ? (getCategoriesByType("income")[0]?.name || "Salario")
+          : "Otros");
+
       if (currentUser) {
-        for (const tx of toDelete) {
+        for (const tx of matches) {
           if (tx.id) await deleteTransactionFromFirestore(tx.id);
         }
       }
 
       transactions = transactions.filter(tx => {
         const d = new Date(tx.date);
-        const ds = d.toISOString().split("T")[0];
-        return !(ds === dateStr && tx.type === targetType);
+        return !(tx.type === targetType && isSameLocalDay(d, targetDate));
       });
 
       if (newValue > 0) {
         const newTx = {
-          date: date.toISOString(),
+          date: targetDate.toISOString(),
           type: targetType,
           amount: newValue,
           description: `Ajuste manual ${targetType === "income" ? t("ingreso","income") : t("gasto","expense")}`,
-          category: targetType === "expense" ? "Otros" : "Salario"
+          category: preservedCategory
         };
 
         if (currentUser) {
@@ -2160,50 +2166,65 @@ function renderMonthView(monthIndex) {
       drawCategoryChart();
     }
 
-    async function updateIncomeCategory(monthIndex, day, newCategory) {
-  const date = new Date(CURRENT_YEAR, monthIndex, day);
-  const dateStr = date.toISOString().split("T")[0];
+    async function updateDayCategory(monthIndex, day, newCategory) {
+      const targetDate = new Date(CURRENT_YEAR, monthIndex, day);
 
-  // 🔥 actualizar Firebase
-  if (currentUser) {
-    const updates = transactions.filter(tx => {
-      const d = new Date(tx.date);
-      return (
-        d.toISOString().split("T")[0] === dateStr &&
-        tx.type === "income"
-      );
-    });
-
-    for (const tx of updates) {
-      if (tx.id) {
-        await updateTransactionInFirestore(tx.id, {
-          category: newCategory
+      if (currentUser) {
+        const updates = transactions.filter(tx => {
+          const d = new Date(tx.date);
+          return tx.type === "expense" && isSameLocalDay(d, targetDate);
         });
+
+        for (const tx of updates) {
+          if (tx.id) await updateTransactionInFirestore(tx.id, { category: newCategory });
+        }
       }
+
+      transactions = transactions.map(tx => {
+        const d = new Date(tx.date);
+        if (tx.type === "expense" && isSameLocalDay(d, targetDate)) {
+          return { ...tx, category: newCategory };
+        }
+        return tx;
+      });
+
+      if (!currentUser) {
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+      }
+
+      drawCategoryChart();
     }
-  }
 
-  // 🔥 actualizar memoria local
-  transactions = transactions.map(tx => {
-    const d = new Date(tx.date);
-    if (
-      d.toISOString().split("T")[0] === dateStr &&
-      tx.type === "income"
-    ) {
-      return { ...tx, category: newCategory };
+    async function updateIncomeCategory(monthIndex, day, newCategory) {
+      const targetDate = new Date(CURRENT_YEAR, monthIndex, day);
+
+      if (currentUser) {
+        const updates = transactions.filter(tx => {
+          const d = new Date(tx.date);
+          return tx.type === "income" && isSameLocalDay(d, targetDate);
+        });
+
+        for (const tx of updates) {
+          if (tx.id) await updateTransactionInFirestore(tx.id, { category: newCategory });
+        }
+      }
+
+      transactions = transactions.map(tx => {
+        const d = new Date(tx.date);
+        if (tx.type === "income" && isSameLocalDay(d, targetDate)) {
+          return { ...tx, category: newCategory };
+        }
+        return tx;
+      });
+
+      if (!currentUser) {
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+      }
+
+      drawCategoryChart();
     }
-    return tx;
-  });
 
-  // 🔥 guardar local si no hay login
-  if (!currentUser) {
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-  }
-
-  drawCategoryChart();
-}
-
-    function calculateWeekData() {
+    function calculateWeekData() {    function calculateWeekData() {
       const today = new Date();
       const weekAgo = new Date(today);
       weekAgo.setDate(today.getDate() - 6);
@@ -2500,6 +2521,7 @@ function renderMonthView(monthIndex) {
 
       document.getElementById("thDay").innerText = t("Día", "Day");
       document.getElementById("thIncome").innerText = t("Ingresos", "Income");
+      document.getElementById("thIncomeCategory").innerText = t("Cat. Ingreso", "Income Cat.");
       document.getElementById("thExpense").innerText = t("Gastos", "Expenses");
       document.getElementById("thCategory").innerText = t("Categoría", "Category");
       document.getElementById("thProfit").innerText = t("Ganancia", "Profit");
