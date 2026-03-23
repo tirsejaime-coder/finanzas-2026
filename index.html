@@ -737,37 +737,6 @@
     .btn, .tab, .export-option {
       touch-action: manipulation;
     }
-    .dashboard {
-  margin-top: 20px;
-}
-
-.kpi-cards {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.kpi-card {
-  flex: 1;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 12px;
-  text-align: center;
-}
-
-.charts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.chart-box {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 10px;
-}
   </style>
 
   <!-- Disqometer (1 sola instancia de cada script) -->
@@ -847,45 +816,6 @@
       <div class="category-manager" id="categoryManager"></div>
 
       <div class="buttons-row">
-        <div class="dashboard" id="dashboard">
-
-  <h3 style="margin-top:15px;">📊 Dashboard financiero</h3>
-
-  <div class="kpi-cards">
-    <div class="kpi-card">
-      <div>💰 Ingresos del Año</div>
-      <h3 id="totalIncome">$0.00</h3>
-    </div>
-
-    <div class="kpi-card">
-      <div>💸 Gastos del Año</div>
-      <h3 id="totalExpense">$0.00</h3>
-    </div>
-
-    <div class="kpi-card">
-      <div>📈 Balance Neto</div>
-      <h3 id="netBalance">$0.00</h3>
-    </div>
-
-    <div class="kpi-card">
-      <div>🏆 Mejor Mes</div>
-      <h3 id="bestMonth">-</h3>
-    </div>
-  </div>
-
-  <div class="charts-grid">
-    <div class="chart-box">
-      <h4>Gastos por Categoría</h4>
-      <div id="chartExpenses" style="height:250px;"></div>
-    </div>
-
-    <div class="chart-box">
-      <h4>Ingresos vs Gastos por Mes</h4>
-      <div id="chartMonthly" style="height:250px;"></div>
-    </div>
-  </div>
-
-</div>
         <button class="btn btn-secondary" onclick="checkExportAccess()" id="btnExport">📥 Exportar Datos</button>
         <button class="btn btn-outline" onclick="window.print()" id="btnPrint">🖨 Imprimir</button>
         <button class="btn btn-danger" onclick="clearData()" id="btnClear">🗑 Borrar datos</button>
@@ -1088,51 +1018,6 @@
       transactions = JSON.parse(localStorage.getItem("transactions")) || [];
       renderCurrentView();
       drawCategoryChart();
-      updateDashboard();
-      function updateDashboard() {
-  let totalIncome = 0;
-  let totalExpense = 0;
-
-  const monthly = Array(12).fill(0).map(() => ({ income: 0, expense: 0 }));
-
-  transactions.forEach(tx => {
-    const d = new Date(tx.date);
-    if (d.getFullYear() !== CURRENT_YEAR) return;
-
-    const m = d.getMonth();
-
-    if (tx.type === "income") {
-      totalIncome += tx.amount;
-      monthly[m].income += tx.amount;
-    } else {
-      totalExpense += tx.amount;
-      monthly[m].expense += tx.amount;
-    }
-  });
-
-  const net = totalIncome - totalExpense;
-
-  document.getElementById("totalIncome").textContent = `$${totalIncome.toFixed(2)}`;
-  document.getElementById("totalExpense").textContent = `$${totalExpense.toFixed(2)}`;
-  document.getElementById("netBalance").textContent = `$${net.toFixed(2)}`;
-
-  // mejor mes
-  let best = 0;
-  let bestIndex = -1;
-
-  monthly.forEach((m, i) => {
-    const profit = m.income - m.expense;
-    if (profit > best) {
-      best = profit;
-      bestIndex = i;
-    }
-  });
-
-  document.getElementById("bestMonth").textContent =
-    bestIndex >= 0 ? getMonthNames()[bestIndex] : "-";
-
-  drawMonthlyChart(monthly);
-}
     }
 
   } else {
@@ -1143,7 +1028,6 @@
 
     renderCurrentView();
     drawCategoryChart();
-    updateDashboard();
   }
 });
     const CURRENT_YEAR = new Date().getFullYear();
@@ -1640,31 +1524,6 @@ async function startPaidProCheckout() {
     google.charts.setOnLoadCallback(drawCategoryChart);
 
     function drawCategoryChart() {
-      function drawMonthlyChart(monthly) {
-  if (!google.visualization) return;
-
-  const data = new google.visualization.DataTable();
-  data.addColumn("string", "Mes");
-  data.addColumn("number", "Ingresos");
-  data.addColumn("number", "Gastos");
-
-  monthly.forEach((m, i) => {
-    data.addRow([
-      getMonthNames()[i],
-      m.income,
-      m.expense
-    ]);
-  });
-
-  const chart = new google.visualization.ColumnChart(
-    document.getElementById("chartMonthly")
-  );
-
-  chart.draw(data, {
-    legend: { position: "top" },
-    chartArea: { width: "80%", height: "70%" }
-  });
-}
       if (!window.google || !google.visualization) return;
 
       const { categoryTotals, totalProfit } = computeCategoryData();
@@ -2011,7 +1870,6 @@ async function startPaidProCheckout() {
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
         drawCategoryChart();
-        updateDashboard();
         return;
       }
 
@@ -2030,7 +1888,6 @@ async function startPaidProCheckout() {
 
         renderCurrentView();
         drawCategoryChart();
-        updateDashboard();
         showSyncStatus("success", t("Sincronizado", "Synced"));
       }, (error) => {
         console.error("Error loading transactions:", error);
@@ -2039,7 +1896,6 @@ async function startPaidProCheckout() {
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
         drawCategoryChart();
-        updateDashboard();
       });
     }
 
@@ -2229,7 +2085,6 @@ async function startPaidProCheckout() {
         renderCategoryManager();
         renderCurrentView();
         drawCategoryChart();
-        updateDashboard();
         return;
       }
 
