@@ -1088,6 +1088,7 @@
       transactions = JSON.parse(localStorage.getItem("transactions")) || [];
       renderCurrentView();
       drawCategoryChart();
+      updateDashboard();
       function updateDashboard() {
   let totalIncome = 0;
   let totalExpense = 0;
@@ -1142,6 +1143,7 @@
 
     renderCurrentView();
     drawCategoryChart();
+    updateDashboard();
   }
 });
     const CURRENT_YEAR = new Date().getFullYear();
@@ -2009,6 +2011,7 @@ async function startPaidProCheckout() {
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
         drawCategoryChart();
+        updateDashboard();
         return;
       }
 
@@ -2027,6 +2030,7 @@ async function startPaidProCheckout() {
 
         renderCurrentView();
         drawCategoryChart();
+        updateDashboard();
         showSyncStatus("success", t("Sincronizado", "Synced"));
       }, (error) => {
         console.error("Error loading transactions:", error);
@@ -2035,6 +2039,7 @@ async function startPaidProCheckout() {
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
         drawCategoryChart();
+        updateDashboard();
       });
     }
 
@@ -2224,6 +2229,7 @@ async function startPaidProCheckout() {
         renderCategoryManager();
         renderCurrentView();
         drawCategoryChart();
+        updateDashboard();
         return;
       }
 
