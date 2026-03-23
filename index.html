@@ -995,6 +995,41 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+
+  if (user) {
+    console.log("✅ Usuario activo:", user.uid);
+
+    try {
+      // Asegura que el perfil existe
+      await ensureUserProfile(user);
+
+      // Escucha cambios del perfil (plan PRO, etc.)
+      watchUserProfile(user);
+
+      // 🔥 CARGA DATOS DESDE FIRESTORE (ESTO ES LO QUE TE FALTABA)
+      loadTransactionsFromFirestore();
+
+    } catch (error) {
+      console.error("Error inicializando usuario:", error);
+
+      // fallback a local
+      transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+      renderCurrentView();
+      drawCategoryChart();
+    }
+
+  } else {
+    console.log("❌ Usuario NO logueado");
+
+    // modo FREE → localStorage
+    transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+    renderCurrentView();
+    drawCategoryChart();
+  }
+});
     const CURRENT_YEAR = new Date().getFullYear();
 
     const monthNamesEs = [
