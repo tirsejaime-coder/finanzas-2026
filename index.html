@@ -816,6 +816,45 @@
       <div class="category-manager" id="categoryManager"></div>
 
       <div class="buttons-row">
+        <div class="dashboard" id="dashboard">
+
+  <h3 style="margin-top:15px;">📊 Dashboard financiero</h3>
+
+  <div class="kpi-cards">
+    <div class="kpi-card">
+      <div>💰 Ingresos del Año</div>
+      <h3 id="totalIncome">$0.00</h3>
+    </div>
+
+    <div class="kpi-card">
+      <div>💸 Gastos del Año</div>
+      <h3 id="totalExpense">$0.00</h3>
+    </div>
+
+    <div class="kpi-card">
+      <div>📈 Balance Neto</div>
+      <h3 id="netBalance">$0.00</h3>
+    </div>
+
+    <div class="kpi-card">
+      <div>🏆 Mejor Mes</div>
+      <h3 id="bestMonth">-</h3>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-box">
+      <h4>Gastos por Categoría</h4>
+      <div id="chartExpenses" style="height:250px;"></div>
+    </div>
+
+    <div class="chart-box">
+      <h4>Ingresos vs Gastos por Mes</h4>
+      <div id="chartMonthly" style="height:250px;"></div>
+    </div>
+  </div>
+
+</div>
         <button class="btn btn-secondary" onclick="checkExportAccess()" id="btnExport">📥 Exportar Datos</button>
         <button class="btn btn-outline" onclick="window.print()" id="btnPrint">🖨 Imprimir</button>
         <button class="btn btn-danger" onclick="clearData()" id="btnClear">🗑 Borrar datos</button>
