@@ -738,6 +738,15 @@
     .btn, .tab, .export-option {
       touch-action: manipulation;
     }
+.dashboard { margin-top: 20px; }
+.kpi-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi-card { background: var(--card-bg, #1e1e2e); border-radius: 10px; padding: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.kpi-label { font-size: 0.78rem; color: var(--text-muted, #aaa); margin-bottom: 6px; }
+.kpi-value { font-size: 1.3rem; font-weight: 700; color: var(--accent, #4fc3f7); }
+.kpi-value.negative { color: #f44336; }
+.charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 16px; }
+.chart-box { background: var(--card-bg, #1e1e2e); border-radius: 10px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.chart-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; color: var(--text-muted, #aaa); }
   </style>
 
   <!-- Disqometer (1 sola instancia de cada script) -->
@@ -820,6 +829,37 @@
         <button class="btn btn-secondary" onclick="checkExportAccess()" id="btnExport">📥 Exportar Datos</button>
         <button class="btn btn-outline" onclick="window.print()" id="btnPrint">🖨 Imprimir</button>
         <button class="btn btn-danger" onclick="clearData()" id="btnClear">🗑 Borrar datos</button>
+      </div>
+      
+      <div class="dashboard" id="dashboard">
+        <div class="kpi-cards">
+          <div class="kpi-card">
+            <div class="kpi-label">💰 Ingresos del Año</div>
+            <div class="kpi-value" id="kpiIncome">$0.00</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">💸 Gastos del Año</div>
+            <div class="kpi-value negative" id="kpiExpense">$0.00</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">📈 Balance Neto</div>
+            <div class="kpi-value" id="kpiBalance">$0.00</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">📅 Mejor Mes</div>
+            <div class="kpi-value" id="kpiBestMonth">-</div>
+          </div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-box">
+            <div class="chart-title">Gastos por Categoría</div>
+            <div id="dashPieChart" style="width:100%;height:220px;"></div>
+          </div>
+          <div class="chart-box">
+            <div class="chart-title">Ingresos vs Gastos por Mes</div>
+            <div id="dashMonthChart" style="width:100%;height:220px;"></div>
+          </div>
+        </div>
       </div>
 
       <div class="plans-wrapper" id="plansWrapper">
@@ -1019,6 +1059,7 @@
       transactions = JSON.parse(localStorage.getItem("transactions")) || [];
       renderCurrentView();
       drawCategoryChart();
+      renderDashboard();
     }
 
   } else {
@@ -1028,7 +1069,7 @@
     transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
     renderCurrentView();
-    drawCategoryChart();
+    drawCategoryChart();       renderDashboard();
   }
 });
     const CURRENT_YEAR = new Date().getFullYear();
@@ -1870,7 +1911,7 @@ async function startPaidProCheckout() {
       if (!currentUser) {
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
-        drawCategoryChart();
+        drawCategoryChart();       renderDashboard();
         return;
       }
 
@@ -1888,7 +1929,7 @@ async function startPaidProCheckout() {
         });
 
         renderCurrentView();
-        drawCategoryChart();
+        drawCategoryChart();       renderDashboard();
         showSyncStatus("success", t("Sincronizado", "Synced"));
       }, (error) => {
         console.error("Error loading transactions:", error);
@@ -1896,7 +1937,7 @@ async function startPaidProCheckout() {
 
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
-        drawCategoryChart();
+        drawCategoryChart();       renderDashboard();
       });
     }
 
@@ -1988,7 +2029,7 @@ async function startPaidProCheckout() {
         renderCategorySelects();
         renderCategoryManager();
         if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-        drawCategoryChart();
+        drawCategoryChart();       renderDashboard();
         return;
       }
 
@@ -2005,7 +2046,7 @@ async function startPaidProCheckout() {
         renderCategorySelects();
         renderCategoryManager();
         if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-        drawCategoryChart();
+        drawCategoryChart();       renderDashboard();
       }, (error) => {
         console.error("Error loading categories:", error);
       });
@@ -2017,7 +2058,7 @@ async function startPaidProCheckout() {
       renderCategorySelects();
       renderCategoryManager();
       if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-      drawCategoryChart();
+      drawCategoryChart();       renderDashboard();
     }
 
     async function addCategoryPrompt(type) {
@@ -2098,7 +2139,7 @@ async function startPaidProCheckout() {
     renderCategorySelects();
     renderCategoryManager();
     renderCurrentView();
-    drawCategoryChart();
+    drawCategoryChart();       renderDashboard();
     return;
   }
 
@@ -2116,7 +2157,7 @@ async function startPaidProCheckout() {
         transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
         renderCurrentView();
-        drawCategoryChart();
+        drawCategoryChart();       renderDashboard();
         return;
       }
 
@@ -2140,7 +2181,7 @@ async function startPaidProCheckout() {
         transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
         renderCurrentView();
-        drawCategoryChart();
+        drawCategoryChart();       renderDashboard();
       }
     }
 
@@ -2213,7 +2254,7 @@ async function startPaidProCheckout() {
         localStorage.setItem("transactions", JSON.stringify(transactions));
       }
 
-      drawCategoryChart();
+      drawCategoryChart();       renderDashboard();
     }
 
     async function updateDayCategory(monthIndex, day, newCategory) {
@@ -2242,7 +2283,7 @@ async function startPaidProCheckout() {
         localStorage.setItem("transactions", JSON.stringify(transactions));
       }
 
-      drawCategoryChart();
+      drawCategoryChart();       renderDashboard();
     }
 
     async function updateIncomeCategory(monthIndex, day, newCategory) {
@@ -2271,7 +2312,7 @@ async function startPaidProCheckout() {
         localStorage.setItem("transactions", JSON.stringify(transactions));
       }
 
-      drawCategoryChart();
+      drawCategoryChart();       renderDashboard();
     }
 
     function calculateWeekData() {
@@ -2640,7 +2681,7 @@ async function startPaidProCheckout() {
         "Your data syncs to the cloud when you sign in."
       );
 
-      drawCategoryChart();
+      drawCategoryChart();       renderDashboard();
       updatePlanUI(currentUser ? { plan: currentPlan } : null);
 
       if (currentView === "year") renderYearView();
@@ -2708,7 +2749,7 @@ async function startPaidProCheckout() {
       renderCategorySelects();
 
       alert(t("✅ Transacción guardada", "✅ Transaction saved"));
-      drawCategoryChart();
+      drawCategoryChart();       renderDashboard();
     };
 
     window.showProExportMessage = function () {
@@ -2829,7 +2870,7 @@ async function startPaidProCheckout() {
         document.getElementById("view-input").classList.add("active");
       }
 
-      drawCategoryChart();
+      drawCategoryChart();       renderDashboard();
       showSyncStatus("success", t("Datos eliminados", "Data deleted"));
     };
 
@@ -2983,7 +3024,7 @@ async function startPaidProCheckout() {
     transactions = JSON.parse(localStorage.getItem("transactions")) || [];
     await loadCategories();
     renderCurrentView();
-    drawCategoryChart();
+    drawCategoryChart();       renderDashboard();
     updatePlanUI(null);
 
     // 🔥 AQUÍ VA EXACTAMENTE 👇
@@ -2999,6 +3040,57 @@ async function startPaidProCheckout() {
     loadCategories();
     applyLanguage();
     switchTab("input");
+function renderDashboard() {
+  const dash = document.getElementById('dashboard');
+  if (!dash) return;
+  const txs = transactions || [];
+  let income = 0, expense = 0;
+  const now = new Date();
+  const thisMonth = txs.filter(t => { const d = new Date(t.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
+  thisMonth.forEach(t => { if (t.type === 'income') income += t.amount; else expense += t.amount; });
+  const balance = income - expense;
+  const allIncome = txs.filter(t => t.type === 'income').reduce((a,b) => a + b.amount, 0);
+  const allExpense = txs.filter(t => t.type === 'expense').reduce((a,b) => a + b.amount, 0);
+  const fmt = n => '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const setKpi = (id, val, neg) => { const el = document.getElementById(id); if (el) { el.textContent = fmt(Math.abs(val)); el.className = 'kpi-value' + (neg && val < 0 ? ' negative' : ''); } };
+  setKpi('kpi-income', income);
+  setKpi('kpi-expense', expense);
+  setKpi('kpi-balance', balance, true);
+  setKpi('kpi-total-income', allIncome);
+  setKpi('kpi-total-expense', allExpense);
+  setKpi('kpi-net', allIncome - allExpense, true);
+  drawPieChart(txs);
+  drawMonthlyChart(txs);
+}
+
+function drawPieChart(txs) {
+  const el = document.getElementById('dash-pie');
+  if (!el || !window.google || !google.visualization) return;
+  const cats = {};
+  txs.filter(t => t.type === 'expense').forEach(t => { const c = t.category || 'Otros'; cats[c] = (cats[c] || 0) + t.amount; });
+  const data = new google.visualization.DataTable();
+  data.addColumn('string', 'Categoría');
+  data.addColumn('number', 'Monto');
+  Object.entries(cats).forEach(([k,v]) => data.addRow([k, v]));
+  if (data.getNumberOfRows() === 0) { el.innerHTML = ''; return; }
+  new google.visualization.PieChart(el).draw(data, { backgroundColor: 'transparent', legend: { textStyle: { color: '#aaa' } }, pieSliceTextStyle: { color: '#fff' } });
+}
+
+function drawMonthlyChart(txs) {
+  const el = document.getElementById('dash-monthly');
+  if (!el || !window.google || !google.visualization) return;
+  const months = {};
+  txs.forEach(t => { const d = new Date(t.date); const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); if (!months[key]) months[key] = {income:0,expense:0}; if (t.type==='income') months[key].income += t.amount; else months[key].expense += t.amount; });
+  const keys = Object.keys(months).sort().slice(-6);
+  const data = new google.visualization.DataTable();
+  data.addColumn('string', 'Mes');
+  data.addColumn('number', 'Ingresos');
+  data.addColumn('number', 'Gastos');
+  keys.forEach(k => data.addRow([k, months[k].income, months[k].expense]));
+  if (data.getNumberOfRows() === 0) { el.innerHTML = ''; return; }
+  new google.visualization.BarChart(el).draw(data, { backgroundColor: 'transparent', legend: { textStyle: { color: '#aaa' } }, hAxis: { textStyle: { color: '#aaa' } }, vAxis: { textStyle: { color: '#aaa' } }, colors: ['#4fc3f7','#f44336'] });
+}
+
   </script>
 </body>
 </html>
