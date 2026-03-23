@@ -782,6 +782,35 @@
     </div>
 
     <div id="view-input" class="view active">
+      <div class="dashboard">
+
+  <div class="balance-card">
+    <div class="balance-amount" id="balanceAmount">$0</div>
+    <div class="balance-label">Balance actual</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card income">
+      <div class="stat-value" id="incomeAmount">$0</div>
+      <div class="stat-label">Ingresos</div>
+    </div>
+
+    <div class="stat-card expense">
+      <div class="stat-value" id="expenseAmount">$0</div>
+      <div class="stat-label">Gastos</div>
+    </div>
+
+    <div class="stat-card profit">
+      <div class="stat-value" id="profitAmount">$0</div>
+      <div class="stat-label">Ahorro</div>
+    </div>
+  </div>
+
+  <div class="insight-box" id="insightBox">
+    🧠 Cargando insights...
+  </div>
+
+</div>
       <form class="quick-form" onsubmit="saveTransaction(event)">
 
         <div class="field">
