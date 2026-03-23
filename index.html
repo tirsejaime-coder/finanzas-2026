@@ -2069,34 +2069,42 @@ async function startPaidProCheckout() {
       }
     }
 
-    async function deleteCategory(name) {
-      if (name === "Otros") {
-        alert(t("No puedes eliminar la categoría 'Otros'.", "You cannot delete the 'Other' category."));
-        return;
-      }
+    async function deleteCategory(name, type) {
+  if (name === "Otros" && type === "expense") {
+    alert(t("No puedes eliminar la categoría 'Otros'.", "You cannot delete the 'Other' category."));
+    return;
+  }
 
-      const confirmDelete = confirm(t(`¿Eliminar la categoría "${name}"? Sus movimientos pasarán a "Otros".`, `Delete the category "${name}"? Its transactions will be moved to "Other".`));
-      if (!confirmDelete) return;
+  const confirmDelete = confirm(
+    t(
+      `¿Eliminar la categoría "${name}"?`,
+      `Delete category "${name}"?`
+    )
+  );
 
-      await replaceCategoryInTransactions(name, "Otros");
+  if (!confirmDelete) return;
 
-      if (!currentUser) {
-        userCategories = normalizeCategories(userCategories.filter(category => category.name !== name));
-        localStorage.setItem("categories", JSON.stringify(userCategories));
-        renderCategorySelects();
-        renderCategoryManager();
-        renderCurrentView();
-        drawCategoryChart();
-        return;
-      }
+  if (!currentUser) {
+    userCategories = normalizeCategories(
+      userCategories.filter(c => !(c.name === name && c.type === type))
+    );
 
-      const matches = userCategories.filter(category => category.name === name);
-      for (const category of matches) {
-        if (category.id) {
-          await deleteDoc(doc(db, "users", currentUser.uid, "categories", category.id));
-        }
-      }
+    localStorage.setItem("categories", JSON.stringify(userCategories));
+    renderCategorySelects();
+    renderCategoryManager();
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const matches = userCategories.filter(c => c.name === name && c.type === type);
+
+  for (const cat of matches) {
+    if (cat.id) {
+      await deleteDoc(doc(db, "users", currentUser.uid, "categories", cat.id));
     }
+  }
+}
 
     async function saveTransactionToFirestore(transaction) {
       if (!currentUser) {
