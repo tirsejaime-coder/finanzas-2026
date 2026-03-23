@@ -1939,14 +1939,13 @@ async function startPaidProCheckout() {
           </div>
           <div class="chips-wrap">
             ${categories.map(category => `
-              <span class="category-chip">
-                <span>${getTranslatedCategoryName(category.name)}</span>
-                ${category.name === "Otros" ? "" : `<button type="button" onclick="deleteCategory('${category.name}', '${category.type}')"
-              </span>
-            `).join("")}
-          </div>
-        </div>
-      `;
+  <span class="category-chip">
+    <span>${getTranslatedCategoryName(category.name)}</span>
+    ${category.name === "Otros" && category.type === "expense"
+      ? ""
+      : `<button type="button" onclick="deleteCategory('${category.name}', '${category.type}')">✕</button>`}
+  </span>
+`).join("")}
 
       container.innerHTML = `
         <div class="category-manager-header">
