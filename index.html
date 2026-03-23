@@ -1941,7 +1941,7 @@ async function startPaidProCheckout() {
             ${categories.map(category => `
               <span class="category-chip">
                 <span>${getTranslatedCategoryName(category.name)}</span>
-                ${category.name === "Otros" ? "" : `<button type="button" onclick="deleteCategory('${category.name.replace(/'/g, "\\'")}', '${category.type}')"
+                ${category.name === "Otros" ? "" : `<button type="button" onclick="deleteCategory('${category.name}', '${category.type}')"
               </span>
             `).join("")}
           </div>
