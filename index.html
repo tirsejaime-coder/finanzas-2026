@@ -1603,7 +1603,7 @@ async function startPaidProCheckout() {
     }
 
     function renderYearView() {
-    function renderYearView() {
+    
       const yearData = calculateYearData();
       const grid = document.getElementById("yearGrid");
       const monthNames = getMonthNames();
@@ -1785,7 +1785,7 @@ async function startPaidProCheckout() {
     }
 
     function attachEditListeners() {
-    function attachEditListeners() {
+    
       document.querySelectorAll(".editable").forEach(cell => {
         cell.addEventListener("click", function () {
           const day = parseInt(this.dataset.day, 10);
@@ -2224,39 +2224,38 @@ async function startPaidProCheckout() {
       drawCategoryChart();
     }
 
-    function calculateWeekData() {    function calculateWeekData() {
-      const today = new Date();
-      const weekAgo = new Date(today);
-      weekAgo.setDate(today.getDate() - 6);
-      const weekData = [];
+    function calculateWeekData() {
+  const today = new Date();
+  const weekAgo = new Date(today);
+  weekAgo.setDate(today.getDate() - 6);
 
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(weekAgo);
-        date.setDate(weekAgo.getDate() + i);
+  const weekData = [];
 
-        let income = 0;
-        let expense = 0;
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(weekAgo);
+    date.setDate(weekAgo.getDate() + i);
 
-        transactions.forEach(tx => {
-          const d = new Date(tx.date);
-          if (d.toDateString() === date.toDateString()) {
-            if (tx.type === "income") income += tx.amount;
-            else expense += tx.amount;
-          }
-        });
+    let income = 0;
+    let expense = 0;
 
-        weekData.push({
-          date: language === "es"
-            ? date.toLocaleDateString("es-ES")
-            : date.toLocaleDateString("en-US"),
-          income,
-          expense,
-          profit: income - expense
-        });
+    transactions.forEach(tx => {
+      const d = new Date(tx.date);
+      if (isSameLocalDay(d, date)) {
+        if (tx.type === "income") income += tx.amount;
+        else expense += tx.amount;
       }
+    });
 
-      return weekData;
-    }
+    weekData.push({
+      date,
+      income,
+      expense,
+      profit: income - expense
+    });
+  }
+
+  return weekData;
+}
 
     function exportYearPDF(docPdf) {
       docPdf.setFontSize(16);
