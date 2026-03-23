@@ -1921,43 +1921,50 @@ async function startPaidProCheckout() {
     }
 
     function renderCategoryManager() {
-      const container = document.getElementById("categoryManager");
-      if (!container) return;
+  const container = document.getElementById("categoryManager");
+  if (!container) return;
 
-      const expenseCategories = getCategoriesByType("expense");
-      const incomeCategories = getCategoriesByType("income");
-      const limit = getEditableCategoryLimit();
-      const usageText = limit === Infinity
-        ? t(`${getCategoryUsageCount()} categorías`, `${getCategoryUsageCount()} categories`)
-        : t(`${getCategoryUsageCount()} / ${limit} categorías`, `${getCategoryUsageCount()} / ${limit} categories`);
+  const expenseCategories = getCategoriesByType("expense");
+  const incomeCategories = getCategoriesByType("income");
+  const limit = getEditableCategoryLimit();
+  const usageText = limit === Infinity
+    ? t(`${getCategoryUsageCount()} categorías`, `${getCategoryUsageCount()} categories`)
+    : t(`${getCategoryUsageCount()} / ${limit} categorías`, `${getCategoryUsageCount()} / ${limit} categories`);
 
-      const groupHtml = (title, type, categories) => `
-        <div class="category-group">
-          <div class="category-group-head">
-            <div class="category-group-title">${title}</div>
-            <button type="button" class="category-add-btn" onclick="addCategoryPrompt('${type}')">➕ ${t("Agregar", "Add")}</button>
-          </div>
-          <div class="chips-wrap">
-            ${categories.map(category => `
-  <span class="category-chip">
-    <span>${getTranslatedCategoryName(category.name)}</span>
-    ${category.name === "Otros" && category.type === "expense"
-      ? ""
-      : `<button type="button" onclick="deleteCategory('${category.name}', '${category.type}')">✕</button>`}
-  </span>
-`).join("")}
+  const groupHtml = (title, type, categories) => `
+    <div class="category-group">
+      <div class="category-group-head">
+        <div class="category-group-title">${title}</div>
+        <button type="button" class="category-add-btn" onclick="addCategoryPrompt('${type}')">➕ ${t("Agregar", "Add")}</button>
+      </div>
+      <div class="chips-wrap">
+        ${categories.map(category => `
+          <span class="category-chip">
+            <span>${getTranslatedCategoryName(category.name)}</span>
+            ${category.name === "Otros" && category.type === "expense"
+              ? ""
+              : `<button type="button" onclick="deleteCategory('${category.name}', '${category.type}')">✕</button>`}
+          </span>
+        `).join("")}
+      </div>
+    </div>
+  `;
 
-      container.innerHTML = `
-        <div class="category-manager-header">
-          <div class="category-manager-title">${t("Gestionar categorías", "Manage categories")}</div>
-          <div class="category-limit">${isProUser ? t("PRO ilimitado", "Unlimited PRO") : t(`Plan FREE: máximo ${limit}`, `FREE plan: max ${limit}`)} · ${usageText}</div>
-        </div>
-        <div class="category-groups">
-          ${groupHtml(`📉 ${t("Gastos", "Expenses")}`, "expense", expenseCategories)}
-          ${groupHtml(`📈 ${t("Ingresos", "Income")}`, "income", incomeCategories)}
-        </div>
-      `;
-    }
+  container.innerHTML = `
+    <div class="category-manager-header">
+      <div class="category-manager-title">${t("Gestionar categorías", "Manage categories")}</div>
+      <div class="category-limit">
+        ${isProUser
+          ? t("PRO ilimitado", "Unlimited PRO")
+          : t(`Plan FREE: máximo ${limit}`, `FREE plan: max ${limit}`)} · ${usageText}
+      </div>
+    </div>
+    <div class="category-groups">
+      ${groupHtml(`📉 ${t("Gastos", "Expenses")}`, "expense", expenseCategories)}
+      ${groupHtml(`📈 ${t("Ingresos", "Income")}`, "income", incomeCategories)}
+    </div>
+  `;
+}
 
     async function seedDefaultCategoriesToFirestore() {
       if (!currentUser) return;
