@@ -3156,26 +3156,28 @@ function drawDashboardPie(dataObj) {
   chart.draw(data, options);
 }
 
-function drawDashboardMonthly(monthlyData) {
+function drawDashboardMonthly(monthlyIncome, monthlyExpense) {
+  const el = document.getElementById("dashMonthChart");
+  if (!el || !google || !google.visualization) return;
+
   const months = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 
-  const dataArray = [["Mes", "Balance"]];
+  const dataArray = [["Mes", "Ingresos", "Gastos"]];
 
-  monthlyData.forEach((val, i) => {
-    dataArray.push([months[i], val]);
+  months.forEach((m, i) => {
+    dataArray.push([
+      m,
+      monthlyIncome[i] || 0,
+      monthlyExpense[i] || 0
+    ]);
   });
 
   const data = google.visualization.arrayToDataTable(dataArray);
 
-  const options = {
-    legend: { position: "none" }
-  };
-
-  const chart = new google.visualization.ColumnChart(
-    document.getElementById("dashMonthChart")
-  );
-
-  chart.draw(data, options);
+  const chart = new google.visualization.ColumnChart(el);
+  chart.draw(data, {
+    legend: { position: "bottom" }
+  });
 }
 
   </script>
