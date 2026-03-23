@@ -1858,7 +1858,6 @@ async function startPaidProCheckout() {
           await updateIncomeCategory(currentMonth, day, newCat);
           if (!currentUser) renderMonthView(currentMonth);
         });
-      });
     }
 
     function attachEditListeners() {
@@ -1892,8 +1891,6 @@ async function startPaidProCheckout() {
               input.blur();
             }
           });
-        });
-      });
     }
 
     function attachCategoryListeners() {
@@ -1904,7 +1901,6 @@ async function startPaidProCheckout() {
           await updateDayCategory(currentMonth, day, newCat);
           renderMonthView(currentMonth);
         });
-      });
     }
 
     async function loadTransactionsFromFirestore() {
@@ -2018,7 +2014,6 @@ async function startPaidProCheckout() {
           ...category,
           createdAt: serverTimestamp()
         });
-      }
     }
 
     async function loadCategories() {
@@ -2112,7 +2107,6 @@ async function startPaidProCheckout() {
         if (tx.id) {
           await updateTransactionInFirestore(tx.id, { category: newName });
         }
-      }
     }
 
     async function deleteCategory(name, type) {
@@ -2148,8 +2142,7 @@ async function startPaidProCheckout() {
   for (const cat of matches) {
     if (cat.id) {
       await deleteDoc(doc(db, "users", currentUser.uid, "categories", cat.id));
-    }
-  }
+    
 }
 
     async function saveTransactionToFirestore(transaction) {
@@ -2183,7 +2176,7 @@ async function startPaidProCheckout() {
         renderCurrentView();
         drawCategoryChart();       renderDashboard();
       }
-    }
+    
 
     async function updateTransactionInFirestore(transactionId, updates) {
       if (!currentUser) return;
@@ -2195,7 +2188,7 @@ async function startPaidProCheckout() {
       } catch (e) {
         console.error("Error updating transaction:", e);
       }
-    }
+    
 
     async function deleteTransactionFromFirestore(transactionId) {
       if (!currentUser) return;
@@ -2207,7 +2200,7 @@ async function startPaidProCheckout() {
       } catch (e) {
         console.error("Error deleting transaction:", e);
       }
-    }
+    
 
     async function updateDayValue(monthIndex, day, field, newValue) {
       const targetDate = new Date(CURRENT_YEAR, monthIndex, day);
@@ -2228,7 +2221,7 @@ async function startPaidProCheckout() {
         for (const tx of matches) {
           if (tx.id) await deleteTransactionFromFirestore(tx.id);
         }
-      }
+      
 
       transactions = transactions.filter(tx => {
         const d = new Date(tx.date);
@@ -2269,7 +2262,7 @@ async function startPaidProCheckout() {
         for (const tx of updates) {
           if (tx.id) await updateTransactionInFirestore(tx.id, { category: newCategory });
         }
-      }
+      
 
       transactions = transactions.map(tx => {
         const d = new Date(tx.date);
@@ -2298,7 +2291,7 @@ async function startPaidProCheckout() {
         for (const tx of updates) {
           if (tx.id) await updateTransactionInFirestore(tx.id, { category: newCategory });
         }
-      }
+      
 
       transactions = transactions.map(tx => {
         const d = new Date(tx.date);
