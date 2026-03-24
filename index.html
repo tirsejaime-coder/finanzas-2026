@@ -58,6 +58,7 @@ async function saveQuickTransaction(tx) {
     localStorage.setItem("transactions", JSON.stringify(transactions));
     renderCurrentView();
     drawCategoryChart();
+    updateDashboard();
     return;
   }
 
