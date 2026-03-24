@@ -1303,7 +1303,7 @@
         const category = detectQuickCategory(text, isIncome);
 
         const tx = {
-  date: new Date().toLocaleDateString("en-CA"),
+  date: document.getElementById("date").value || formatLocalDate(new Date()),
   amount,
   type: isIncome ? "income" : "expense",
   category
