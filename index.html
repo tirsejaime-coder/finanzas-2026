@@ -1308,7 +1308,7 @@
         const category = detectQuickCategory(text, isIncome);
 
         const tx = {
-  date:  || formatLocalDate(new Date()),
+  date: document.getElementById("date").value || formatLocalDate(new Date())
   amount,
   type: isIncome ? "income" : "expense",
   category
