@@ -1308,7 +1308,7 @@
         const category = detectQuickCategory(text, isIncome);
 
         const tx = {
-  date: document.getElementById("date").value || formatLocalDate(new Date()),
+  date:  || formatLocalDate(new Date()),
   amount,
   type: isIncome ? "income" : "expense",
   category
@@ -1320,6 +1320,25 @@
       e.target.value = "";
       showQuickFeedback();
     };
+
+    function updateCurrentDateDisplay() {
+  const el = document.getElementById("currentDateDisplay");
+  if (!el) return;
+
+  const now = new Date();
+
+  const formatted = now.toLocaleDateString(
+    language === "es" ? "es-ES" : "en-US",
+    {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    }
+  );
+
+  el.textContent = "📅 " + formatted;
+}
 
     function detectQuickCategory(text, isIncome) {
       const categories = getCategoriesByType(isIncome ? "income" : "expense");
@@ -1701,9 +1720,16 @@ async function startPaidProCheckout() {
     const syncMessage = document.getElementById("syncMessage");
 
     document.getElementById("date").value = formatLocalDate(new Date());
+updateCurrentDateDisplay();
+
+if (!window.dateIntervalStarted) {
+  setInterval(updateCurrentDateDisplay, 60000);
+  window.dateIntervalStarted = true;
+}
+
     function getMonthNames() {
       return language === "es" ? monthNamesEs : monthNamesEn;
-    }
+}
 
     function t(es, en) {
       return language === "es" ? es : en;
