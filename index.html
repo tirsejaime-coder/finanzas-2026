@@ -884,16 +884,107 @@
 .quick-add-input::placeholder {
   color: #9ca3af;
 }
-.day-details { padding: 10px; background: #f9fafb; border-radius: 8px; }
-        .tx-line { font-size: 0.85rem; padding: 4px 0; border-bottom: 1px dashed #e5e7eb; }
-        .toggle-btn { background: none; border: none; cursor: pointer; font-size: 0.9rem; margin-right: 4px; }
+
+.quick-add-helper {
+  margin-top: 8px;
+  font-size: 0.84rem;
+  color: var(--color-text-secondary);
+}
+
+.hero-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.hero-mini-card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.hero-mini-label {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.hero-mini-value {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.hero-mini-subtext {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.progress-row {
+  margin-top: 8px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #22c55e, #3b82f6);
+  transition: width 0.35s ease;
+}
+
+.hero-action-link {
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #bfdbfe;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.hero-action-link:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+.dashboard-hero, .month-card, .plan-box, .category-group, .pro-banner {
+  animation: fadeInUp 0.35s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-stats,
+  .hero-meta {
+    flex-direction: column;
+    grid-template-columns: 1fr;
+  }
+}
 
 </style>
 
-  <!-- Disqometer (1 sola instancia de cada script) -->
- <script defer src="https://api.disqometer.com/8ee4ea609a6346c4cf34c2b621ac79ba.js?nc=NjM5MjQw"></script>
-<script defer src="https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw"></script>
+  <!-- Ads se cargan dinámicamente solo para usuarios FREE -->
 
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjMyMDUxOTY5MTg2NzMzMjE3NTI1MTc="></script>
 </head>
 <body>
   <div class="container">
@@ -966,6 +1057,26 @@
     🧠 Cargando análisis...
   </div>
 
+  <div class="hero-meta">
+    <div class="hero-mini-card">
+      <div class="hero-mini-label" id="streakLabel">Racha activa</div>
+      <div class="hero-mini-value" id="streakValue">0 días</div>
+      <div class="hero-mini-subtext" id="streakSubtext">Empieza hoy y crea el hábito.</div>
+    </div>
+
+    <div class="hero-mini-card">
+      <div class="hero-mini-label" id="goalLabel">Meta mensual de ahorro</div>
+      <div class="hero-mini-value" id="goalValue">$0 / $500</div>
+      <div class="progress-row">
+        <div class="progress-bar">
+          <div id="goalProgressFill" class="progress-fill"></div>
+        </div>
+      </div>
+      <div class="hero-mini-subtext" id="goalSubtext">Define una meta y sigue tu progreso.</div>
+      <button type="button" class="hero-action-link" id="goalActionButton" onclick="openSavingsGoalPrompt()">✏️ Ajustar meta</button>
+    </div>
+  </div>
+
 </div>
 <!-- 🔥 FIN HERO -->
 
@@ -978,6 +1089,7 @@
           onkeyup="handleQuickAdd(event)"
           class="quick-add-input"
         />
+        <div class="quick-add-helper" id="quickAddHelper">Escribe varios movimientos separados por ; y presiona Enter.</div>
       </div>
 
 <form class="quick-form" onsubmit="saveTransaction(event)" style="display:none;">
@@ -1193,41 +1305,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    onAuthStateChanged(auth, async (user) => {
-  currentUser = user;
-
-  if (user) {
-    console.log("✅ Usuario activo:", user.uid);
-
-    try {
-      // Asegura que el perfil existe
-      await ensureUserProfile(user);
-
-      // Escucha cambios del perfil (plan PRO, etc.)
-      watchUserProfile(user);
-
-      // 🔥 CARGA DATOS DESDE FIRESTORE (ESTO ES LO QUE TE FALTABA)
-      loadTransactionsFromFirestore();
-
-    } catch (error) {
-      console.error("Error inicializando usuario:", error);
-
-      // fallback a local
-      transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-      renderCurrentView();
-      drawCategoryChart();
-    }
-
-  } else {
-    console.log("❌ Usuario NO logueado");
-
-    // modo FREE → localStorage
-    transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-
-    renderCurrentView();
-    drawCategoryChart();
-  }
-});
     const CURRENT_YEAR = new Date().getFullYear();
 
     const monthNamesEs = [
@@ -1280,6 +1357,87 @@
     
     const STRIPE_SUCCESS_PARAM = "success";
     const STRIPE_CANCEL_PARAM = "cancel";
+    const DEFAULT_MONTHLY_SAVINGS_GOAL = 500;
+
+    function getSavingsGoal() {
+      const raw = parseFloat(localStorage.getItem("lumenssaveSavingsGoal") || DEFAULT_MONTHLY_SAVINGS_GOAL);
+      return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_MONTHLY_SAVINGS_GOAL;
+    }
+
+    function getTrackedDaysSet() {
+      const set = new Set();
+      transactions.forEach(tx => {
+        if (tx?.date) set.add(formatLocalDate(parseLocalDate(tx.date)));
+      });
+      return set;
+    }
+
+    function getStreakDays() {
+      const days = getTrackedDaysSet();
+      if (!days.size) return 0;
+
+      let streak = 0;
+      const cursor = new Date();
+      cursor.setHours(0, 0, 0, 0);
+
+      while (days.has(formatLocalDate(cursor))) {
+        streak += 1;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+
+      if (streak > 0) return streak;
+
+      const sorted = [...days].sort().reverse();
+      const latest = parseLocalDate(sorted[0]);
+      latest.setHours(0, 0, 0, 0);
+      while (days.has(formatLocalDate(latest))) {
+        streak += 1;
+        latest.setDate(latest.getDate() - 1);
+      }
+
+      return streak;
+    }
+
+    function getCurrentMonthBalance() {
+      const now = new Date();
+      let income = 0;
+      let expense = 0;
+
+      transactions.forEach(tx => {
+        const d = parseLocalDate(tx.date);
+        if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
+          if (tx.type === "income") income += Number(tx.amount) || 0;
+          if (tx.type === "expense") expense += Number(tx.amount) || 0;
+        }
+      });
+
+      return income - expense;
+    }
+
+    function loadAdsIfNeeded() {
+      if (isProUser) return;
+      if (document.getElementById("ads-script-main")) return;
+
+      const script1 = document.createElement("script");
+      script1.src = "https://api.disqometer.com/8ee4ea609a6346c4cf34c2b621ac79ba.js?nc=NjM5MjQw";
+      script1.defer = true;
+      script1.id = "ads-script-main";
+
+      const script2 = document.createElement("script");
+      script2.src = "https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw";
+      script2.defer = true;
+      script2.id = "ads-script-display";
+
+      document.body.appendChild(script1);
+      document.body.appendChild(script2);
+    }
+
+    function removeAdsIfPresent() {
+      ["ads-script-main", "ads-script-display"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+      });
+    }
 
 
     window.handleQuickAdd = async function handleQuickAdd(e) {
@@ -1307,11 +1465,11 @@
         const category = detectQuickCategory(text, isIncome);
 
         const tx = {
-  date: document.getElementById("date").value || formatLocalDate(new Date())
-  amount,
-  type: isIncome ? "income" : "expense",
-  category
-};
+          date: document.getElementById("date").value || formatLocalDate(new Date()),
+          amount,
+          type: isIncome ? "income" : "expense",
+          category
+        };
 
         await saveQuickTransaction(tx);
       }
@@ -1525,6 +1683,7 @@
     proBannerButton.style.opacity = "0.7";
     proBannerButton.style.cursor = "default";
 
+    removeAdsIfPresent();
     renderCategoryManager();
     return;
   }
@@ -1566,6 +1725,7 @@
   proBannerButton.style.opacity = "1";
   proBannerButton.style.cursor = "pointer";
 
+  loadAdsIfNeeded();
   renderCategoryManager();
 }
 
@@ -1766,6 +1926,48 @@ async function startPaidProCheckout() {
       updateDashboard();
     }
 
+    function updateHeroRetention(balance = 0) {
+      const streakValue = document.getElementById("streakValue");
+      const streakSubtext = document.getElementById("streakSubtext");
+      const goalValue = document.getElementById("goalValue");
+      const goalSubtext = document.getElementById("goalSubtext");
+      const goalProgressFill = document.getElementById("goalProgressFill");
+
+      const streakDays = getStreakDays();
+      const goal = getSavingsGoal();
+      const monthBalance = getCurrentMonthBalance();
+      const progress = Math.max(0, Math.min(100, (monthBalance / goal) * 100));
+
+      if (streakValue) {
+        streakValue.textContent = language === "es"
+          ? `${streakDays} ${streakDays === 1 ? "día" : "días"}`
+          : `${streakDays} ${streakDays === 1 ? "day" : "days"}`;
+      }
+
+      if (streakSubtext) {
+        streakSubtext.textContent = streakDays > 0
+          ? t("Sigue así: registrar hoy mantiene tu racha viva.", "Keep going: logging today keeps your streak alive.")
+          : t("Empieza hoy y crea el hábito.", "Start today and build the habit.");
+      }
+
+      if (goalValue) {
+        goalValue.textContent = `$${monthBalance.toFixed(0)} / $${goal.toFixed(0)}`;
+      }
+
+      if (goalSubtext) {
+        if (monthBalance >= goal) {
+          goalSubtext.textContent = t("¡Meta alcanzada! Vas por excelente camino.", "Goal reached! You're doing great.");
+        } else {
+          const missing = Math.max(0, goal - monthBalance);
+          goalSubtext.textContent = t(`Te faltan $${missing.toFixed(0)} para tu meta.`, `$${missing.toFixed(0)} left to reach your goal.`);
+        }
+      }
+
+      if (goalProgressFill) {
+        goalProgressFill.style.width = `${progress}%`;
+      }
+    }
+
     function updateBreadcrumb(items) {
       const breadcrumb = document.getElementById("breadcrumb");
 
@@ -1812,11 +2014,16 @@ async function startPaidProCheckout() {
 
       let income = 0;
       let expense = 0;
+      const expenseByCategory = {};
 
       transactions.forEach(tx => {
         const amount = Number(tx.amount) || 0;
         if (tx.type === "income") income += amount;
-        else if (tx.type === "expense") expense += amount;
+        else if (tx.type === "expense") {
+          expense += amount;
+          const key = tx.category || "Otros";
+          expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
+        }
       });
 
       const balance = income - expense;
@@ -1826,18 +2033,30 @@ async function startPaidProCheckout() {
       profitEl.textContent = `$${balance.toFixed(2)}`;
       balanceEl.textContent = `$${balance.toFixed(2)}`;
 
-      let insight = "💡 Empieza a registrar tus finanzas";
+      const topCategoryEntry = Object.entries(expenseByCategory).sort((a, b) => b[1] - a[1])[0];
+      const savingsRate = income > 0 ? (balance / income) * 100 : 0;
+      let insight = t("💡 Empieza a registrar tus finanzas", "💡 Start tracking your finances");
+
       if (!transactions.length) {
-        insight = "💡 Empieza a registrar tus finanzas";
+        insight = t("💡 Empieza a registrar tus finanzas", "💡 Start tracking your finances");
       } else if (expense > income) {
-        insight = "⚠️ Estás gastando más de lo que ganas";
+        const over = Math.abs(balance).toFixed(0);
+        insight = t(`⚠️ Estás por debajo por $${over}. Reduce gastos para volver al control.`, `⚠️ You are below by $${over}. Reduce spending to get back in control.`);
+      } else if (topCategoryEntry) {
+        const [cat, total] = topCategoryEntry;
+        if (savingsRate >= 20) {
+          insight = t(`✅ Ahorras ${savingsRate.toFixed(0)}% de tus ingresos. Tu gasto #1 es ${getCategoryLabel(cat)} ($${total.toFixed(0)}).`, `✅ You're saving ${savingsRate.toFixed(0)}% of your income. Your #1 expense is ${getCategoryLabel(cat)} ($${total.toFixed(0)}).`);
+        } else {
+          insight = t(`📊 Tu gasto más alto es ${getCategoryLabel(cat)} ($${total.toFixed(0)}). Puedes mejorar tu margen este mes.`, `📊 Your highest expense is ${getCategoryLabel(cat)} ($${total.toFixed(0)}). You can improve your margin this month.`);
+        }
       } else if (balance > 0) {
-        insight = "✅ Vas bien, estás ahorrando dinero";
-      } else if (income > 0 || expense > 0) {
-        insight = "📊 Tu balance está en equilibrio";
+        insight = t("✅ Vas bien, estás ahorrando dinero", "✅ You're doing well, you're saving money");
+      } else {
+        insight = t("📊 Tu balance está en equilibrio", "📊 Your balance is balanced");
       }
 
       insightEl.textContent = `🧠 ${insight}`;
+      updateHeroRetention(balance);
     }
 
     function computeCategoryData() {
@@ -1966,52 +2185,50 @@ function isSameLocalDay(dateA, dateB) {
   );
 }
 
-function calculateMonthData(monthIndex) {
-    const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
-    const monthData = [];
+    function calculateMonthData(monthIndex) {
+      const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
+      const monthData = [];
 
-    for (let d = 1; d <= daysInMonth; d++) {
-      let income = 0;
-      let expense = 0;
-      let incomeCategory = null;
-      const categoriesSet = new Set();
-      const txs = []; // 🔥 NUEVO
+      for (let d = 1; d <= daysInMonth; d++) {
+        let income = 0;
+        let expense = 0;
+        let incomeCategory = null;
+        const categoriesSet = new Set();
 
-      transactions.forEach(tx => {
-        const td = parseLocalDate(tx.date);
-        if (
-          td.getFullYear() === CURRENT_YEAR &&
-          td.getMonth() === monthIndex &&
-          td.getDate() === d
-        ) {
-          txs.push(tx); // 🔥 NUEVO
-          if (tx.type === "income") {
-            income += tx.amount;
-            if (tx.category) incomeCategory = tx.category;
-          } else {
-            expense += tx.amount;
-            if (tx.category) categoriesSet.add(tx.category);
+        transactions.forEach(tx => {
+          const td = parseLocalDate(tx.date);
+          if (
+            td.getFullYear() === CURRENT_YEAR &&
+            td.getMonth() === monthIndex &&
+            td.getDate() === d
+          ) {
+            if (tx.type === "income") {
+              income += tx.amount;
+              if (tx.category) incomeCategory = tx.category;
+            } else {
+              expense += tx.amount;
+              if (tx.category) categoriesSet.add(tx.category);
+            }
           }
-        }
-      });
+        });
 
-      let categoryDisplay = "-";
-      if (categoriesSet.size === 1) categoryDisplay = [...categoriesSet][0];
-      else if (categoriesSet.size > 1) categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
+        let categoryDisplay = "-";
+        if (categoriesSet.size === 1) categoryDisplay = [...categoriesSet][0];
+        else if (categoriesSet.size > 1) categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
 
-      monthData.push({
-        day: d,
-        income,
-        incomeCategory,
-        expense,
-        profit: income - expense,
-        category: categoryDisplay,
-        txs // 🔥 NUEVO
-      });
+        monthData.push({
+          day: d,
+          income,
+          incomeCategory,
+          expense,
+          profit: income - expense,
+          category: categoryDisplay
+        });
+      }
+
+      return monthData;
     }
 
-    return monthData;
-  }
     function renderYearView() {
     
       const yearData = calculateYearData();
@@ -2155,37 +2372,15 @@ function calculateMonthData(monthIndex) {
         totalProfit += day.profit;
 
         const row = document.createElement("tr");
-row.innerHTML = `
-        <td><button class="toggle-btn" onclick="toggleDetail(${day.day})">▼</button> <strong>${day.day}</strong></td>
-        <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
-        <td>${renderIncomeCategorySelect(day.incomeCategory, day.day)}</td>
-        <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
-        <td class="editable-category" data-day="${day.day}">${renderCategorySelect(day.category, day.day)}</td>
-        <td>$${day.profit.toFixed(2)}</td>
-      `;
-        tbody.appendChild(row);
-
-        // 🔥 FILA EXPANDIBLE
-        const detailRow = document.createElement("tr");
-        detailRow.id = `detail-${day.day}`;
-        detailRow.style.display = "none";
-        detailRow.innerHTML = `
-          <td colspan="6">
-            <div class="day-details">
-              ${day.txs.length === 0
-                ? `<span style="color:#9ca3af">${t("Sin transacciones", "No transactions")}</span>`
-                : day.txs.map(tx => `
-                  <div class="tx-line">
-                    ${tx.type === "income" ? "🟢" : "🔴"}
-                    $${Number(tx.amount).toFixed(2)} &bull;
-                    ${tx.category || "-"} &bull;
-                    ${tx.type === "income" ? t("Ingreso","Income") : t("Gasto","Expense")}
-                  </div>
-                `).join("")}
-            </div>
-          </td>
+        row.innerHTML = `
+          <td><strong>${day.day}</strong></td>
+          <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
+          <td>${renderIncomeCategorySelect(day.incomeCategory, day.day)}</td>
+          <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
+          <td class="editable-category" data-day="${day.day}">${renderCategorySelect(day.category, day.day)}</td>
+          <td>$${day.profit.toFixed(2)}</td>
         `;
-        tbody.appendChild(detailRow);
+        tbody.appendChild(row);
       });
 
       const totalRow = document.createElement("tr");
@@ -2267,7 +2462,6 @@ row.innerHTML = `
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
         drawCategoryChart();
-        updateDashboard();
         updateDashboard();
         return;
       }
@@ -2948,6 +3142,10 @@ row.innerHTML = `
       document.getElementById("btnExport").innerText = t("📥 Exportar Datos", "📥 Export Data");
       document.getElementById("btnPrint").innerText = t("🖨 Imprimir", "🖨 Print");
       document.getElementById("btnClear").innerText = t("🗑 Borrar datos", "🗑 Clear data");
+      document.getElementById("quickAddHelper").innerText = t("Escribe varios movimientos separados por ; y presiona Enter.", "Type multiple entries separated by ; and press Enter.");
+      document.getElementById("streakLabel").innerText = t("Racha activa", "Active streak");
+      document.getElementById("goalLabel").innerText = t("Meta mensual de ahorro", "Monthly savings goal");
+      document.getElementById("goalActionButton").innerText = t("✏️ Ajustar meta", "✏️ Adjust goal");
 
       document.getElementById("adSlot1").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
       document.getElementById("adSlot2").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
@@ -2996,7 +3194,7 @@ row.innerHTML = `
            <li>Publicidad discreta dentro de la app.</li>`
         : `<li>No registration required (data stored only in your browser).</li>
            <li>Track income and expenses for the current year.</li>
-           <li>Charts and export to PDF/Excel.</li>
+           <li>Charts and printing included.</li>
            <li>Light ads inside the app.</li>`;
 
       document.getElementById("proPlanFeatures").innerHTML = language === "es"
@@ -3009,8 +3207,8 @@ row.innerHTML = `
            <li>Automatic weekly cloud backups.</li>
            <li>Access from multiple devices with your account.</li>
            <li>Ad-free experience.</li>
-           <li>Priority for new features and support.</li>
-            <li>Exportación a PDF y Excel.</li>`;
+           <li>PDF and Excel exports.</li>
+           <li>Priority for new features and support.</li>`;
 
       document.getElementById("loginModalTitle").textContent = t("🔐 Iniciar sesión", "🔐 Sign in");
       document.getElementById("loginEmailLabel").textContent = t("Correo electrónico", "Email");
@@ -3025,6 +3223,7 @@ row.innerHTML = `
         "Your data syncs to the cloud when you sign in."
       );
 
+      updateCurrentDateDisplay();
       drawCategoryChart();
       updatePlanUI(currentUser ? { plan: currentPlan } : null);
 
@@ -3054,14 +3253,23 @@ row.innerHTML = `
       }
     };
 
+    window.openSavingsGoalPrompt = function () {
+      const currentGoal = getSavingsGoal();
+      const message = t("Define tu meta mensual de ahorro en USD:", "Set your monthly savings goal in USD:");
+      const result = window.prompt(message, String(currentGoal));
+      if (result === null) return;
+      const value = parseFloat(result);
+      if (!Number.isFinite(value) || value <= 0) {
+        alert(t("Ingresa una meta válida mayor que 0.", "Enter a valid goal greater than 0."));
+        return;
+      }
+      localStorage.setItem("lumenssaveSavingsGoal", String(value));
+      updateDashboard();
+    };
+
     window.showMonthView = function (monthIndex) {
       renderMonthView(monthIndex);
     };
-    window.toggleDetail = function(day) {
-    const detailRow = document.getElementById(`detail-${day}`);
-    if (!detailRow) return;
-    detailRow.style.display = detailRow.style.display === "none" ? "table-row" : "none";
-  };
 
     window.addCategoryPrompt = addCategoryPrompt;
     window.deleteCategory = deleteCategory;
@@ -3306,16 +3514,11 @@ row.innerHTML = `
 
     document.getElementById("proBannerButton").addEventListener("click", async () => {
       if (!currentUser) {
-        alert("Primero inicia sesión");
+        alert(t("Primero inicia sesión", "Please sign in first"));
         return;
       }
 
-      // 🔥 SI YA USÓ EL TRIAL → PAGO
-      if (currentPlan === "pro_trial" || currentPlan === "free") {
-        await startPaidProCheckout();
-      } else {
-        await startProTrial();
-      }
+      await startProTrial();
     });
 
     document.getElementById("type").addEventListener("change", () => {
