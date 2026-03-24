@@ -895,6 +895,7 @@
 
 
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
 </head>
 <body>
   <div class="container">
@@ -1819,7 +1820,7 @@ async function startPaidProCheckout() {
       let totalIncome = 0;
 
       transactions.forEach(tx => {
-        const d = new Date(tx.date);
+        const d = parseLocalDate(tx.date);
         if (d.getFullYear() === CURRENT_YEAR) {
           if (tx.type === "expense") {
             const key = tx.category || "Otros";
@@ -1886,7 +1887,7 @@ async function startPaidProCheckout() {
         let expense = 0;
 
         transactions.forEach(tx => {
-          const d = new Date(tx.date);
+          const d = parseLocalDate(tx.date);
           if (d.getMonth() === m && d.getFullYear() === CURRENT_YEAR) {
             if (tx.type === "income") income += tx.amount;
             else expense += tx.amount;
@@ -1903,7 +1904,17 @@ async function startPaidProCheckout() {
       return yearData;
     }
 
-    function isSameLocalDay(dateA, dateB) {
+    
+function parseLocalDate(dateStr) {
+  if (!dateStr) return new Date();
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+  return new Date(dateStr);
+}
+
+function isSameLocalDay(dateA, dateB) {
       return (
         dateA.getFullYear() === dateB.getFullYear() &&
         dateA.getMonth() === dateB.getMonth() &&
@@ -1922,7 +1933,7 @@ async function startPaidProCheckout() {
         const categoriesSet = new Set();
 
         transactions.forEach(tx => {
-          const td = new Date(tx.date);
+          const td = parseLocalDate(tx.date);
           if (
             td.getFullYear() === CURRENT_YEAR &&
             td.getMonth() === monthIndex &&
@@ -2052,7 +2063,7 @@ async function startPaidProCheckout() {
       if (!display) {
         const targetDate = new Date(CURRENT_YEAR, currentMonth, day);
         const existingIncome = transactions.find(tx => {
-          const d = new Date(tx.date);
+          const d = parseLocalDate(tx.date);
           return tx.type === "income" && isSameLocalDay(d, targetDate);
         });
         display = existingIncome?.category || incomeCategories[0]?.name || "Salario";
@@ -2479,7 +2490,7 @@ async function startPaidProCheckout() {
       const targetType = field === "income" ? "income" : "expense";
 
       const matches = transactions.filter(tx => {
-        const d = new Date(tx.date);
+        const d = parseLocalDate(tx.date);
         return tx.type === targetType && isSameLocalDay(d, targetDate);
       });
 
@@ -2496,7 +2507,7 @@ async function startPaidProCheckout() {
       }
 
       transactions = transactions.filter(tx => {
-        const d = new Date(tx.date);
+        const d = parseLocalDate(tx.date);
         return !(tx.type === targetType && isSameLocalDay(d, targetDate));
       });
 
@@ -2527,7 +2538,7 @@ async function startPaidProCheckout() {
 
       if (currentUser) {
         const updates = transactions.filter(tx => {
-          const d = new Date(tx.date);
+          const d = parseLocalDate(tx.date);
           return tx.type === "expense" && isSameLocalDay(d, targetDate);
         });
 
@@ -2537,7 +2548,7 @@ async function startPaidProCheckout() {
       }
 
       transactions = transactions.map(tx => {
-        const d = new Date(tx.date);
+        const d = parseLocalDate(tx.date);
         if (tx.type === "expense" && isSameLocalDay(d, targetDate)) {
           return { ...tx, category: newCategory };
         }
@@ -2556,7 +2567,7 @@ async function startPaidProCheckout() {
 
       if (currentUser) {
         const updates = transactions.filter(tx => {
-          const d = new Date(tx.date);
+          const d = parseLocalDate(tx.date);
           return tx.type === "income" && isSameLocalDay(d, targetDate);
         });
 
@@ -2566,7 +2577,7 @@ async function startPaidProCheckout() {
       }
 
       transactions = transactions.map(tx => {
-        const d = new Date(tx.date);
+        const d = parseLocalDate(tx.date);
         if (tx.type === "income" && isSameLocalDay(d, targetDate)) {
           return { ...tx, category: newCategory };
         }
@@ -2595,7 +2606,7 @@ async function startPaidProCheckout() {
     let expense = 0;
 
     transactions.forEach(tx => {
-      const d = new Date(tx.date);
+      const d = parseLocalDate(tx.date);
       if (isSameLocalDay(d, date)) {
         if (tx.type === "income") income += tx.amount;
         else expense += tx.amount;
