@@ -2091,20 +2091,20 @@ function isSameLocalDay(dateA, dateB) {
       let totalExpense = 0;
       let totalProfit = 0;
 
-      monthData.forEach(day => {
+      monthData.forEach(tx => {
         totalIncome += day.income;
         totalExpense += day.expense;
         totalProfit += day.profit;
 
         const row = document.createElement("tr");
-        row.innerHTML = `
-          <td><strong>${day.day}</strong></td>
-          <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
-          <td>${renderIncomeCategorySelect(day.incomeCategory, day.day)}</td>
-          <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
-          <td class="editable-category" data-day="${day.day}">${renderCategorySelect(day.category, day.day)}</td>
-          <td>$${day.profit.toFixed(2)}</td>
-        `;
+row.innerHTML = `
+  <td><strong>${tx._date.getDate()}</strong></td>
+  <td>$${tx.type === "income" ? tx.amount.toFixed(2) : "0.00"}</td>
+  <td>${tx.type === "income" ? tx.category || "-" : "-"}</td>
+  <td>$${tx.type === "expense" ? tx.amount.toFixed(2) : "0.00"}</td>
+  <td>${tx.type === "expense" ? tx.category || "-" : "-"}</td>
+  <td>$${(tx.type === "income" ? tx.amount : -tx.amount).toFixed(2)}</td>
+`;
         tbody.appendChild(row);
       });
 
