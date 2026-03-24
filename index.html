@@ -1719,13 +1719,15 @@ async function startPaidProCheckout() {
     const syncStatus = document.getElementById("syncStatus");
     const syncMessage = document.getElementById("syncMessage");
 
-    document.getElementById("date").value = formatLocalDate(new Date());
-updateCurrentDateDisplay();
+    document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("date").value = formatLocalDate(new Date());
+  updateCurrentDateDisplay();
 
-if (!window.dateIntervalStarted) {
-  setInterval(updateCurrentDateDisplay, 60000);
-  window.dateIntervalStarted = true;
-}
+  if (!window.dateIntervalStarted) {
+    setInterval(updateCurrentDateDisplay, 60000);
+    window.dateIntervalStarted = true;
+  }
+});
 
     function getMonthNames() {
       return language === "es" ? monthNamesEs : monthNamesEn;
