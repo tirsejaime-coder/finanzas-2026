@@ -12,69 +12,6 @@
 
   <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-function handleQuickAdd(e) {
-  if (e.key !== "Enter") return;
-
-  e.preventDefault();
-
-  const input = e.target.value.toLowerCase().trim();
-  if (!input) return;
-
-  const amountMatch = input.match(/\d+(\.\d+)?/);
-  if (!amountMatch) return;
-
-  const amount = parseFloat(amountMatch[0]);
-
-  const isIncome =
-    input.includes("salario") ||
-    input.includes("income") ||
-    input.includes("+");
-
-  const category = detectCategory(input, isIncome);
-
-  const tx = {
-    date: new Date().toISOString(),
-    amount,
-    type: isIncome ? "income" : "expense",
-    category
-  };
-
-  saveQuickTransaction(tx);
-
-  e.target.value = "";
-}
-
-function detectCategory(text, isIncome) {
-  const categories = getCategoriesByType(isIncome ? "income" : "expense");
-
-  for (let c of categories) {
-    if (text.includes(c.name.toLowerCase())) {
-      return c.name;
-    }
-  }
-
-  return isIncome ? "Salario" : "Otros";
-}
-
-async function saveQuickTransaction(tx) {
-
-  if (!currentUser) {
-    transactions.push(tx);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    renderCurrentView();
-    drawCategoryChart();
-    return;
-  }
-
-  const userRef = doc(collection(db, "users"), currentUser.uid);
-
-  await addDoc(collection(userRef, "transactions"), {
-    ...tx,
-    createdAt: serverTimestamp()
-  });
-}
-
-</script>
 
   <style>
     :root {
@@ -928,11 +865,9 @@ async function saveQuickTransaction(tx) {
 
 
 /* ⚡ QUICK ADD */
-
 .quick-add-box {
   margin: 20px 0;
 }
-
 .quick-add-input {
   width: 100%;
   padding: 18px;
@@ -941,13 +876,11 @@ async function saveQuickTransaction(tx) {
   font-size: 1.1rem;
   transition: all 0.2s ease;
 }
-
 .quick-add-input:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
   outline: none;
 }
-
 .quick-add-input::placeholder {
   color: #9ca3af;
 }
@@ -956,10 +889,9 @@ async function saveQuickTransaction(tx) {
 
   <!-- Disqometer (1 sola instancia de cada script) -->
   <script src="https://api.disqometer.com/8ee4ea609a6346c4cf34c2b621ac79ba.js?nc=NjM5MjQw"></script>
-  
-
-
-
+  <script src="https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw"></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NTkyNDYzOTc2OTczNzU5MDg1OTI3MDI="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
 
 
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
@@ -1035,15 +967,16 @@ async function saveQuickTransaction(tx) {
 </div>
 <!-- 🔥 FIN HERO -->
 
+      
       <!-- ⚡ QUICK ADD INTELIGENTE -->
-<div class="quick-add-box">
-  <input 
-  id="quickInput" 
-  placeholder="Ej: 50 comida, 2000 salario, 30 uber"
-  onkeydown="handleQuickAdd(event)"
-  class="quick-add-input"
-/>
-</div>
+      <div class="quick-add-box">
+        <input
+          id="quickInput"
+          placeholder="Ej: 50 comida; 2000 salario; 30 uber"
+          onkeydown="handleQuickAdd(event)"
+          class="quick-add-input"
+        />
+      </div>
 
 <form class="quick-form" onsubmit="saveTransaction(event)">
 
@@ -1345,6 +1278,85 @@ async function saveQuickTransaction(tx) {
     
     const STRIPE_SUCCESS_PARAM = "success";
     const STRIPE_CANCEL_PARAM = "cancel";
+
+
+    window.handleQuickAdd = async function handleQuickAdd(e) {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+
+      const raw = e.target.value.trim().toLowerCase();
+      if (!raw) return;
+
+      const parts = raw.split(/[;\n]+/).map(s => s.trim()).filter(Boolean);
+      if (!parts.length) return;
+
+      for (const text of parts) {
+        const amountMatch = text.match(/\d+(\.\d+)?/);
+        if (!amountMatch) continue;
+
+        const amount = parseFloat(amountMatch[0]);
+        const isIncome =
+          text.includes("salario") ||
+          text.includes("income") ||
+          text.includes("+") ||
+          text.includes("cash") ||
+          text.includes("freelance");
+
+        const category = detectQuickCategory(text, isIncome);
+
+        const tx = {
+          date: new Date().toISOString(),
+          amount,
+          type: isIncome ? "income" : "expense",
+          category
+        };
+
+        await saveQuickTransaction(tx);
+      }
+
+      e.target.value = "";
+      showQuickFeedback();
+    };
+
+    function detectQuickCategory(text, isIncome) {
+      const categories = getCategoriesByType(isIncome ? "income" : "expense");
+      for (const c of categories) {
+        if (text.includes(String(c.name).toLowerCase())) return c.name;
+      }
+      return isIncome ? "Salario" : "Otros";
+    }
+
+    async function saveQuickTransaction(tx) {
+      if (!currentUser) {
+        transactions.push(tx);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+
+      const userRef = doc(collection(db, "users"), currentUser.uid);
+      await addDoc(collection(userRef, "transactions"), {
+        ...tx,
+        createdAt: serverTimestamp()
+      });
+      // onSnapshot will refresh the UI, but we keep this for instant feedback
+      renderCurrentView();
+      drawCategoryChart();
+      updateDashboard();
+    }
+
+    function showQuickFeedback() {
+      const input = document.getElementById("quickInput");
+      if (!input) return;
+      const previous = input.style.borderColor;
+      input.style.borderColor = "#22c55e";
+      setTimeout(() => {
+        input.style.borderColor = previous || "#e5e7eb";
+      }, 600);
+    }
+
 
 
     function cloneDefaultCategories() {
@@ -2176,6 +2188,8 @@ async function startPaidProCheckout() {
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
         drawCategoryChart();
+        updateDashboard();
+        updateDashboard();
         return;
       }
 
@@ -2202,6 +2216,7 @@ async function startPaidProCheckout() {
         transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
         drawCategoryChart();
+        updateDashboard();
       });
     }
 
@@ -3290,155 +3305,6 @@ async function startPaidProCheckout() {
     loadCategories();
     applyLanguage();
     switchTab("input");
-  
-function handleQuickAdd(e) {
-  if (e.key !== "Enter") return;
-
-  e.preventDefault();
-
-  const input = e.target.value.toLowerCase().trim();
-  if (!input) return;
-
-  const amountMatch = input.match(/\d+(\.\d+)?/);
-  if (!amountMatch) return;
-
-  const amount = parseFloat(amountMatch[0]);
-
-  const isIncome =
-    input.includes("salario") ||
-    input.includes("income") ||
-    input.includes("+");
-
-  const category = detectCategory(input, isIncome);
-
-  const tx = {
-    date: new Date().toISOString(),
-    amount,
-    type: isIncome ? "income" : "expense",
-    category
-  };
-
-  saveQuickTransaction(tx);
-
-  e.target.value = "";
-}
-
-function detectCategory(text, isIncome) {
-  const categories = getCategoriesByType(isIncome ? "income" : "expense");
-
-  for (let c of categories) {
-    if (text.includes(c.name.toLowerCase())) {
-      return c.name;
-    }
-  }
-
-  return isIncome ? "Salario" : "Otros";
-}
-
-async function saveQuickTransaction(tx) {
-
-  if (!currentUser) {
-    transactions.push(tx);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    renderCurrentView();
-    drawCategoryChart();
-    return;
-  }
-
-  const userRef = doc(collection(db, "users"), currentUser.uid);
-
-  await addDoc(collection(userRef, "transactions"), {
-    ...tx,
-    createdAt: serverTimestamp()
-  });
-}
-
-<script>
-function handleQuickAdd(e) {
-  if (e.key !== "Enter") return;
-  e.preventDefault();
-
-  const input = e.target.value.toLowerCase().trim();
-  if (!input) return;
-
-  const parts = input.split(/[;,]/);
-
-  parts.forEach(part => {
-    const text = part.trim();
-    if (!text) return;
-
-    const amountMatch = text.match(/\d+(\.\d+)?/);
-    if (!amountMatch) return;
-
-    const amount = parseFloat(amountMatch[0]);
-
-    const isIncome =
-      text.includes("salario") ||
-      text.includes("income") ||
-      text.includes("+") ||
-      text.includes("cash");
-
-    const category = detectCategory(text, isIncome);
-
-    const tx = {
-      date: new Date().toISOString(),
-      amount,
-      type: isIncome ? "income" : "expense",
-      category
-    };
-
-    saveQuickTransaction(tx);
-  });
-
-  e.target.value = "";
-  showQuickFeedback();
-}
-
-function detectCategory(text, isIncome) {
-  const categories = getCategoriesByType(isIncome ? "income" : "expense");
-
-  for (let c of categories) {
-    if (text.includes(c.name.toLowerCase())) {
-      return c.name;
-    }
-  }
-
-  return isIncome ? "Salario" : "Otros";
-}
-
-async function saveQuickTransaction(tx) {
-  if (!currentUser) {
-    transactions.push(tx);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    renderCurrentView();
-    drawCategoryChart();
-    updateDashboard();
-    return;
-  }
-
-  const userRef = doc(collection(db, "users"), currentUser.uid);
-
-  await addDoc(collection(userRef, "transactions"), {
-    ...tx,
-    createdAt: serverTimestamp()
-  });
-
-  renderCurrentView();
-  drawCategoryChart();
-  updateDashboard();
-}
-
-function showQuickFeedback() {
-  const input = document.getElementById("quickInput");
-  if (!input) return;
-
-  input.style.borderColor = "#22c55e";
-
-  setTimeout(() => {
-    input.style.borderColor = "#e5e7eb";
-  }, 600);
-}
-</script>
-
+  </script>
 </body>
 </html>
