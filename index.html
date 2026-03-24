@@ -892,6 +892,7 @@
   <script src="https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw"></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NTkyNDYzOTc2OTczNzU5MDg1OTI3MDI="></script>
 
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
 </head>
 <body>
   <div class="container">
@@ -1917,6 +1918,14 @@ function parseLocalDate(dateStr) {
   return new Date(dateStr);
 }
 
+function formatLocalDate(date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0")
+  ].join("-");
+}
+
 // 👇 ESTA FUNCIÓN DEBE ESTAR FUERA
 function isSameLocalDay(dateA, dateB) {
   return (
@@ -2517,7 +2526,7 @@ function isSameLocalDay(dateA, dateB) {
 
       if (newValue > 0) {
         const newTx = {
-          date: targetDate.toISOString().split('T')[0],
+          date: formatLocalDate(targetDate),
           type: targetType,
           amount: newValue,
           description: `Ajuste manual ${targetType === "income" ? t("ingreso","income") : t("gasto","expense")}`,
@@ -3011,12 +3020,10 @@ function isSameLocalDay(dateA, dateB) {
         return;
       }
 
-      const date = new Date(dateInput + "T00:00:00");
-
       const selectedCategory = category || (type === "expense" ? "Otros" : "Salario");
 
       const transaction = {
-        date: date.toISOString().split('T')[0],
+        date: dateInput,
         type,
         amount,
         description,
