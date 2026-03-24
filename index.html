@@ -1600,10 +1600,11 @@ async function saveQuickTransaction(tx) {
       <!-- ⚡ QUICK ADD INTELIGENTE -->
 <div class="quick-add-box">
   <input 
-    id="quickInput" 
-    placeholder="Ej: 50 comida o 2000 salario"
-    onkeydown="handleQuickAdd(event)"
-  />
+  id="quickInput" 
+  placeholder="Ej: 50 comida, 2000 salario, 30 uber"
+  onkeydown="handleQuickAdd(event)"
+  class="quick-add-input"
+/>
 </div>
 
 <form class="quick-form" onsubmit="saveTransaction(event)">
