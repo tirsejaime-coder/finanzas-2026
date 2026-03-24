@@ -1119,22 +1119,26 @@ async function saveQuickTransaction(tx) {
 /* ⚡ QUICK ADD */
 
 .quick-add-box {
-  margin-bottom: 14px;
+  margin: 20px 0;
 }
 
-#quickInput {
+.quick-add-input {
   width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
-  font-size: 1rem;
-  background: #ffffff;
+  padding: 18px;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
 }
 
-#quickInput:focus {
+.quick-add-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+}
+
+.quick-add-input::placeholder {
+  color: #9ca3af;
 }
 
 </style>
