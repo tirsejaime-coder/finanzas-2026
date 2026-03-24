@@ -1695,8 +1695,7 @@ async function startPaidProCheckout() {
     const syncStatus = document.getElementById("syncStatus");
     const syncMessage = document.getElementById("syncMessage");
 
-    document.getElementById("date").valueAsDate = new Date();
-
+    document.getElementById("date").value = formatLocalDate(new Date());
     function getMonthNames() {
       return language === "es" ? monthNamesEs : monthNamesEn;
     }
