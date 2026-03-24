@@ -11,7 +11,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <!-- Google Charts -->
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 function handleQuickAdd(e) {
   if (e.key !== "Enter") return;
 
@@ -3353,8 +3353,6 @@ async function saveQuickTransaction(tx) {
   });
 }
 
-</script>
-
 <script>
 function handleQuickAdd(e) {
   if (e.key !== "Enter") return;
@@ -3363,7 +3361,7 @@ function handleQuickAdd(e) {
   const input = e.target.value.toLowerCase().trim();
   if (!input) return;
 
-  const parts = input.split(";");
+  const parts = input.split(/[;,]/);
 
   parts.forEach(part => {
     const text = part.trim();
@@ -3377,7 +3375,8 @@ function handleQuickAdd(e) {
     const isIncome =
       text.includes("salario") ||
       text.includes("income") ||
-      text.includes("+");
+      text.includes("+") ||
+      text.includes("cash");
 
     const category = detectCategory(text, isIncome);
 
@@ -3391,8 +3390,8 @@ function handleQuickAdd(e) {
     saveQuickTransaction(tx);
   });
 
-  showQuickFeedback();
   e.target.value = "";
+  showQuickFeedback();
 }
 
 function detectCategory(text, isIncome) {
@@ -3434,6 +3433,7 @@ function showQuickFeedback() {
   if (!input) return;
 
   input.style.borderColor = "#22c55e";
+
   setTimeout(() => {
     input.style.borderColor = "#e5e7eb";
   }, 600);
