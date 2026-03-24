@@ -1923,29 +1923,17 @@ function isSameLocalDay(dateA, dateB) {
     }
 
     function calculateMonthData(monthIndex) {
-      const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
-      const monthData = [];
-
-      for (let d = 1; d <= daysInMonth; d++) {
-        let income = 0;
-        let expense = 0;
-        let incomeCategory = null;
-        const categoriesSet = new Set();
-
-        transactions.forEach(tx => {
-          const td = parseLocalDate(tx.date);
-          if (
-            td.getFullYear() === CURRENT_YEAR &&
-            td.getMonth() === monthIndex &&
-            td.getDate() === d
-          ) {
-            if (tx.type === "income") {
-              income += tx.amount;
-              if (tx.category) incomeCategory = tx.category;
-            } else {
-              expense += tx.amount;
-              if (tx.category) categoriesSet.add(tx.category);
-            }
+  return transactions
+    .map(tx => {
+      const d = parseLocalDate(tx.date);
+      return { ...tx, _date: d };
+    })
+    .filter(tx =>
+      tx._date.getFullYear() === CURRENT_YEAR &&
+      tx._date.getMonth() === monthIndex
+    )
+    .sort((a, b) => a._date - b._date);
+}
           }
         });
 
