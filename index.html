@@ -6,12 +6,208 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- jsPDF / AutoTable / XLSX -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+
+window.updateTransactionAmount = function(day, index, newValue) {
+  const amount = parseFloat(newValue);
+  if (isNaN(amount) || amount <= 0) return;
+
+  let counter = -1;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
+
+    if (d.getDate() === day) {
+      counter++;
+      if (counter === index) {
+        transactions[i].amount = amount;
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+    }
+  }
+}
+
+window.deleteTransaction = function(day, index) {
+  if (!confirm("¿Eliminar esta transacción?")) return;
+
+  let counter = -1;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
+
+    if (d.getDate() === day) {
+      counter++;
+      if (counter === index) {
+        transactions.splice(i, 1);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+    }
+  }
+}
+
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js">
+
+window.updateTransactionAmount = function(day, index, newValue) {
+  const amount = parseFloat(newValue);
+  if (isNaN(amount) || amount <= 0) return;
+
+  let counter = -1;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
+
+    if (d.getDate() === day) {
+      counter++;
+      if (counter === index) {
+        transactions[i].amount = amount;
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+    }
+  }
+}
+
+window.deleteTransaction = function(day, index) {
+  if (!confirm("¿Eliminar esta transacción?")) return;
+
+  let counter = -1;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
+
+    if (d.getDate() === day) {
+      counter++;
+      if (counter === index) {
+        transactions.splice(i, 1);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+    }
+  }
+}
+
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+
+window.updateTransactionAmount = function(day, index, newValue) {
+  const amount = parseFloat(newValue);
+  if (isNaN(amount) || amount <= 0) return;
+
+  let counter = -1;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
+
+    if (d.getDate() === day) {
+      counter++;
+      if (counter === index) {
+        transactions[i].amount = amount;
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+    }
+  }
+}
+
+window.deleteTransaction = function(day, index) {
+  if (!confirm("¿Eliminar esta transacción?")) return;
+
+  let counter = -1;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
+
+    if (d.getDate() === day) {
+      counter++;
+      if (counter === index) {
+        transactions.splice(i, 1);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+    }
+  }
+}
+
+</script>
 
   <!-- Google Charts -->
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
+
+window.updateTransactionAmount = function(day, index, newValue) {
+  const amount = parseFloat(newValue);
+  if (isNaN(amount) || amount <= 0) return;
+
+  let counter = -1;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
+
+    if (d.getDate() === day) {
+      counter++;
+      if (counter === index) {
+        transactions[i].amount = amount;
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+    }
+  }
+}
+
+window.deleteTransaction = function(day, index) {
+  if (!confirm("¿Eliminar esta transacción?")) return;
+
+  let counter = -1;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
+
+    if (d.getDate() === day) {
+      counter++;
+      if (counter === index) {
+        transactions.splice(i, 1);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+    }
+  }
+}
+
+</script>
 
   <style>
     :root {
@@ -983,6 +1179,8 @@
 </style>
 
   <!-- Ads se cargan dinámicamente solo para usuarios FREE -->
+
+
 
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjMyMDUxOTY5MTg2NzMzMjE3NTI1MTc="></script>
 </head>
@@ -2194,6 +2392,7 @@ function isSameLocalDay(dateA, dateB) {
         let expense = 0;
         let incomeCategory = null;
         const categoriesSet = new Set();
+        const dayTransactions = [];
 
         transactions.forEach(tx => {
           const td = parseLocalDate(tx.date);
@@ -2202,6 +2401,7 @@ function isSameLocalDay(dateA, dateB) {
             td.getMonth() === monthIndex &&
             td.getDate() === d
           ) {
+            dayTransactions.push(tx);
             if (tx.type === "income") {
               income += tx.amount;
               if (tx.category) incomeCategory = tx.category;
@@ -2222,7 +2422,8 @@ function isSameLocalDay(dateA, dateB) {
           incomeCategory,
           expense,
           profit: income - expense,
-          category: categoryDisplay
+          category: categoryDisplay,
+          transactions: dayTransactions
         });
       }
 
@@ -2381,6 +2582,50 @@ function isSameLocalDay(dateA, dateB) {
           <td>$${day.profit.toFixed(2)}</td>
         `;
         tbody.appendChild(row);
+
+  // 🔥 EXPANDABLE DETAIL
+  if (day.transactions && day.transactions.length > 1) {
+    const detailRow = document.createElement("tr");
+    detailRow.style.display = "none";
+
+    detailRow.innerHTML = `
+      <td colspan="6">
+        <div style="padding:10px;background:#f9fafb;border-radius:8px;">
+          ${day.transactions.map((tx, index) => `
+  <div style="display:flex;align-items:center;justify-content:space-between;font-size:0.85rem;padding:6px 0;border-bottom:1px dashed #e5e7eb;gap:6px;">
+    <span>${tx.type === "income" ? "🟢 +" : "🔴 -"}</span>
+
+    <input 
+      type="number" 
+      value="${tx.amount}" 
+      step="0.01"
+      style="width:80px;padding:4px;border-radius:4px;border:1px solid #ccc;"
+      onchange="updateTransactionAmount(${day.day}, ${index}, this.value)"
+    />
+
+    <span style="flex:1;">${tx.category}</span>
+
+    <button 
+      onclick="deleteTransaction(${day.day}, ${index})"
+      style="border:none;background:#ef4444;color:white;border-radius:4px;padding:4px 6px;cursor:pointer;"
+    >
+      ❌
+    </button>
+  </div>
+`).join("")}
+        </div>
+      </td>
+    `;
+
+    tbody.appendChild(detailRow);
+
+    row.style.cursor = "pointer";
+
+    row.addEventListener("click", () => {
+      detailRow.style.display =
+        detailRow.style.display === "none" ? "table-row" : "none";
+    });
+  }
       });
 
       const totalRow = document.createElement("tr");
@@ -3590,6 +3835,55 @@ function isSameLocalDay(dateA, dateB) {
     loadCategories();
     applyLanguage();
     switchTab("input");
-  </script>
+  
+
+window.updateTransactionAmount = function(day, index, newValue) {
+  const amount = parseFloat(newValue);
+  if (isNaN(amount) || amount <= 0) return;
+
+  let counter = -1;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
+
+    if (d.getDate() === day) {
+      counter++;
+      if (counter === index) {
+        transactions[i].amount = amount;
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+    }
+  }
+}
+
+window.deleteTransaction = function(day, index) {
+  if (!confirm("¿Eliminar esta transacción?")) return;
+
+  let counter = -1;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
+
+    if (d.getDate() === day) {
+      counter++;
+      if (counter === index) {
+        transactions.splice(i, 1);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        return;
+      }
+    }
+  }
+}
+
+</script>
 </body>
 </html>
