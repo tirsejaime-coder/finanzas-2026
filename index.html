@@ -6,12 +6,264 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- jsPDF / AutoTable / XLSX -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js">
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
 
   <!-- Google Charts -->
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
 
   <style>
     :root {
@@ -705,11 +957,80 @@
     }
 
 
+
+
+    /* 🔥 DASHBOARD */
+    .dashboard {
+      margin-bottom: 20px;
+    }
+
+    .balance-card {
+      text-align: center;
+      padding: 20px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      margin-bottom: 12px;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+    }
+
+    .balance-amount {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .balance-label {
+      font-size: 0.9rem;
+      opacity: 0.92;
+      margin-top: 4px;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .stat-card {
+      padding: 12px;
+      border-radius: 10px;
+      background: #f9fafb;
+      text-align: center;
+      border: 1px solid var(--color-border);
+    }
+
+    .stat-card.income { border-top: 3px solid #16a34a; }
+    .stat-card.expense { border-top: 3px solid #ef4444; }
+    .stat-card.profit { border-top: 3px solid #3b82f6; }
+
+    .stat-value {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .insight-box {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #0369a1;
+    }
+
     @media (max-width: 768px) {
       .container { padding: 18px 14px 24px; }
       h1 { font-size: 1.4rem; }
       .year-grid { grid-template-columns: 1fr; }
       .quick-form { flex-direction: column; }
+      .stats-row { grid-template-columns: 1fr; }
       .field { width: 100%; }
       #piechart_3d {
         position: static !important;
@@ -737,12 +1058,473 @@
     .btn, .tab, .export-option {
       touch-action: manipulation;
     }
-  </style>
+  
+/* 🔥 HERO DASHBOARD (NUEVO DISEÑO) */
+
+.dashboard-hero {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  color: white;
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.hero-balance {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.hero-amount {
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+
+.hero-label {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.hero-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  background: rgba(255,255,255,0.08);
+}
+
+.hero-card.income { border-top: 3px solid #22c55e; }
+.hero-card.expense { border-top: 3px solid #ef4444; }
+.hero-card.profit { border-top: 3px solid #3b82f6; }
+
+.hero-value {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.hero-insight {
+  background: rgba(255,255,255,0.1);
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+
+/* ⚡ QUICK ADD */
+
+.quick-add-box {
+  margin-bottom: 14px;
+}
+
+#quickInput {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  font-size: 1rem;
+  background: #ffffff;
+}
+
+#quickInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+}
+
+</style>
 
   <!-- Disqometer (1 sola instancia de cada script) -->
-  <script src="https://api.disqometer.com/8ee4ea609a6346c4cf34c2b621ac79ba.js?nc=NjM5MjQw"></script>
-  <script src="https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw"></script>
-<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NTkyNDYzOTc2OTczNzU5MDg1OTI3MDI="></script>
+  <script src="https://api.disqometer.com/8ee4ea609a6346c4cf34c2b621ac79ba.js?nc=NjM5MjQw">
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
+  <script src="https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw">
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NTkyNDYzOTc2OTczNzU5MDg1OTI3MDI=">
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc=">
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc=">
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc=">
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
 </head>
 <body>
   <div class="container">
@@ -782,36 +1564,49 @@
     </div>
 
     <div id="view-input" class="view active">
-      <div class="dashboard">
 
-  <div class="balance-card">
-    <div class="balance-amount" id="balanceAmount">$0</div>
-    <div class="balance-label">Balance actual</div>
+  <!-- 🔥 HERO DASHBOARD (NUEVO) -->
+<div class="dashboard-hero">
+
+  <div class="hero-balance">
+    <div id="balanceAmount" class="hero-amount">$0</div>
+    <div class="hero-label">Balance actual</div>
   </div>
 
-  <div class="stats-row">
-    <div class="stat-card income">
-      <div class="stat-value" id="incomeAmount">$0</div>
-      <div class="stat-label">Ingresos</div>
+  <div class="hero-stats">
+    <div class="hero-card income">
+      <div id="incomeAmount" class="hero-value">$0</div>
+      <div>Ingresos</div>
     </div>
 
-    <div class="stat-card expense">
-      <div class="stat-value" id="expenseAmount">$0</div>
-      <div class="stat-label">Gastos</div>
+    <div class="hero-card expense">
+      <div id="expenseAmount" class="hero-value">$0</div>
+      <div>Gastos</div>
     </div>
 
-    <div class="stat-card profit">
-      <div class="stat-value" id="profitAmount">$0</div>
-      <div class="stat-label">Ahorro</div>
+    <div class="hero-card profit">
+      <div id="profitAmount" class="hero-value">$0</div>
+      <div>Ahorro</div>
     </div>
   </div>
 
-  <div class="insight-box" id="insightBox">
-    🧠 Cargando insights...
+  <div id="insightBox" class="hero-insight">
+    🧠 Cargando análisis...
   </div>
 
 </div>
-      <form class="quick-form" onsubmit="saveTransaction(event)">
+<!-- 🔥 FIN HERO -->
+
+      <!-- ⚡ QUICK ADD INTELIGENTE -->
+<div class="quick-add-box">
+  <input 
+    id="quickInput" 
+    placeholder="Ej: 50 comida o 2000 salario"
+    onkeydown="handleQuickAdd(event)"
+  />
+</div>
+
+<form class="quick-form" onsubmit="saveTransaction(event)">
 
         <div class="field">
   <label for="date" id="labelDate">Fecha</label>
@@ -1487,6 +2282,8 @@ async function startPaidProCheckout() {
       } else if (currentView === "month" && currentMonth !== null) {
         renderMonthView(currentMonth);
       }
+
+      updateDashboard();
     }
 
     function updateBreadcrumb(items) {
@@ -1523,6 +2320,46 @@ async function startPaidProCheckout() {
       });
     }
 
+
+    function updateDashboard() {
+      const balanceEl = document.getElementById("balanceAmount");
+      const incomeEl = document.getElementById("incomeAmount");
+      const expenseEl = document.getElementById("expenseAmount");
+      const profitEl = document.getElementById("profitAmount");
+      const insightEl = document.getElementById("insightBox");
+
+      if (!balanceEl || !incomeEl || !expenseEl || !profitEl || !insightEl) return;
+
+      let income = 0;
+      let expense = 0;
+
+      transactions.forEach(tx => {
+        const amount = Number(tx.amount) || 0;
+        if (tx.type === "income") income += amount;
+        else if (tx.type === "expense") expense += amount;
+      });
+
+      const balance = income - expense;
+
+      incomeEl.textContent = `$${income.toFixed(2)}`;
+      expenseEl.textContent = `$${expense.toFixed(2)}`;
+      profitEl.textContent = `$${balance.toFixed(2)}`;
+      balanceEl.textContent = `$${balance.toFixed(2)}`;
+
+      let insight = "💡 Empieza a registrar tus finanzas";
+      if (!transactions.length) {
+        insight = "💡 Empieza a registrar tus finanzas";
+      } else if (expense > income) {
+        insight = "⚠️ Estás gastando más de lo que ganas";
+      } else if (balance > 0) {
+        insight = "✅ Vas bien, estás ahorrando dinero";
+      } else if (income > 0 || expense > 0) {
+        insight = "📊 Tu balance está en equilibrio";
+      }
+
+      insightEl.textContent = `🧠 ${insight}`;
+    }
+
     function computeCategoryData() {
       const categoryTotals = {};
       getCategoriesByType("expense").forEach(c => {
@@ -1553,6 +2390,7 @@ async function startPaidProCheckout() {
     google.charts.setOnLoadCallback(drawCategoryChart);
 
     function drawCategoryChart() {
+      updateDashboard();
       if (!window.google || !google.visualization) return;
 
       const { categoryTotals, totalProfit } = computeCategoryData();
@@ -3013,6 +3851,69 @@ async function startPaidProCheckout() {
     loadCategories();
     applyLanguage();
     switchTab("input");
-  </script>
+  
+function handleQuickAdd(e) {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const input = e.target.value.toLowerCase().trim();
+  if (!input) return;
+
+  const amountMatch = input.match(/\d+(\.\d+)?/);
+  if (!amountMatch) return;
+
+  const amount = parseFloat(amountMatch[0]);
+
+  const isIncome =
+    input.includes("salario") ||
+    input.includes("income") ||
+    input.includes("+");
+
+  const category = detectCategory(input, isIncome);
+
+  const tx = {
+    date: new Date().toISOString(),
+    amount,
+    type: isIncome ? "income" : "expense",
+    category
+  };
+
+  saveQuickTransaction(tx);
+
+  e.target.value = "";
+}
+
+function detectCategory(text, isIncome) {
+  const categories = getCategoriesByType(isIncome ? "income" : "expense");
+
+  for (let c of categories) {
+    if (text.includes(c.name.toLowerCase())) {
+      return c.name;
+    }
+  }
+
+  return isIncome ? "Salario" : "Otros";
+}
+
+async function saveQuickTransaction(tx) {
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    renderCurrentView();
+    drawCategoryChart();
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+}
+
+</script>
 </body>
 </html>
