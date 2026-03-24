@@ -1923,17 +1923,29 @@ function isSameLocalDay(dateA, dateB) {
     }
 
     function calculateMonthData(monthIndex) {
-  return transactions
-    .map(tx => {
-      const d = parseLocalDate(tx.date);
-      return { ...tx, _date: d };
-    })
-    .filter(tx =>
-      tx._date.getFullYear() === CURRENT_YEAR &&
-      tx._date.getMonth() === monthIndex
-    )
-    .sort((a, b) => a._date - b._date);
-}
+      const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
+      const monthData = [];
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        let income = 0;
+        let expense = 0;
+        let incomeCategory = null;
+        const categoriesSet = new Set();
+
+        transactions.forEach(tx => {
+          const td = parseLocalDate(tx.date);
+          if (
+            td.getFullYear() === CURRENT_YEAR &&
+            td.getMonth() === monthIndex &&
+            td.getDate() === d
+          ) {
+            if (tx.type === "income") {
+              income += tx.amount;
+              if (tx.category) incomeCategory = tx.category;
+            } else {
+              expense += tx.amount;
+              if (tx.category) categoriesSet.add(tx.category);
+            }
           }
         });
 
@@ -2091,20 +2103,20 @@ function isSameLocalDay(dateA, dateB) {
       let totalExpense = 0;
       let totalProfit = 0;
 
-      monthData.forEach(tx => {
+      monthData.forEach(day => {
         totalIncome += day.income;
         totalExpense += day.expense;
         totalProfit += day.profit;
 
         const row = document.createElement("tr");
-row.innerHTML = `
-  <td><strong>${tx._date.getDate()}</strong></td>
-  <td>$${tx.type === "income" ? tx.amount.toFixed(2) : "0.00"}</td>
-  <td>${tx.type === "income" ? tx.category || "-" : "-"}</td>
-  <td>$${tx.type === "expense" ? tx.amount.toFixed(2) : "0.00"}</td>
-  <td>${tx.type === "expense" ? tx.category || "-" : "-"}</td>
-  <td>$${(tx.type === "income" ? tx.amount : -tx.amount).toFixed(2)}</td>
-`;
+        row.innerHTML = `
+          <td><strong>${day.day}</strong></td>
+          <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
+          <td>${renderIncomeCategorySelect(day.incomeCategory, day.day)}</td>
+          <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
+          <td class="editable-category" data-day="${day.day}">${renderCategorySelect(day.category, day.day)}</td>
+          <td>$${day.profit.toFixed(2)}</td>
+        `;
         tbody.appendChild(row);
       });
 
