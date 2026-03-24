@@ -896,6 +896,8 @@
 
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
 </head>
 <body>
   <div class="container">
@@ -1422,7 +1424,7 @@
     function getFutureDateISO(days) {
       const d = new Date();
       d.setDate(d.getDate() + days);
-      return d.toISOString();
+      return d.toISOString().split('T')[0];
     }
 
     function formatPlanDate(dateIso) {
@@ -1907,11 +1909,17 @@ async function startPaidProCheckout() {
     
 function parseLocalDate(dateStr) {
   if (!dateStr) return new Date();
+
+  if (dateStr.includes("T")) {
+    const d = new Date(dateStr);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
   const parts = dateStr.split("-");
   if (parts.length === 3) {
     return new Date(parts[0], parts[1] - 1, parts[2]);
   }
-  return new Date(dateStr);
+}
 }
 
 function isSameLocalDay(dateA, dateB) {
@@ -2513,7 +2521,7 @@ function isSameLocalDay(dateA, dateB) {
 
       if (newValue > 0) {
         const newTx = {
-          date: targetDate.toISOString(),
+          date: targetDate.toISOString().split('T')[0],
           type: targetType,
           amount: newValue,
           description: `Ajuste manual ${targetType === "income" ? t("ingreso","income") : t("gasto","expense")}`,
@@ -3012,7 +3020,7 @@ function isSameLocalDay(dateA, dateB) {
       const selectedCategory = category || (type === "expense" ? "Otros" : "Salario");
 
       const transaction = {
-        date: date.toISOString(),
+        date: date.toISOString().split('T')[0],
         type,
         amount,
         description,
