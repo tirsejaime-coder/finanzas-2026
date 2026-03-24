@@ -79,27 +79,36 @@ function handleQuickAdd(e) {
   const input = e.target.value.toLowerCase().trim();
   if (!input) return;
 
-  const amountMatch = input.match(/\d+(\.\d+)?/);
-  if (!amountMatch) return;
+  // 🔥 dividir múltiples entradas
+  const parts = input.split(";");
 
-  const amount = parseFloat(amountMatch[0]);
+  parts.forEach(part => {
+    const text = part.trim();
+    if (!text) return;
 
-  const isIncome =
-    input.includes("salario") ||
-    input.includes("income") ||
-    input.includes("+");
+    const amountMatch = text.match(/\d+(\.\d+)?/);
+    if (!amountMatch) return;
 
-  const category = detectCategory(input, isIncome);
+    const amount = parseFloat(amountMatch[0]);
 
-  const tx = {
-    date: new Date().toISOString(),
-    amount,
-    type: isIncome ? "income" : "expense",
-    category
-  };
+    const isIncome =
+      text.includes("salario") ||
+      text.includes("income") ||
+      text.includes("+");
 
-  saveQuickTransaction(tx);
+    const category = detectCategory(text, isIncome);
 
+    const tx = {
+      date: new Date().toISOString(),
+      amount,
+      type: isIncome ? "income" : "expense",
+      category
+    };
+
+    saveQuickTransaction(tx);
+  });
+
+  showQuickFeedback();
   e.target.value = "";
 }
 
