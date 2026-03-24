@@ -884,6 +884,9 @@
 .quick-add-input::placeholder {
   color: #9ca3af;
 }
+.day-details { padding: 10px; background: #f9fafb; border-radius: 8px; }
+        .tx-line { font-size: 0.85rem; padding: 4px 0; border-bottom: 1px dashed #e5e7eb; }
+        .toggle-btn { background: none; border: none; cursor: pointer; font-size: 0.9rem; margin-right: 4px; }
 
 </style>
 
@@ -1963,50 +1966,52 @@ function isSameLocalDay(dateA, dateB) {
   );
 }
 
-    function calculateMonthData(monthIndex) {
-      const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
-      const monthData = [];
+function calculateMonthData(monthIndex) {
+    const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
+    const monthData = [];
 
-      for (let d = 1; d <= daysInMonth; d++) {
-        let income = 0;
-        let expense = 0;
-        let incomeCategory = null;
-        const categoriesSet = new Set();
+    for (let d = 1; d <= daysInMonth; d++) {
+      let income = 0;
+      let expense = 0;
+      let incomeCategory = null;
+      const categoriesSet = new Set();
+      const txs = []; // 🔥 NUEVO
 
-        transactions.forEach(tx => {
-          const td = parseLocalDate(tx.date);
-          if (
-            td.getFullYear() === CURRENT_YEAR &&
-            td.getMonth() === monthIndex &&
-            td.getDate() === d
-          ) {
-            if (tx.type === "income") {
-              income += tx.amount;
-              if (tx.category) incomeCategory = tx.category;
-            } else {
-              expense += tx.amount;
-              if (tx.category) categoriesSet.add(tx.category);
-            }
+      transactions.forEach(tx => {
+        const td = parseLocalDate(tx.date);
+        if (
+          td.getFullYear() === CURRENT_YEAR &&
+          td.getMonth() === monthIndex &&
+          td.getDate() === d
+        ) {
+          txs.push(tx); // 🔥 NUEVO
+          if (tx.type === "income") {
+            income += tx.amount;
+            if (tx.category) incomeCategory = tx.category;
+          } else {
+            expense += tx.amount;
+            if (tx.category) categoriesSet.add(tx.category);
           }
-        });
+        }
+      });
 
-        let categoryDisplay = "-";
-        if (categoriesSet.size === 1) categoryDisplay = [...categoriesSet][0];
-        else if (categoriesSet.size > 1) categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
+      let categoryDisplay = "-";
+      if (categoriesSet.size === 1) categoryDisplay = [...categoriesSet][0];
+      else if (categoriesSet.size > 1) categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
 
-        monthData.push({
-          day: d,
-          income,
-          incomeCategory,
-          expense,
-          profit: income - expense,
-          category: categoryDisplay
-        });
-      }
-
-      return monthData;
+      monthData.push({
+        day: d,
+        income,
+        incomeCategory,
+        expense,
+        profit: income - expense,
+        category: categoryDisplay,
+        txs // 🔥 NUEVO
+      });
     }
 
+    return monthData;
+  }
     function renderYearView() {
     
       const yearData = calculateYearData();
@@ -2150,15 +2155,37 @@ function isSameLocalDay(dateA, dateB) {
         totalProfit += day.profit;
 
         const row = document.createElement("tr");
-        row.innerHTML = `
-          <td><strong>${day.day}</strong></td>
-          <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
-          <td>${renderIncomeCategorySelect(day.incomeCategory, day.day)}</td>
-          <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
-          <td class="editable-category" data-day="${day.day}">${renderCategorySelect(day.category, day.day)}</td>
-          <td>$${day.profit.toFixed(2)}</td>
-        `;
+row.innerHTML = `
+        <td><button class="toggle-btn" onclick="toggleDetail(${day.day})">▼</button> <strong>${day.day}</strong></td>
+        <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
+        <td>${renderIncomeCategorySelect(day.incomeCategory, day.day)}</td>
+        <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
+        <td class="editable-category" data-day="${day.day}">${renderCategorySelect(day.category, day.day)}</td>
+        <td>$${day.profit.toFixed(2)}</td>
+      `;
         tbody.appendChild(row);
+
+        // 🔥 FILA EXPANDIBLE
+        const detailRow = document.createElement("tr");
+        detailRow.id = `detail-${day.day}`;
+        detailRow.style.display = "none";
+        detailRow.innerHTML = `
+          <td colspan="6">
+            <div class="day-details">
+              ${day.txs.length === 0
+                ? `<span style="color:#9ca3af">${t("Sin transacciones", "No transactions")}</span>`
+                : day.txs.map(tx => `
+                  <div class="tx-line">
+                    ${tx.type === "income" ? "🟢" : "🔴"}
+                    $${Number(tx.amount).toFixed(2)} &bull;
+                    ${tx.category || "-"} &bull;
+                    ${tx.type === "income" ? t("Ingreso","Income") : t("Gasto","Expense")}
+                  </div>
+                `).join("")}
+            </div>
+          </td>
+        `;
+        tbody.appendChild(detailRow);
       });
 
       const totalRow = document.createElement("tr");
@@ -3030,6 +3057,11 @@ function isSameLocalDay(dateA, dateB) {
     window.showMonthView = function (monthIndex) {
       renderMonthView(monthIndex);
     };
+    window.toggleDetail = function(day) {
+    const detailRow = document.getElementById(`detail-${day}`);
+    if (!detailRow) return;
+    detailRow.style.display = detailRow.style.display === "none" ? "table-row" : "none";
+  };
 
     window.addCategoryPrompt = addCategoryPrompt;
     window.deleteCategory = deleteCategory;
