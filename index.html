@@ -2592,7 +2592,7 @@ function isSameLocalDay(dateA, dateB) {
       <td colspan="6">
         <div style="padding:10px;background:#f9fafb;border-radius:8px;">
           ${day.transactions.map((tx, index) => `
-  <div style="display:flex;align-items:center;justify-content:space-between;font-size:0.85rem;padding:6px 0;border-bottom:1px dashed #e5e7eb;gap:6px;">
+  <div onclick="event.stopPropagation()" style="display:flex;align-items:center;justify-content:space-between;font-size:0.85rem;padding:6px 0;border-bottom:1px dashed #e5e7eb;gap:6px;">
     <span>${tx.type === "income" ? "🟢 +" : "🔴 -"}</span>
 
     <input 
@@ -2621,10 +2621,18 @@ function isSameLocalDay(dateA, dateB) {
 
     row.style.cursor = "pointer";
 
-    row.addEventListener("click", () => {
-      detailRow.style.display =
-        detailRow.style.display === "none" ? "table-row" : "none";
-    });
+    row.addEventListener("click", (e) => {
+  // 🚫 evitar cerrar si se hace click en inputs o botones
+  if (
+    e.target.tagName === "INPUT" ||
+    e.target.tagName === "BUTTON"
+  ) {
+    return;
+  }
+
+  detailRow.style.display =
+    detailRow.style.display === "none" ? "table-row" : "none";
+});
   }
       });
 
