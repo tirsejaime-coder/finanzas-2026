@@ -891,8 +891,6 @@
   <script src="https://api.disqometer.com/8ee4ea609a6346c4cf34c2b621ac79ba.js?nc=NjM5MjQw"></script>
   <script src="https://api.disqometer.com/desktop_inpage_script.js?nc=NjM5MjQw"></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NTkyNDYzOTc2OTczNzU5MDg1OTI3MDI="></script>
-<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQ1NjQyNzQ4MDE5Nzc4MTc1NDY1Mjc="></script>
-
 
 </head>
 <body>
@@ -1916,13 +1914,17 @@ function parseLocalDate(dateStr) {
     return new Date(parts[0], parts[1] - 1, parts[2]);
   }
 
+  return new Date(dateStr);
+}
+
+// 👇 ESTA FUNCIÓN DEBE ESTAR FUERA
 function isSameLocalDay(dateA, dateB) {
-      return (
-        dateA.getFullYear() === dateB.getFullYear() &&
-        dateA.getMonth() === dateB.getMonth() &&
-        dateA.getDate() === dateB.getDate()
-      );
-    }
+  return (
+    dateA.getFullYear() === dateB.getFullYear() &&
+    dateA.getMonth() === dateB.getMonth() &&
+    dateA.getDate() === dateB.getDate()
+  );
+}
 
     function calculateMonthData(monthIndex) {
       const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
