@@ -1305,11 +1305,11 @@
         const category = detectQuickCategory(text, isIncome);
 
         const tx = {
-          date: new Date().toISOString(),
-          amount,
-          type: isIncome ? "income" : "expense",
-          category
-        };
+  date: new Date().toLocaleDateString("en-CA"),
+  amount,
+  type: isIncome ? "income" : "expense",
+  category
+};
 
         await saveQuickTransaction(tx);
       }
