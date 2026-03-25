@@ -3834,8 +3834,9 @@ function isSameLocalDay(dateA, dateB) {
 
   
 function updateCurrentDate() {
-  const el = document.getElementById("currentDate");
-  if (!el) return;
+  const els = document.querySelectorAll("#currentDate");
+
+  if (!els.length) return;
 
   const now = new Date();
 
@@ -3847,11 +3848,13 @@ function updateCurrentDate() {
   };
 
   const formatted = now.toLocaleDateString(
-    typeof language !== "undefined" && language === "es" ? "es-ES" : "en-US",
+    language === "es" ? "es-ES" : "en-US",
     options
   );
 
-  el.innerHTML = `📅 ${formatted}`;
+  els.forEach(el => {
+    el.innerHTML = `📅 ${formatted}`;
+  });
 }
 
 </script>
