@@ -6,75 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- jsPDF / AutoTable / XLSX -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-function updateCurrentDate() {
-  const el = document.getElementById("currentDate");
-  if (!el) return;
-
-  const now = new Date();
-
-  const options = {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  };
-
-  const formatted = now.toLocaleDateString(
-    typeof language !== "undefined" && language === "es" ? "es-ES" : "en-US",
-    options
-  );
-
-  el.innerHTML = `📅 ${formatted}`;
-}
-
-</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js">
-function updateCurrentDate() {
-  const el = document.getElementById("currentDate");
-  if (!el) return;
-
-  const now = new Date();
-
-  const options = {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  };
-
-  const formatted = now.toLocaleDateString(
-    typeof language !== "undefined" && language === "es" ? "es-ES" : "en-US",
-    options
-  );
-
-  el.innerHTML = `📅 ${formatted}`;
-}
-
-</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
-function updateCurrentDate() {
-  const el = document.getElementById("currentDate");
-  if (!el) return;
-
-  const now = new Date();
-
-  const options = {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  };
-
-  const formatted = now.toLocaleDateString(
-    typeof language !== "undefined" && language === "es" ? "es-ES" : "en-US",
-    options
-  );
-
-  el.innerHTML = `📅 ${formatted}`;
-}
-
-</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
@@ -1077,6 +1011,8 @@ function updateCurrentDate() {
 
 
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
 </head>
 <body>
   <div class="container">
@@ -1122,8 +1058,7 @@ function updateCurrentDate() {
 
   <div class="hero-balance">
   <div id="balanceAmount" class="hero-amount">$0</div>
-  <div class="hero-label">Balance actual
-<div id="currentDate" style="font-size:0.85rem;opacity:0.8;margin-top:4px;"></div></div>
+  <div class="hero-label">Balance actual</div>
 
   <!-- 🆕 FECHA ACTUAL -->
   <div id="currentDateDisplay" style="margin-top:6px; font-size:0.85rem; opacity:0.7;"></div>
@@ -3858,5 +3793,27 @@ function updateCurrentDate() {
 }
 
 </script>
+
+<!-- SAVE STATUS -->
+<div id="saveStatus" style="position:fixed;top:20px;right:20px;background:#111827;color:white;padding:6px 10px;border-radius:6px;opacity:0;transition:all 0.3s;"></div>
+
+<script>
+function showSaveStatus(type="saving"){
+ const el=document.getElementById("saveStatus");
+ if(!el)return;
+ if(type==="saving"){
+  el.innerHTML="💾 Guardando...";
+  el.style.opacity="1";
+  el.style.background="#374151";
+ }
+ if(type==="saved"){
+  el.innerHTML="✔ Guardado";
+  el.style.opacity="1";
+  el.style.background="#16a34a";
+  setTimeout(()=>{el.style.opacity="0";},1500);
+ }
+}
+</script>
+
 </body>
 </html>
