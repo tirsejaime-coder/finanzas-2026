@@ -987,6 +987,7 @@
 
 
 
+
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
 </head>
 <body>
@@ -3647,7 +3648,7 @@ function isSameLocalDay(dateA, dateB) {
     applyLanguage();
     switchTab("input");
 
-    window.updateTransactionAmount = function(day, index, newValue) {
+    window.updateTransactionAmount = async function(day, index, newValue) {
   const amount = parseFloat(newValue);
   if (isNaN(amount) || amount <= 0) return;
 
@@ -3673,8 +3674,17 @@ function isSameLocalDay(dateA, dateB) {
 
   if (realIndex === -1) return;
 
-  transactions[realIndex].amount = amount;
+  const tx = transactions[realIndex];
 
+  if (currentUser && tx.id) {
+    const userRef = doc(collection(db, "users"), currentUser.uid);
+    await updateDoc(doc(userRef, "transactions", tx.id), {
+      amount: amount
+    });
+    return;
+  }
+
+  transactions[realIndex].amount = amount;
   localStorage.setItem("transactions", JSON.stringify(transactions));
 
   renderCurrentView();
@@ -3682,7 +3692,7 @@ function isSameLocalDay(dateA, dateB) {
   updateDashboard();
 };
 
-    window.deleteTransaction = function(day, index) {
+    window.deleteTransaction = async function(day, index) {
   if (!confirm(language === "es" ? "¿Eliminar esta transacción?" : "Delete this transaction?")) return;
 
   let realIndex = -1;
@@ -3707,8 +3717,15 @@ function isSameLocalDay(dateA, dateB) {
 
   if (realIndex === -1) return;
 
-  transactions.splice(realIndex, 1);
+  const tx = transactions[realIndex];
 
+  if (currentUser && tx.id) {
+    const userRef = doc(collection(db, "users"), currentUser.uid);
+    await deleteDoc(doc(userRef, "transactions", tx.id));
+    return;
+  }
+
+  transactions.splice(realIndex, 1);
   localStorage.setItem("transactions", JSON.stringify(transactions));
 
   renderCurrentView();
