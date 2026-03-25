@@ -3648,55 +3648,73 @@ function isSameLocalDay(dateA, dateB) {
     switchTab("input");
 
     window.updateTransactionAmount = function(day, index, newValue) {
-      const amount = parseFloat(newValue);
-      if (isNaN(amount) || amount <= 0) return;
+  const amount = parseFloat(newValue);
+  if (isNaN(amount) || amount <= 0) return;
 
-      const matches = transactions
-        .map((tx, i) => ({ tx, i }))
-        .filter(({ tx }) => {
-          const d = parseLocalDate(tx.date);
-          return (
-            currentMonth !== null &&
-            d.getFullYear() === CURRENT_YEAR &&
-            d.getMonth() === currentMonth &&
-            d.getDate() === day
-          );
-        });
+  let realIndex = -1;
+  let counter = 0;
 
-      const target = matches[index];
-      if (!target) return;
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
 
-      transactions[target.i].amount = amount;
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      renderCurrentView();
-      drawCategoryChart();
-      updateDashboard();
-    };
+    if (
+      d.getFullYear() === CURRENT_YEAR &&
+      d.getMonth() === currentMonth &&
+      d.getDate() === day
+    ) {
+      if (counter === index) {
+        realIndex = i;
+        break;
+      }
+      counter++;
+    }
+  }
+
+  if (realIndex === -1) return;
+
+  transactions[realIndex].amount = amount;
+
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+
+  renderCurrentView();
+  drawCategoryChart();
+  updateDashboard();
+};
 
     window.deleteTransaction = function(day, index) {
-      if (!confirm(language === "es" ? "¿Eliminar esta transacción?" : "Delete this transaction?")) return;
+  if (!confirm(language === "es" ? "¿Eliminar esta transacción?" : "Delete this transaction?")) return;
 
-      const matches = transactions
-        .map((tx, i) => ({ tx, i }))
-        .filter(({ tx }) => {
-          const d = parseLocalDate(tx.date);
-          return (
-            currentMonth !== null &&
-            d.getFullYear() === CURRENT_YEAR &&
-            d.getMonth() === currentMonth &&
-            d.getDate() === day
-          );
-        });
+  let realIndex = -1;
+  let counter = 0;
 
-      const target = matches[index];
-      if (!target) return;
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const d = parseLocalDate(tx.date);
 
-      transactions.splice(target.i, 1);
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      renderCurrentView();
-      drawCategoryChart();
-      updateDashboard();
-    };
+    if (
+      d.getFullYear() === CURRENT_YEAR &&
+      d.getMonth() === currentMonth &&
+      d.getDate() === day
+    ) {
+      if (counter === index) {
+        realIndex = i;
+        break;
+      }
+      counter++;
+    }
+  }
+
+  if (realIndex === -1) return;
+
+  transactions.splice(realIndex, 1);
+
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+
+  renderCurrentView();
+  drawCategoryChart();
+  updateDashboard();
+};
 
 
   </script>
