@@ -1534,27 +1534,36 @@ function updateCurrentDate() {
     }
 
     async function saveQuickTransaction(tx) {
-      if (!currentUser) {
-        transactions.push(tx);
-        localStorage.setItem("transactions", JSON.stringify(transactions));
-        renderCurrentView();
-        drawCategoryChart();
-        updateDashboard();
-  updateCurrentDate();
-        return;
-      }
 
-      const userRef = doc(collection(db, "users"), currentUser.uid);
-      await addDoc(collection(userRef, "transactions"), {
-        ...tx,
-        createdAt: serverTimestamp()
-      });
-      // onSnapshot will refresh the UI, but we keep this for instant feedback
-      renderCurrentView();
-      drawCategoryChart();
-      updateDashboard();
-  updateCurrentDate();
-    }
+  showSaveStatus("saving"); // 🔥 INICIO
+
+  if (!currentUser) {
+    transactions.push(tx);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+
+    renderCurrentView();
+    drawCategoryChart();
+    updateDashboard();
+    updateCurrentDateDisplay();
+
+    showSaveStatus("saved"); // 🔥 FIN
+    return;
+  }
+
+  const userRef = doc(collection(db, "users"), currentUser.uid);
+
+  await addDoc(collection(userRef, "transactions"), {
+    ...tx,
+    createdAt: serverTimestamp()
+  });
+
+  renderCurrentView();
+  drawCategoryChart();
+  updateDashboard();
+  updateCurrentDateDisplay();
+
+  showSaveStatus("saved"); // 🔥 FIN
+}
 
     function showQuickFeedback() {
       const input = document.getElementById("quickInput");
@@ -3680,6 +3689,9 @@ function isSameLocalDay(dateA, dateB) {
     switchTab("input");
 
     window.updateTransactionAmount = async function(day, index, newValue) {
+
+  showSaveStatus("saving"); // 🔥 INICIO
+
   const amount = parseFloat(newValue);
   if (isNaN(amount) || amount <= 0) return;
 
@@ -3709,9 +3721,12 @@ function isSameLocalDay(dateA, dateB) {
 
   if (currentUser && tx.id) {
     const userRef = doc(collection(db, "users"), currentUser.uid);
+
     await updateDoc(doc(userRef, "transactions", tx.id), {
       amount: amount
     });
+
+    showSaveStatus("saved"); // 🔥 FIN
     return;
   }
 
@@ -3721,7 +3736,8 @@ function isSameLocalDay(dateA, dateB) {
   renderCurrentView();
   drawCategoryChart();
   updateDashboard();
-  updateCurrentDate();
+
+  showSaveStatus("saved"); // 🔥 FIN
 };
 
     window.deleteTransaction = async function(day, index) {
