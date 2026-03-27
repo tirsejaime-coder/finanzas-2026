@@ -1601,7 +1601,11 @@ window.openYearGoalPrompt = function(){
     let language = localStorage.getItem("financeLang") || "es";
     let isProUser = false;
     let transactions = [];
-    window.transactions = transactions;
+   Object.defineProperty(window, "transactions", {
+  get() {
+    return transactions;
+  }
+});
     let currentView = "input";
     let currentMonth = null;
     let selectedExportOption = "year";
