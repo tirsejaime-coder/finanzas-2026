@@ -1,3 +1,4 @@
+<!-- FIXED VERSION: Chat unified -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,34 +7,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- jsPDF / AutoTable / XLSX -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+// SAFE YEAR GOAL (NON BREAKING)
+function getYearGoalSafe(){
+  const saved = localStorage.getItem("yearGoal");
+  if(saved) return Number(saved);
+  return getSavingsGoal()*12;
+}
+
+window.openYearGoalPrompt = function(){
+  const current = getYearGoalSafe();
+  const input = prompt("Meta anual:", current);
+  if(input===null) return;
+
+  const val = Number(input);
+  if(isNaN(val) || val<=0){
+    alert("Valor inválido");
+    return;
+  }
+
+  localStorage.setItem("yearGoal", val);
+
+  if(typeof updateHeroRetention==="function"){
+    updateHeroRetention();
+  }
+};
+
+
+// PATCH YEAR RENDER (SAFE EXTENSION)
+(function(){
+  const original = updateHeroRetention;
+  updateHeroRetention = function(){
+    if(original) original.apply(this, arguments);
+
+    try{
+      const yVal = document.getElementById("yearGoalValue");
+      const yBar = document.getElementById("yearGoalProgressFill");
+      const ySub = document.getElementById("yearGoalSubtext");
+
+      if(!yVal) return;
+
+      const yearGoal = getYearGoalSafe();
+      const yearBalance = getCurrentMonthBalance()*12;
+
+      yVal.textContent = `$${yearBalance.toFixed(0)} / $${yearGoal}`;
+
+      const progress = Math.min(100,(yearBalance/yearGoal)*100);
+
+      if(yBar) yBar.style.width = progress+"%";
+
+      if(ySub){
+        const missing = Math.max(0, yearGoal-yearBalance);
+        ySub.textContent = missing===0
+          ? "Meta anual lograda 🚀"
+          : `Faltan $${missing}`;
+      }
+
+    }catch(e){
+      console.log("year patch",e);
+    }
+  }
+})();
+
+</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <!-- Google Charts -->
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
-function updateCurrentDate() {
-  const el = document.getElementById("currentDate");
-  if (!el) return;
-
-  const now = new Date();
-
-  const options = {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  };
-
-  const formatted = now.toLocaleDateString(
-    typeof language !== "undefined" && language === "es" ? "es-ES" : "en-US",
-    options
-  );
-
-  el.innerHTML = `📅 ${formatted}`;
-}
-
-</script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
   <style>
     :root {
@@ -1002,6 +1043,175 @@ function updateCurrentDate() {
   }
 }
 
+
+/* 🤖 AI CHAT */
+.ai-chat-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2100;
+  border: none;
+  border-radius: 999px;
+  background: #111827;
+  color: white;
+  padding: 12px 16px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  font-weight: 600;
+}
+
+.ai-chat-panel {
+  position: fixed;
+  bottom: 78px;
+  right: 20px;
+  width: 360px;
+  max-width: calc(100vw - 24px);
+  height: 520px;
+  max-height: calc(100vh - 110px);
+  background: #0f172a;
+  color: white;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 2100;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.ai-chat-panel.active {
+  display: flex;
+}
+
+.ai-chat-header {
+  padding: 14px 16px;
+  background: #111827;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ai-chat-header-title {
+  font-weight: 700;
+  font-size: 0.96rem;
+}
+
+.ai-chat-header-sub {
+  font-size: 0.78rem;
+  opacity: 0.72;
+  margin-top: 2px;
+}
+
+.ai-chat-close {
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.ai-chat-messages {
+  flex: 1;
+  overflow: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+}
+
+.ai-chat-bubble {
+  max-width: 88%;
+  line-height: 1.45;
+  padding: 10px 12px;
+  border-radius: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.9rem;
+}
+
+.ai-chat-bubble.bot {
+  align-self: flex-start;
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+.ai-chat-bubble.user {
+  align-self: flex-end;
+  background: #2563eb;
+  color: white;
+}
+
+.ai-chat-prompts {
+  padding: 10px 14px 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: #111827;
+}
+
+.ai-chip {
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
+  color: #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.ai-chat-input-wrap {
+  padding: 12px;
+  background: #111827;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.ai-chat-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.ai-chat-input {
+  flex: 1;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #0f172a;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.ai-chat-send {
+  border: none;
+  background: #16a34a;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.ai-chat-note {
+  margin-top: 8px;
+  font-size: 0.76rem;
+  color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  .ai-chat-toggle {
+    right: 14px;
+    bottom: 14px;
+  }
+  .ai-chat-panel {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    bottom: 70px;
+    height: 70vh;
+  }
+}
+
 </style>
 
   <!-- Ads se cargan dinámicamente solo para usuarios FREE -->
@@ -1010,6 +1220,10 @@ function updateCurrentDate() {
 
 
 
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
@@ -1093,7 +1307,7 @@ function updateCurrentDate() {
     </div>
 
     <div class="hero-mini-card">
-      <div class="hero-mini-label" id="goalLabel">Meta mensual de ahorro</div>
+      <div class="hero-mini-label" id="goalLabel">Meta de ahorro</div>
       <div class="hero-mini-value" id="goalValue">$0 / $500</div>
       <div class="progress-row">
         <div class="progress-bar">
@@ -1101,7 +1315,19 @@ function updateCurrentDate() {
         </div>
       </div>
       <div class="hero-mini-subtext" id="goalSubtext">Define una meta y sigue tu progreso.</div>
-      <button type="button" class="hero-action-link" id="goalActionButton" onclick="openSavingsGoalPrompt()">✏️ Ajustar meta</button>
+      <button type="button" class="hero-action-link" id="goalActionButton" onclick="openSavingsGoalPrompt()">✏️ Ajustar meta mensual</button>
+
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">
+        <div class="hero-mini-label" style="font-size:0.72rem;opacity:0.7;">Anual</div>
+        <div class="hero-mini-value" id="yearGoalValue">$0 / $6000</div>
+        <div class="progress-row">
+          <div class="progress-bar">
+            <div id="yearGoalProgressFill" class="progress-fill"></div>
+          </div>
+        </div>
+        <div class="hero-mini-subtext" id="yearGoalSubtext"></div>
+        <button class="hero-action-link" onclick="openYearGoalPrompt()">✏️ Ajustar meta anual</button>
+      </div>
     </div>
   </div>
 
@@ -1289,6 +1515,8 @@ function updateCurrentDate() {
       </div>
     </div>
   </div>
+
+  <div id="saveStatus" style="position:fixed;top:20px;right:20px;background:#111827;color:white;padding:6px 10px;border-radius:8px;opacity:0;transition:all 0.3s ease;z-index:1100;pointer-events:none;font-size:0.85rem;"></div>
 
   <div id="syncStatus" class="sync-status success" style="display:none;">
     <span>🔄</span>
@@ -1534,36 +1762,31 @@ function updateCurrentDate() {
     }
 
     async function saveQuickTransaction(tx) {
+      showSaveStatus("saving");
 
-  showSaveStatus("saving"); // 🔥 INICIO
+      if (!currentUser) {
+        transactions.push(tx);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        updateCurrentDateDisplay();
+        showSaveStatus("saved");
+        return;
+      }
 
-  if (!currentUser) {
-    transactions.push(tx);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-
-    renderCurrentView();
-    drawCategoryChart();
-    updateDashboard();
-    updateCurrentDateDisplay();
-
-    showSaveStatus("saved"); // 🔥 FIN
-    return;
-  }
-
-  const userRef = doc(collection(db, "users"), currentUser.uid);
-
-  await addDoc(collection(userRef, "transactions"), {
-    ...tx,
-    createdAt: serverTimestamp()
-  });
-
-  renderCurrentView();
-  drawCategoryChart();
-  updateDashboard();
-  updateCurrentDateDisplay();
-
-  showSaveStatus("saved"); // 🔥 FIN
-}
+      const userRef = doc(collection(db, "users"), currentUser.uid);
+      await addDoc(collection(userRef, "transactions"), {
+        ...tx,
+        createdAt: serverTimestamp()
+      });
+      // onSnapshot will refresh the UI, but we keep this for instant feedback
+      renderCurrentView();
+      drawCategoryChart();
+      updateDashboard();
+      updateCurrentDateDisplay();
+      showSaveStatus("saved");
+    }
 
     function showQuickFeedback() {
       const input = document.getElementById("quickInput");
@@ -1935,6 +2158,27 @@ async function startPaidProCheckout() {
       return language === "es" ? es : en;
     }
 
+    function showSaveStatus(type = "saving") {
+      const el = document.getElementById("saveStatus");
+      if (!el) return;
+
+      if (type === "saving") {
+        el.textContent = language === "es" ? "💾 Guardando..." : "💾 Saving...";
+        el.style.opacity = "1";
+        el.style.background = "#374151";
+      }
+
+      if (type === "saved") {
+        el.textContent = language === "es" ? "✔ Guardado" : "✔ Saved";
+        el.style.opacity = "1";
+        el.style.background = "#16a34a";
+
+        setTimeout(() => {
+          el.style.opacity = "0";
+        }, 1500);
+      }
+    }
+
     function showSyncStatus(type, message) {
       syncStatus.style.display = "flex";
       syncStatus.className = `sync-status ${type}`;
@@ -1963,7 +2207,7 @@ async function startPaidProCheckout() {
       }
 
       updateDashboard();
-  updateCurrentDate();
+  updateCurrentDateDisplay();
     }
 
     function updateHeroRetention(balance = 0) {
@@ -2043,6 +2287,155 @@ async function startPaidProCheckout() {
     }
 
 
+
+    function getWeeklyExpenseTotals() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      let thisWeek = 0;
+      let lastWeek = 0;
+
+      transactions.forEach(tx => {
+        if (tx.type !== "expense") return;
+
+        const d = parseLocalDate(tx.date);
+        d.setHours(0, 0, 0, 0);
+
+        const diffDays = Math.floor((today - d) / (1000 * 60 * 60 * 24));
+
+        if (diffDays >= 0 && diffDays <= 6) {
+          thisWeek += Number(tx.amount) || 0;
+        } else if (diffDays >= 7 && diffDays <= 13) {
+          lastWeek += Number(tx.amount) || 0;
+        }
+      });
+
+      return { thisWeek, lastWeek };
+    }
+
+    function getTopExpenseCategory(expenseByCategory) {
+      const entries = Object.entries(expenseByCategory || {}).sort((a, b) => b[1] - a[1]);
+      if (!entries.length) return null;
+      return { category: entries[0][0], total: entries[0][1] };
+    }
+
+    function getSavingsSuggestion(expenseByCategory) {
+      const top = getTopExpenseCategory(expenseByCategory);
+      if (!top) return null;
+
+      const potential = top.total * 0.2;
+      if (potential <= 0) return null;
+
+      return {
+        category: top.category,
+        amount: potential
+      };
+    }
+
+    
+function getTopCategories(expenseByCategory, limit = 3) {
+  return Object.entries(expenseByCategory || {})
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
+}
+
+function getTopIncomeCategories() {
+  const map = {};
+  transactions.forEach(tx => {
+    if (tx.type !== "income") return;
+    const key = tx.category || "Otros";
+    map[key] = (map[key] || 0) + (Number(tx.amount) || 0);
+  });
+
+  return Object.entries(map)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+}
+
+
+
+function generateInsights(income, expense, balance, expenseByCategory) {
+  if (!transactions.length) {
+    return t("💡 Empieza a registrar tus finanzas", "💡 Start tracking your finances");
+  }
+
+  const messages = [];
+  const weekly = getWeeklyExpenseTotals();
+
+  // Weekly comparison
+  if (weekly.lastWeek > 0) {
+    const pct = ((weekly.thisWeek - weekly.lastWeek) / weekly.lastWeek) * 100;
+    if (pct > 15) {
+      messages.push(t(`🚨 Estás gastando ${pct.toFixed(0)}% más que la semana pasada.`,
+                      `🚨 You are spending ${pct.toFixed(0)}% more than last week.`));
+    } else if (pct < -10) {
+      messages.push(t(`🔥 Buen trabajo, redujiste gastos ${Math.abs(pct).toFixed(0)}%.`,
+                      `🔥 Great job, you reduced spending ${Math.abs(pct).toFixed(0)}%.`));
+    }
+  }
+
+  // Top expense category insight
+  const topExpenses = getTopCategories(expenseByCategory, 3);
+  if (isProUser && topExpenses.length) {
+    const totalExpense = expense || 1;
+    const [topCat, topVal] = topExpenses[0];
+    const percent = (topVal / totalExpense) * 100;
+
+    messages.push(t(
+      `⚠️ ${getCategoryLabel(topCat)} representa ${percent.toFixed(0)}% de tus gastos.`,
+      `⚠️ ${getCategoryLabel(topCat)} is ${percent.toFixed(0)}% of your spending.`
+    ));
+
+    const list = topExpenses
+      .map(([cat, total]) => `${getCategoryLabel(cat)} ($${total.toFixed(0)})`)
+      .join(", ");
+
+    messages.push(t(`💸 Top gastos: ${list}`, `💸 Top expenses: ${list}`));
+  }
+
+  // Income intelligence
+  if (isProUser) {
+    const topIncome = getTopIncomeCategories();
+    if (topIncome.length) {
+      const list = topIncome
+        .map(([cat, total]) => `${getCategoryLabel(cat)} ($${total.toFixed(0)})`)
+        .join(", ");
+
+      messages.push(t(`💰 Top ingresos: ${list}`, `💰 Top income: ${list}`));
+    }
+  }
+
+  // Savings suggestion
+  if (isProUser && topExpenses.length) {
+    const [cat, total] = topExpenses[0];
+    const potential = total * 0.3;
+
+    messages.push(t(
+      `💡 Si reduces ${getCategoryLabel(cat)} un 30% podrías ahorrar ~$${potential.toFixed(0)}.`,
+      `💡 If you reduce ${getCategoryLabel(cat)} by 30% you could save ~$${potential.toFixed(0)}.`
+    ));
+  }
+
+  // Balance insight
+  if (balance < 0) {
+    messages.push(t(
+      `🚨 Estás en negativo. Revisa tus gastos urgentes.`,
+      `🚨 You are negative. Review your urgent expenses.`
+    ));
+  } else if (balance > income * 0.2) {
+    messages.push(t(
+      `🔥 Estás ahorrando bien este mes.`,
+      `🔥 You are saving well this month.`
+    ));
+  }
+
+  return messages.join(" ");
+}
+
+
+
+
+
     function updateDashboard() {
       const balanceEl = document.getElementById("balanceAmount");
       const incomeEl = document.getElementById("incomeAmount");
@@ -2058,8 +2451,9 @@ async function startPaidProCheckout() {
 
       transactions.forEach(tx => {
         const amount = Number(tx.amount) || 0;
-        if (tx.type === "income") income += amount;
-        else if (tx.type === "expense") {
+        if (tx.type === "income") {
+          income += amount;
+        } else if (tx.type === "expense") {
           expense += amount;
           const key = tx.category || "Otros";
           expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
@@ -2073,29 +2467,7 @@ async function startPaidProCheckout() {
       profitEl.textContent = `$${balance.toFixed(2)}`;
       balanceEl.textContent = `$${balance.toFixed(2)}`;
 
-      const topCategoryEntry = Object.entries(expenseByCategory).sort((a, b) => b[1] - a[1])[0];
-      const savingsRate = income > 0 ? (balance / income) * 100 : 0;
-      let insight = t("💡 Empieza a registrar tus finanzas", "💡 Start tracking your finances");
-
-      if (!transactions.length) {
-        insight = t("💡 Empieza a registrar tus finanzas", "💡 Start tracking your finances");
-      } else if (expense > income) {
-        const over = Math.abs(balance).toFixed(0);
-        insight = t(`⚠️ Estás por debajo por $${over}. Reduce gastos para volver al control.`, `⚠️ You are below by $${over}. Reduce spending to get back in control.`);
-      } else if (topCategoryEntry) {
-        const [cat, total] = topCategoryEntry;
-        if (savingsRate >= 20) {
-          insight = t(`✅ Ahorras ${savingsRate.toFixed(0)}% de tus ingresos. Tu gasto #1 es ${getCategoryLabel(cat)} ($${total.toFixed(0)}).`, `✅ You're saving ${savingsRate.toFixed(0)}% of your income. Your #1 expense is ${getCategoryLabel(cat)} ($${total.toFixed(0)}).`);
-        } else {
-          insight = t(`📊 Tu gasto más alto es ${getCategoryLabel(cat)} ($${total.toFixed(0)}). Puedes mejorar tu margen este mes.`, `📊 Your highest expense is ${getCategoryLabel(cat)} ($${total.toFixed(0)}). You can improve your margin this month.`);
-        }
-      } else if (balance > 0) {
-        insight = t("✅ Vas bien, estás ahorrando dinero", "✅ You're doing well, you're saving money");
-      } else {
-        insight = t("📊 Tu balance está en equilibrio", "📊 Your balance is balanced");
-      }
-
-      insightEl.textContent = `🧠 ${insight}`;
+      insightEl.textContent = generateInsights(income, expense, balance, expenseByCategory);
       updateHeroRetention(balance);
     }
 
@@ -2130,7 +2502,7 @@ async function startPaidProCheckout() {
 
     function drawCategoryChart() {
       updateDashboard();
-  updateCurrentDate();
+  updateCurrentDateDisplay();
       if (!window.google || !google.visualization) return;
 
       const { categoryTotals, totalProfit } = computeCategoryData();
@@ -2557,7 +2929,8 @@ function isSameLocalDay(dateA, dateB) {
         renderCurrentView();
         drawCategoryChart();
         updateDashboard();
-  updateCurrentDate();
+        updateCurrentDateDisplay();
+        showSaveStatus("saved");
         return;
       }
 
@@ -2585,7 +2958,7 @@ function isSameLocalDay(dateA, dateB) {
         renderCurrentView();
         drawCategoryChart();
         updateDashboard();
-  updateCurrentDate();
+  updateCurrentDateDisplay();
       });
     }
 
@@ -3361,7 +3734,7 @@ function isSameLocalDay(dateA, dateB) {
       }
       localStorage.setItem("lumenssaveSavingsGoal", String(value));
       updateDashboard();
-  updateCurrentDate();
+  updateCurrentDateDisplay();
     };
 
     window.showMonthView = function (monthIndex) {
@@ -3689,9 +4062,6 @@ function isSameLocalDay(dateA, dateB) {
     switchTab("input");
 
     window.updateTransactionAmount = async function(day, index, newValue) {
-
-  showSaveStatus("saving"); // 🔥 INICIO
-
   const amount = parseFloat(newValue);
   if (isNaN(amount) || amount <= 0) return;
 
@@ -3721,12 +4091,9 @@ function isSameLocalDay(dateA, dateB) {
 
   if (currentUser && tx.id) {
     const userRef = doc(collection(db, "users"), currentUser.uid);
-
     await updateDoc(doc(userRef, "transactions", tx.id), {
       amount: amount
     });
-
-    showSaveStatus("saved"); // 🔥 FIN
     return;
   }
 
@@ -3736,8 +4103,7 @@ function isSameLocalDay(dateA, dateB) {
   renderCurrentView();
   drawCategoryChart();
   updateDashboard();
-
-  showSaveStatus("saved"); // 🔥 FIN
+  updateCurrentDateDisplay();
 };
 
     window.deleteTransaction = async function(day, index) {
@@ -3779,7 +4145,7 @@ function isSameLocalDay(dateA, dateB) {
   renderCurrentView();
   drawCategoryChart();
   updateDashboard();
-  updateCurrentDate();
+  updateCurrentDateDisplay();
 };
 
 
@@ -3808,27 +4174,401 @@ function updateCurrentDate() {
   });
 }
 
+
+// 🔥 AI CHAT LOGIC
+
+function getAIChatElements() {
+  return {
+    panel: document.getElementById("aiChatPanel"),
+    messages: document.getElementById("aiChatMessages") || document.getElementById("chatMessages"),
+    input: document.getElementById("aiChatInput") || document.getElementById("chatInput"),
+    sendButton: document.getElementById("chatSendButton")
+  };
+}
+
+window.toggleAIChat = function(force) {
+  const { panel, input } = getAIChatElements();
+  if (!panel) return;
+
+  const shouldOpen = typeof force === "boolean"
+    ? force
+    : !panel.classList.contains("active");
+
+  panel.classList.toggle("active", shouldOpen);
+
+  if (shouldOpen && input) {
+    setTimeout(() => input.focus(), 50);
+  }
+};
+
+function addMessage(text, type = "bot") {
+  const { messages } = getAIChatElements();
+  if (!messages) return;
+
+  const div = document.createElement("div");
+  div.className = "ai-chat-bubble " + type;
+  div.textContent = text;
+
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function buildFinancialContext() {
+  let income = 0;
+  let expense = 0;
+  const expenseByCategory = {};
+  const incomeByCategory = {};
+
+  transactions.forEach(tx => {
+    const amount = Number(tx?.amount) || 0;
+    const category = tx?.category || (tx?.type === "income" ? "Salario" : "Otros");
+
+    if (tx?.type === "income") {
+      income += amount;
+      incomeByCategory[category] = (incomeByCategory[category] || 0) + amount;
+    }
+
+    if (tx?.type === "expense") {
+      expense += amount;
+      expenseByCategory[category] = (expenseByCategory[category] || 0) + amount;
+    }
+  });
+
+  const balance = income - expense;
+  const topExpense = Object.entries(expenseByCategory).sort((a, b) => b[1] - a[1])[0] || null;
+  const topIncome = Object.entries(incomeByCategory).sort((a, b) => b[1] - a[1])[0] || null;
+  const savingsGoal = getSavingsGoal();
+  const monthBalance = getCurrentMonthBalance();
+
+  return {
+    income,
+    expense,
+    balance,
+    topExpense,
+    topIncome,
+    txCount: transactions.length,
+    savingsGoal,
+    monthBalance
+  };
+}
+
+function generateAIResponse(text) {
+  const query = String(text || "").toLowerCase().trim();
+  const ctx = buildFinancialContext();
+
+  if (!ctx.txCount) {
+    return "Aún no tienes movimientos suficientes. Registra ingresos y gastos para darte recomendaciones reales.";
+  }
+
+  if (query.includes("200")) {
+    if (ctx.topExpense) {
+      const [cat, amount] = ctx.topExpense;
+      const reduction = Math.min(200, amount * 0.25);
+      return `Para acercarte a $200 extra, empieza por ${cat}. Ahí llevas $${amount.toFixed(2)}. Si recortas ~$${reduction.toFixed(2)} en esa categoría y controlas dos gastos menores, vas en buena dirección.`;
+    }
+    return "Para ahorrar $200 extra, revisa tus gastos variables y fija un tope semanal para comida, transporte y compras impulsivas.";
+  }
+
+  if (query.includes("ahorrar") || query.includes("ahorro")) {
+    if (ctx.topExpense) {
+      const [cat, amount] = ctx.topExpense;
+      const possible = amount * 0.2;
+      return `Tu mayor gasto actual es ${cat} con $${amount.toFixed(2)}. Si lo reduces 20%, podrías ahorrar aproximadamente $${possible.toFixed(2)}.`;
+    }
+    return "Puedo ayudarte a ahorrar mejor, pero necesito más gastos categorizados para darte una recomendación precisa.";
+  }
+
+  if (query.includes("gasto")) {
+    if (ctx.topExpense) {
+      const [cat, amount] = ctx.topExpense;
+      return `Tu categoría más alta es ${cat} con $${amount.toFixed(2)}. Esa es la mejor oportunidad para recortar sin tocar todo tu presupuesto.`;
+    }
+    return "Todavía no detecto una categoría dominante de gasto.";
+  }
+
+  if (query.includes("balance") || query.includes("resumen")) {
+    return `Tu balance actual es $${ctx.balance.toFixed(2)}. Ingresos: $${ctx.income.toFixed(2)}. Gastos: $${ctx.expense.toFixed(2)}.`;
+  }
+
+  if (query.includes("mejorar") || query.includes("finanzas")) {
+    const goalDiff = ctx.savingsGoal - ctx.monthBalance;
+    if (ctx.topExpense) {
+      const [cat, amount] = ctx.topExpense;
+      return goalDiff > 0
+        ? `Vas con $${ctx.monthBalance.toFixed(2)} de ahorro este mes. Para mejorar tus finanzas y acercarte a tu meta, revisa primero ${cat} ($${amount.toFixed(2)}).`
+        : `Ya superaste tu meta mensual con $${ctx.monthBalance.toFixed(2)}. Mantén controlado ${cat} para sostener ese ritmo.`;
+    }
+    return `Tu ahorro del mes va en $${ctx.monthBalance.toFixed(2)} frente a una meta de $${ctx.savingsGoal.toFixed(2)}.`;
+  }
+
+  return "Puedo ayudarte con ahorro, gasto alto, balance y cómo mejorar tus finanzas este mes.";
+}
+
+window.sendAIMessage = function(prefilledText) {
+  const { input } = getAIChatElements();
+  if (!input) return;
+
+  const text = typeof prefilledText === "string" ? prefilledText.trim() : input.value.trim();
+  if (!text) return;
+
+  addMessage(text, "user");
+  input.value = "";
+
+  setTimeout(() => {
+    const reply = generateAIResponse(text);
+    addMessage(reply, "bot");
+  }, 300);
+};
+
+window.sendSuggestedAIQuestion = function(text) {
+  const { input } = getAIChatElements();
+  if (input) input.value = text;
+  window.sendAIMessage(text);
+};
+
+function initializeAIChat() {
+  const { input, sendButton, messages } = getAIChatElements();
+  if (!input || !messages) return;
+
+  if (!messages.dataset.initialized) {
+    messages.dataset.initialized = "true";
+    addMessage("Hola. Ya estoy conectado a tus datos locales. Pregúntame por ahorro, gastos altos, balance o cómo mejorar tus finanzas.", "bot");
+  }
+
+  if (!input.dataset.boundEnter) {
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        window.sendAIMessage();
+      }
+    });
+    input.dataset.boundEnter = "true";
+  }
+
+  if (sendButton && !sendButton.dataset.boundClick) {
+    sendButton.addEventListener("click", () => window.sendAIMessage());
+    sendButton.dataset.boundClick = "true";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initializeAIChat);
+setTimeout(initializeAIChat, 300);
+
 </script>
 
-<!-- SAVE STATUS -->
-<div id="saveStatus" style="position:fixed;top:20px;right:20px;background:#111827;color:white;padding:6px 10px;border-radius:6px;opacity:0;transition:all 0.3s;"></div>
+  <button id="aiChatToggle" class="ai-chat-toggle" type="button" onclick="toggleAIChat()">🤖 IA financiera</button>
+
+  <div id="aiChatPanel" class="ai-chat-panel" aria-live="polite">
+    <div class="ai-chat-header">
+      <div>
+        <div class="ai-chat-header-title">🤖 Asistente financiero</div>
+        <div class="ai-chat-header-sub">Chat real si conectas tu backend seguro · análisis local como respaldo</div>
+      </div>
+      <button class="ai-chat-close" type="button" onclick="toggleAIChat(false)">✕</button>
+    </div>
+
+    <div class="ai-chat-prompts">
+      <button class="ai-chip" type="button" onclick="sendSuggestedAIQuestion('Quiero ahorrar 200 dólares extra este mes')">Ahorrar $200</button>
+      <button class="ai-chip" type="button" onclick="sendSuggestedAIQuestion('¿En qué estoy gastando demasiado?')">Gasto alto</button>
+      <button class="ai-chip" type="button" onclick="sendSuggestedAIQuestion('¿Cómo puedo mejorar mis finanzas este mes?')">Mejorar finanzas</button>
+    </div>
+
+    <div id="aiChatMessages" class="ai-chat-messages"></div>
+
+    <div class="ai-chat-input-wrap">
+      <div class="ai-chat-input-row">
+        <input id="aiChatInput" class="ai-chat-input" placeholder="Ej: quiero ahorrar 200 dólares este mes" />
+        <button id="chatSendButton" class="ai-chat-send" type="button" onclick="sendAIMessage()">Enviar</button>
+      </div>
+      <div class="ai-chat-note">Nunca pongas claves API en este HTML. El modo conversacional real usa un endpoint seguro en tu backend.</div>
+    </div>
+  </div>
+
+
+
 
 <script>
-function showSaveStatus(type="saving"){
- const el=document.getElementById("saveStatus");
- if(!el)return;
- if(type==="saving"){
-  el.innerHTML="💾 Guardando...";
-  el.style.opacity="1";
-  el.style.background="#374151";
- }
- if(type==="saved"){
-  el.innerHTML="✔ Guardado";
-  el.style.opacity="1";
-  el.style.background="#16a34a";
-  setTimeout(()=>{el.style.opacity="0";},1500);
- }
-}
+// ===== FIX PERSISTENCIA META ANUAL (NO TOCA IA) =====
+(function () {
+  function parseAmount(value) {
+    const n = parseFloat(String(value).replace(",", "."));
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  window.getYearGoalPersistent = function () {
+    const candidates = [
+      localStorage.getItem("lumenssaveYearGoal"),
+      localStorage.getItem("yearGoal")
+    ];
+
+    for (const raw of candidates) {
+      const n = parseAmount(raw);
+      if (Number.isFinite(n) && n > 0) return n;
+    }
+
+    try {
+      if (typeof getSavingsGoal === "function") {
+        return getSavingsGoal() * 12;
+      }
+    } catch (_) {}
+
+    return 6000;
+  };
+
+  function getCurrentYearBalanceSafe() {
+    try {
+      const now = new Date();
+      let income = 0;
+      let expense = 0;
+      const txs = Array.isArray(window.transactions) ? window.transactions : [];
+
+      txs.forEach((tx) => {
+        if (!tx || !tx.date) return;
+        let d;
+        try {
+          d = typeof parseLocalDate === "function" ? parseLocalDate(tx.date) : new Date(tx.date);
+        } catch (_) {
+          d = new Date(tx.date);
+        }
+        if (!(d instanceof Date) || Number.isNaN(d.getTime())) return;
+        if (d.getFullYear() !== now.getFullYear()) return;
+
+        const amount = Number(tx.amount) || 0;
+        if (tx.type === "income") income += amount;
+        if (tx.type === "expense") expense += amount;
+      });
+
+      return income - expense;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  function renderYearGoalUI() {
+    const valueEl = document.getElementById("yearGoalValue");
+    const subEl = document.getElementById("yearGoalSubtext");
+    const barEl = document.getElementById("yearGoalProgressFill");
+    if (!valueEl) return;
+
+    const yearGoal = window.getYearGoalPersistent();
+    const yearBalance = getCurrentYearBalanceSafe();
+    const progress = yearGoal > 0 ? Math.max(0, Math.min(100, (yearBalance / yearGoal) * 100)) : 0;
+
+    valueEl.textContent = `$${yearBalance.toFixed(0)} / $${yearGoal.toFixed(0)}`;
+
+    if (barEl) {
+      barEl.style.width = `${progress}%`;
+    }
+
+    if (subEl) {
+      if (yearBalance >= yearGoal) {
+        subEl.textContent = "¡Meta anual alcanzada! Mantén este ritmo.";
+      } else {
+        const missing = Math.max(0, yearGoal - yearBalance);
+        subEl.textContent = `Te faltan $${missing.toFixed(0)} para tu meta anual.`;
+      }
+    }
+  }
+
+  window.openYearGoalPrompt = function () {
+    const currentGoal = window.getYearGoalPersistent();
+    const input = window.prompt("Define tu meta anual de ahorro", String(Math.round(currentGoal)));
+    if (input === null) return;
+
+    const value = parseAmount(input);
+    if (!Number.isFinite(value) || value <= 0) {
+      window.alert("Ingresa un número válido.");
+      return;
+    }
+
+    // Guardamos en ambas llaves por compatibilidad con versiones previas
+    localStorage.setItem("lumenssaveYearGoal", String(value));
+    localStorage.setItem("yearGoal", String(value));
+
+    try {
+      if (typeof window.updateHeroRetention === "function") {
+        window.updateHeroRetention();
+      } else {
+        renderYearGoalUI();
+      }
+    } catch (_) {
+      renderYearGoalUI();
+    }
+  };
+
+  // Extensión segura del render existente
+  const originalUpdateHeroRetention = window.updateHeroRetention;
+  if (typeof originalUpdateHeroRetention === "function" && !window.__yearGoalPatched) {
+    window.updateHeroRetention = function () {
+      const result = originalUpdateHeroRetention.apply(this, arguments);
+      renderYearGoalUI();
+      return result;
+    };
+    window.__yearGoalPatched = true;
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    renderYearGoalUI();
+  });
+
+  setTimeout(renderYearGoalUI, 300);
+  setTimeout(renderYearGoalUI, 1200);
+})();
+</script>
+
+
+<script>
+// ===== CATEGORÍAS COLAPSABLES (SEGURO, SIN TOCAR IA) =====
+(function () {
+  const STORAGE_KEY = "lumenssaveCategoriesExpanded";
+
+  function applyCategoryToggleUI() {
+    const manager = document.getElementById("categoryManager");
+    if (!manager) return;
+
+    let toggleBtn = document.getElementById("categoryManagerToggle");
+    if (!toggleBtn) {
+      toggleBtn = document.createElement("button");
+      toggleBtn.id = "categoryManagerToggle";
+      toggleBtn.type = "button";
+      toggleBtn.style.width = "100%";
+      toggleBtn.style.marginTop = "14px";
+      toggleBtn.style.marginBottom = "10px";
+      toggleBtn.style.padding = "12px 14px";
+      toggleBtn.style.borderRadius = "12px";
+      toggleBtn.style.border = "1px solid #d1d5db";
+      toggleBtn.style.background = "#f9fafb";
+      toggleBtn.style.color = "#111827";
+      toggleBtn.style.fontWeight = "700";
+      toggleBtn.style.fontSize = "0.95rem";
+      toggleBtn.style.cursor = "pointer";
+      toggleBtn.style.textAlign = "left";
+      toggleBtn.style.boxShadow = "0 1px 2px rgba(0,0,0,0.03)";
+      manager.parentNode.insertBefore(toggleBtn, manager);
+    }
+
+    const expanded = localStorage.getItem(STORAGE_KEY) === "1";
+    manager.style.display = expanded ? "block" : "none";
+    toggleBtn.textContent = expanded
+      ? "⚙️ Gestionar categorías — ocultar"
+      : "⚙️ Gestionar categorías — mostrar";
+
+    toggleBtn.onclick = function () {
+      const isOpen = manager.style.display !== "none";
+      manager.style.display = isOpen ? "none" : "block";
+      localStorage.setItem(STORAGE_KEY, isOpen ? "0" : "1");
+      toggleBtn.textContent = isOpen
+        ? "⚙️ Gestionar categorías — mostrar"
+        : "⚙️ Gestionar categorías — ocultar";
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    applyCategoryToggleUI();
+    setTimeout(applyCategoryToggleUI, 300);
+    setTimeout(applyCategoryToggleUI, 1200);
+  });
+})();
 </script>
 
 </body>
