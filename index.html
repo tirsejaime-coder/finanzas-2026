@@ -1601,6 +1601,7 @@ window.openYearGoalPrompt = function(){
     let language = localStorage.getItem("financeLang") || "es";
     let isProUser = false;
     let transactions = [];
+    window.transactions = transactions;
     let currentView = "input";
     let currentMonth = null;
     let selectedExportOption = "year";
@@ -1766,6 +1767,7 @@ window.openYearGoalPrompt = function(){
 
       if (!currentUser) {
   addTransaction(tx);
+        window.transactions = transactions;
 
   renderCurrentView();
   drawCategoryChart();
