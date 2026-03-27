@@ -1770,12 +1770,13 @@ window.openYearGoalPrompt = function(){
       showSaveStatus("saving");
 
       if (!currentUser) {
+        import { state } from "./js/state.js";
   addTransaction(tx);
         window.transactions = transactions;
 
-  renderCurrentView();
-  drawCategoryChart();
-  updateDashboard();
+ renderCurrentView(state.transactions);
+drawCategoryChart(state.transactions);
+updateDashboard(state.transactions);
   updateCurrentDateDisplay();
   showSaveStatus("saved");
   return;
