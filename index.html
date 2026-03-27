@@ -1765,15 +1765,15 @@ window.openYearGoalPrompt = function(){
       showSaveStatus("saving");
 
       if (!currentUser) {
-        transactions.push(tx);
-        localStorage.setItem("transactions", JSON.stringify(transactions));
-        renderCurrentView();
-        drawCategoryChart();
-        updateDashboard();
-        updateCurrentDateDisplay();
-        showSaveStatus("saved");
-        return;
-      }
+  addTransaction(tx);
+
+  renderCurrentView();
+  drawCategoryChart();
+  updateDashboard();
+  updateCurrentDateDisplay();
+  showSaveStatus("saved");
+  return;
+}
 
       const userRef = doc(collection(db, "users"), currentUser.uid);
       await addDoc(collection(userRef, "transactions"), {
