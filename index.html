@@ -7,7 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- jsPDF / AutoTable / XLSX -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
 // SAFE YEAR GOAL (NON BREAKING)
 function getYearGoalSafe(){
   const saved = localStorage.getItem("yearGoal");
@@ -35,39 +36,40 @@ window.openYearGoalPrompt = function(){
 
 
 // PATCH YEAR RENDER (SAFE EXTENSION)
-(function(){
-  const original = updateHeroRetention;
-  updateHeroRetention = function(){
-    if(original) original.apply(this, arguments);
+setTimeout(() => {
+  const original = window.updateHeroRetention;
+  if (!original) return;
 
-    try{
+  window.updateHeroRetention = function () {
+    original.apply(this, arguments);
+
+    try {
       const yVal = document.getElementById("yearGoalValue");
       const yBar = document.getElementById("yearGoalProgressFill");
       const ySub = document.getElementById("yearGoalSubtext");
 
-      if(!yVal) return;
+      if (!yVal) return;
 
       const yearGoal = getYearGoalSafe();
-      const yearBalance = getCurrentMonthBalance()*12;
+      const yearBalance = getCurrentMonthBalance() * 12;
 
       yVal.textContent = `$${yearBalance.toFixed(0)} / $${yearGoal}`;
 
-      const progress = Math.min(100,(yearBalance/yearGoal)*100);
+      const progress = Math.min(100, (yearBalance / yearGoal) * 100);
 
-      if(yBar) yBar.style.width = progress+"%";
+      if (yBar) yBar.style.width = progress + "%";
 
-      if(ySub){
-        const missing = Math.max(0, yearGoal-yearBalance);
-        ySub.textContent = missing===0
+      if (ySub) {
+        const missing = Math.max(0, yearGoal - yearBalance);
+        ySub.textContent = missing === 0
           ? "Meta anual lograda 🚀"
           : `Faltan $${missing}`;
       }
-
-    }catch(e){
-      console.log("year patch",e);
+    } catch (e) {
+      console.log("year patch", e);
     }
-  }
-})();
+  };
+}, 0);
 
 </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -1220,13 +1222,7 @@ window.openYearGoalPrompt = function(){
 
 
 
-<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
-<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
-<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
-<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
-<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
-<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
-<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
+
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
 </head>
 <body>
@@ -1602,31 +1598,14 @@ window.openYearGoalPrompt = function(){
     let language = localStorage.getItem("financeLang") || "es";
     let isProUser = false;
     let transactions = [];
-
-// 🔥 STATE MANAGEMENT (REFACTOR)
-function setTransactions(newTx){
-  transactions = Array.isArray(newTx) ? newTx : [];
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-}
-
-function addTransaction(tx){
-  if(!tx) return;
-  transactions.push(tx);
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-}
-
-function loadLocalTransactions(){
-  try{
-    const raw = localStorage.getItem("transactions");
-    return raw ? JSON.parse(raw) : [];
-  }catch(e){
-    return [];
+   Object.defineProperty(window, "transactions", {
+  get() {
+    return transactions;
+  },
+  set(val) {
+    transactions = Array.isArray(val) ? val : [];
   }
-}
-
-// INIT STATE
-setTransactions(loadLocalTransactions());
-
+});
     let currentView = "input";
     let currentMonth = null;
     let selectedExportOption = "year";
@@ -1791,16 +1770,15 @@ setTransactions(loadLocalTransactions());
       showSaveStatus("saving");
 
       if (!currentUser) {
-      import { state } from "./js/state.js";  
-  addTransaction(tx);
-
-  renderCurrentView(state.transactions);
-drawCategoryChart(state.transactions);
-updateDashboard(state.transactions);
-  updateCurrentDateDisplay();
-  showSaveStatus("saved");
-  return;
-}
+        transactions.push(tx);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        renderCurrentView();
+        drawCategoryChart();
+        updateDashboard();
+        updateCurrentDateDisplay();
+        showSaveStatus("saved");
+        return;
+      }
 
       const userRef = doc(collection(db, "users"), currentUser.uid);
       await addDoc(collection(userRef, "transactions"), {
@@ -4598,7 +4576,7 @@ setTimeout(initializeAIChat, 300);
 })();
 </script>
 
-<script type="module" src="/js/app.js"></script>
+
 
 </body>
 </html>
