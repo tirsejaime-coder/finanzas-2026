@@ -1770,8 +1770,7 @@ setTimeout(() => {
       showSaveStatus("saving");
 
       if (!currentUser) {
-        transactions.push(tx);
-        localStorage.setItem("transactions", JSON.stringify(transactions));
+        addTransaction(tx)
         renderCurrentView();
         drawCategoryChart();
         updateDashboard();
