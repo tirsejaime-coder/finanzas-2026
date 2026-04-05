@@ -1544,6 +1544,8 @@ setTimeout(() => {
       setDoc,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { state } from "./state.js";
+import { migrateLocalToFirebase } from "./syncService.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw",
@@ -4008,15 +4010,34 @@ function isSameLocalDay(dateA, dateB) {
       if (e.target.id === "exportModal") closeExportModal();
     });
 
-    onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, async (user) => {
   currentUser = user;
 
   const authButtonText = document.getElementById("authButtonText");
 
   if (user) {
+    // 🔥 NUEVO → sincronizar con arquitectura modular
+    state.user = user;
+
     // 🔐 Usuario logueado
     await ensureUserProfile(user);
-    watchUserProfile(user);
+
+    watchUserProfile(user, async (profile) => {
+
+      // 🔥 NUEVO → detectar PRO correctamente
+      const isPro = isProfilePro(profile);
+      state.isPro = isPro;
+
+      // 🔥 MIGRACIÓN AUTOMÁTICA
+      if (isPro) {
+        await migrateLocalToFirebase();
+      }
+
+      // 👉 UI existente (no tocar)
+      updatePlanUI(profile);
+
+    });
+
     await loadCategories();
     await loadTransactionsFromFirestore();
 
@@ -4029,37 +4050,21 @@ function isSameLocalDay(dateA, dateB) {
     await handleStripeReturn();
 
   } else {
-    // ❌ Usuario NO logueado
+    // 🔥 NUEVO → limpiar estado modular
+    state.user = null;
+    state.isPro = false;
 
-    if (unsubscribeTransactions) {
-      unsubscribeTransactions();
-      unsubscribeTransactions = null;
-    }
+    currentUser = null;
 
-    if (unsubscribeUserProfile) {
-      unsubscribeUserProfile();
-      unsubscribeUserProfile = null;
-    }
+    // 👉 comportamiento existente (no tocar)
+    transactions = loadTransactionsLocal();
+    renderAll();
+    updateYearView();
 
-    if (unsubscribeCategories) {
-      unsubscribeCategories();
-      unsubscribeCategories = null;
-    }
-
-    transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-    await loadCategories();
-    renderCurrentView();
-    drawCategoryChart();
     updatePlanUI(null);
 
-    // 🔥 AQUÍ VA EXACTAMENTE 👇
-    authButtonText.textContent = language === "es"
-      ? "Iniciar sesión"
-      : "Sign in";
-
-    await handleStripeReturn();
-  }
-});
+    authButtonText.textContent = "Iniciar sesión";
+  }});
 
     handleStripeReturn();
     loadCategories();
