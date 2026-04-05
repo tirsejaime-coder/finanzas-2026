@@ -2784,14 +2784,14 @@ function isSameLocalDay(dateA, dateB) {
       let totalExpense = 0;
       let totalProfit = 0;
 
-      monthData.forEach(day => {
+      monthData.forEach(day => {         const transactions = day.transactions || [];
         totalIncome += day.income;
         totalExpense += day.expense;
         totalProfit += day.profit;
 
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td><strong>${day.transactions && day.transactions.length > 1 ? "▸ " : ""}${day.day}</strong></td>
+          <td><strong>${transactions && transactions.length > 1 ? "▸ " : ""}${day.day}</strong></td>
           <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
           <td>${day.income > 0 ? renderIncomeCategorySelect(day.incomeCategory, day.day) : "-"}</td>
           <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
@@ -2801,7 +2801,7 @@ function isSameLocalDay(dateA, dateB) {
         tbody.appendChild(row);
 
   // 🔥 EXPANDABLE DETAIL
-  if (day.transactions && day.transactions.length > 1) {
+  if (transactions && transactions.length > 1) {
     const detailRow = document.createElement("tr");
     detailRow.style.display = "none";
     detailRow.className = "detail-row";
@@ -2809,7 +2809,7 @@ function isSameLocalDay(dateA, dateB) {
     detailRow.innerHTML = `
       <td colspan="6">
         <div onclick="event.stopPropagation()" style="padding:10px;background:#f9fafb;border-radius:8px;">
-          ${day.transactions.map((tx, index) => `
+          ${transactions.map((tx, index) => `
             <div onclick="event.stopPropagation()" style="display:flex;align-items:center;justify-content:space-between;font-size:0.85rem;padding:6px 0;border-bottom:1px dashed #e5e7eb;gap:8px;">
               <span style="min-width:22px;">${tx.type === "income" ? "🟢 +" : "🔴 -"}</span>
 
@@ -3536,7 +3536,7 @@ function isSameLocalDay(dateA, dateB) {
         t("Ganancia", "Profit")
       ]];
 
-      monthData.forEach(day => {
+      monthData.forEach(day => {         const transactions = day.transactions || [];
         data.push([day.day, day.income, day.expense, day.category, day.profit]);
       });
 
