@@ -2791,7 +2791,7 @@ function isSameLocalDay(dateA, dateB) {
 
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td><strong>${day.transactions && day.state.transactions.length > 1 ? "▸ " : ""}${day.day}</strong></td>
+          <td><strong>${day.transactions && day.transactions.length > 1 ? "▸ " : ""}${day.day}</strong></td>
           <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
           <td>${day.income > 0 ? renderIncomeCategorySelect(day.incomeCategory, day.day) : "-"}</td>
           <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
@@ -2801,7 +2801,7 @@ function isSameLocalDay(dateA, dateB) {
         tbody.appendChild(row);
 
   // 🔥 EXPANDABLE DETAIL
-  if (day.transactions && day.state.transactions.length > 1) {
+  if (day.transactions && day.transactions.length > 1) {
     const detailRow = document.createElement("tr");
     detailRow.style.display = "none";
     detailRow.className = "detail-row";
