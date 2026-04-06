@@ -2600,52 +2600,7 @@ function isSameLocalDay(dateA, dateB) {
   );
 }
 
-    function calculateMonthData(monthIndex) {
-  const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
-  const monthData = [];
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    let income = 0;
-    let expense = 0;
-    let incomeCategory = null;
-    const categoriesSet = new Set();
-    const dayTransactions = [];
-
-    state.transactions.forEach(tx => {
-      const td = parseLocalDate(tx.date);
-      if (
-        td.getFullYear() === CURRENT_YEAR &&
-        td.getMonth() === monthIndex &&
-        td.getDate() === d
-      ) {
-        dayTransactions.push(tx);
-        if (tx.type === "income") {
-          income += tx.amount;
-          if (tx.category) incomeCategory = tx.category;
-        } else {
-          expense += tx.amount;
-          if (tx.category) categoriesSet.add(tx.category);
-        }
-      }
-    });
-
-    let categoryDisplay = "-";
-    if (categoriesSet.size === 1) categoryDisplay = [...categoriesSet][0];
-    else if (categoriesSet.size > 1) categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
-
-    monthData.push({
-      day: d,
-      income,
-      incomeCategory,
-      expense,
-      profit: income - expense,
-      category: categoryDisplay,
-      transactions: dayTransactions
-    });
-  }
-
-  return monthData;
-}
+    
 
     function renderYearView() {
     
