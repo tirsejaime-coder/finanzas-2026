@@ -1545,7 +1545,7 @@ setTimeout(() => {
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
     import { state } from "./js/state.js";
-import { migrateLocalToFirebase } from "./js/syncService.js";
+import { migrateLocalToFirebase } from "./js/syncService.js"; import {   showMonthView,   renderMonthView,   calculateMonthData } from "./js/views/monthView.js";  window.showMonthView = showMonthView; window.renderMonthView = renderMonthView; window.calculateMonthData = calculateMonthData;
 
 window.state = state;
 
