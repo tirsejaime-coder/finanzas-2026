@@ -1413,8 +1413,10 @@ setTimeout(() => {
     </div>
 
     <div id="view-year" class="view">
-      <div class="year-grid" id="yearGrid"></div>
-      <div class="ad-slot" id="adSlot2">
+  <div id="yearGrid" class="year-grid"></div>
+</div>
+
+<div id="view-month" class="view"></div>
         Aquí va tu código de anuncios (AdSense / Monetag)
       </div>
     </div>
@@ -2896,9 +2898,9 @@ grid.appendChild(card);
 
       for (const category of cloneDefaultCategories()) {
         await addDoc(colRef, {
-          ...category,
-          createdAt: serverTimestamp()
-        });
+  ...category,
+  createdAt: serverTimestamp()
+});
       }
     }
 
@@ -2923,7 +2925,12 @@ grid.appendChild(card);
       const colRef = collection(db, "users", currentUser.uid, "categories");
 
       unsubscribeCategories = onSnapshot(colRef, (snapshot) => {
-        userCategories = normalizeCategories(snapshot.docs.map(docItem => ({ id: docItem.id, ...docItem.data() })));
+        userCategories = normalizeCategories(
+  snapshot.docs.map(docItem => ({
+    id: docItem.id,
+    ...docItem.data()
+  }))
+);
         renderCategorySelects();
         renderCategoryManager();
         if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
@@ -3595,20 +3602,7 @@ grid.appendChild(card);
       applyLanguage();
     };
 
-    window.switchTab = function (view) {
-      currentView = view;
-
-      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
-      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-
-      if (view === "input") {
-        document.getElementById("tabInput").classList.add("active");
-        document.getElementById("view-input").classList.add("active");
-        updateBreadcrumb([]);
-      } else if (view === "year") {
-        renderYearView();
-      }
-    };
+    window.switchTab = function(view) {
 
     window.openSavingsGoalPrompt = function () {
       const currentGoal = getSavingsGoal();
