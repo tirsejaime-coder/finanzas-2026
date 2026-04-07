@@ -2646,14 +2646,12 @@ function isSameLocalDay(dateA, dateB) {
             <span class="stat-label">${t("Ganancia","Profit")}</span>
             <span class="stat-value ${profitClass}">$${month.profit.toFixed(2)}</span>
           </div>
-<div class="buttons-row" style="margin-top:10px;">
-  <button class="btn btn-outline btn-month-view" onclick="showMonthView(${idx})">
-    👁 ${t("Ver mes","View month")}
-  </button>
-  <button class="btn btn-secondary btn-month-pdf">📄 PDF</button>
-  <button class="btn btn-primary btn-month-excel">📊 Excel</button>
-</div>
-`;
+          <div class="buttons-row" style="margin-top:10px;">
+            <button class="btn btn-outline btn-month-view">👁 ${t("Ver mes","View month")}</button>
+            <button class="btn btn-secondary btn-month-pdf">📄 PDF</button>
+            <button class="btn btn-primary btn-month-excel">📊 Excel</button>
+          </div>
+        `;
 
         card.querySelector(".btn-month-view").onclick = () => showMonthView(idx);
         card.querySelector(".btn-month-pdf").onclick = () => {
