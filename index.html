@@ -2632,52 +2632,52 @@ function isSameLocalDay(dateA, dateB) {
         card.className = "month-card";
         const profitClass = month.profit >= 0 ? "stat-positive" : "stat-negative";
 
-        card.innerHTML = `
-          <h3>${monthNames[idx]}</h3>
-          <div class="stat">
-            <span class="stat-label">${t("Ingresos","Income")}</span>
-            <span class="stat-value stat-positive">$${month.income.toFixed(2)}</span>
-          </div>
-          <div class="stat">
-            <span class="stat-label">${t("Gastos","Expenses")}</span>
-            <span class="stat-value stat-negative">$${month.expense.toFixed(2)}</span>
-          </div>
-          <div class="stat">
-            <span class="stat-label">${t("Ganancia","Profit")}</span>
-            <span class="stat-value ${profitClass}">$${month.profit.toFixed(2)}</span>
-          </div>
-         <div class="buttons-row" style="margin-top:10px;">
-  <button class="btn btn-outline btn-month-view">
-    👁 ${t("Ver mes","View month")}
-  </button>
-  <button class="btn btn-secondary btn-month-pdf">📄 PDF</button>
-  <button class="btn btn-primary btn-month-excel">📊 Excel</button>
-</div>
+       card.innerHTML = `
+  <h3>${monthNames[idx]}</h3>
+  <div class="stat">
+    <span class="stat-label">${t("Ingresos","Income")}</span>
+    <span class="stat-value stat-positive">$${month.income.toFixed(2)}</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">${t("Gastos","Expenses")}</span>
+    <span class="stat-value stat-negative">$${month.expense.toFixed(2)}</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">${t("Ganancia","Profit")}</span>
+    <span class="stat-value ${profitClass}">$${month.profit.toFixed(2)}</span>
+  </div>
+  <div class="buttons-row" style="margin-top:10px;">
+    <button class="btn btn-outline btn-month-view">
+      👁 ${t("Ver mes","View month")}
+    </button>
+    <button class="btn btn-secondary btn-month-pdf">📄 PDF</button>
+    <button class="btn btn-primary btn-month-excel">📊 Excel</button>
+  </div>
 `;
 
-        card.querySelector(".btn-month-view").onclick = () => showMonthView(idx);
-        card.querySelector(".btn-month-pdf").onclick = () => {
-          if (!isProUser) {
-            showProExportMessage();
-            return;
-          }
-          currentMonth = idx;
-          const { jsPDF } = window.jspdf;
-          const docPdf = new jsPDF();
-          exportMonthPDF(docPdf);
-        };
-        card.querySelector(".btn-month-excel").onclick = () => {
-          if (!isProUser) {
-            showProExportMessage();
-            return;
-          }
-          currentMonth = idx;
-          exportMonthExcel();
-        };
+card.querySelector(".btn-month-view").onclick = () => showMonthView(idx);
 
-        grid.appendChild(card);
-      });
-    }
+card.querySelector(".btn-month-pdf").onclick = () => {
+  if (!isProUser) {
+    showProExportMessage();
+    return;
+  }
+  currentMonth = idx;
+  const { jsPDF } = window.jspdf;
+  const docPdf = new jsPDF();
+  exportMonthPDF(docPdf);
+};
+
+card.querySelector(".btn-month-excel").onclick = () => {
+  if (!isProUser) {
+    showProExportMessage();
+    return;
+  }
+  currentMonth = idx;
+  exportMonthExcel();
+};
+
+grid.appendChild(card);
 
     function renderCategorySelect(currentCategory, day) {
       const expenseCategories = getCategoriesByType("expense");
