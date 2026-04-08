@@ -4577,18 +4577,18 @@ setTimeout(initializeAIChat, 300);
 </script>
  <script type="module">
 import {
-  getBalance as calcBalance,
-  getCurrentMonthBalance as calcMonthBalance
+  getBalance as moduleGetBalance,
+  getCurrentMonthBalance as moduleGetMonthBalance
 } from "./core/financeCalc.js";
 
-
-window.calcBalance = function() {
-  return calcBalance(window.transactions || []);
+// 🔥 REEMPLAZO INVISIBLE (MISMO NOMBRE)
+window.getBalance = function() {
+  return moduleGetBalance(window.transactions || []);
 };
 
-window.calcMonthBalance = function(month, year) {
+window.getCurrentMonthBalance = function(month, year) {
   const now = new Date();
-  return calcMonthBalance(
+  return moduleGetMonthBalance(
     window.transactions || [],
     month ?? now.getMonth(),
     year ?? now.getFullYear()
