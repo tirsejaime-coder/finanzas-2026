@@ -4575,6 +4575,26 @@ setTimeout(initializeAIChat, 300);
   });
 })();
 </script>
+ <script type="module">
+import {
+  getBalance as calcBalance,
+  getCurrentMonthBalance as calcMonthBalance
+} from "./core/financeCalc.js";
+
+// ⚠️ SOLO LECTURA (NO CAMBIA NADA)
+window.calcBalance = function() {
+  return calcBalance(window.transactions || []);
+};
+
+window.calcMonthBalance = function(month, year) {
+  const now = new Date();
+  return calcMonthBalance(
+    window.transactions || [],
+    month ?? now.getMonth(),
+    year ?? now.getFullYear()
+  );
+};
+</script> 
 
 
 
