@@ -2441,6 +2441,19 @@ function generateInsights(income, expense, balance, expenseByCategory) {
 
 
 
+      window.getIncomeExpense = function () {
+        let income = 0;
+        let expense = 0;
+        transactions.forEach(tx => {
+          const amount = Number(tx.amount) || 0;
+          if (tx.type === "income") {
+            income += amount;
+          } else if (tx.type === "expense") {
+            expense += amount;
+          }
+        });
+        return { income, expense };
+      };
     function updateDashboard() {
       const balanceEl = document.getElementById("balanceAmount");
       const incomeEl = document.getElementById("incomeAmount");
@@ -2450,16 +2463,12 @@ function generateInsights(income, expense, balance, expenseByCategory) {
 
       if (!balanceEl || !incomeEl || !expenseEl || !profitEl || !insightEl) return;
 
-      let income = 0;
-      let expense = 0;
-      const expenseByCategory = {};
+        const { income, expense } = getIncomeExpense();
+              const expenseByCategory = {};
 
       transactions.forEach(tx => {
         const amount = Number(tx.amount) || 0;
-        if (tx.type === "income") {
-          income += amount;
-        } else if (tx.type === "expense") {
-          expense += amount;
+          if (tx.type === "expense") {
           const key = tx.category || "Otros";
           expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
         }
