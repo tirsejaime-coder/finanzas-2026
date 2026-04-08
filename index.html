@@ -12,7 +12,7 @@
 // SAFE YEAR GOAL (NON BREAKING)
 function getYearGoalSafe(){
   const saved = localStorage.getItem("yearGoal");
-  if(saved) return Number(saved);"/core/financeCalc.js"
+  if(saved) return Number(saved);
   return getSavingsGoal()*12;
 }
 
