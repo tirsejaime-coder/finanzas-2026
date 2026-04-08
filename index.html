@@ -1544,17 +1544,6 @@ setTimeout(() => {
       setDoc,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-    import { state } from "/js/state.js";
- import { migrateLocalToFirebase } from "/js/syncService.js";
-
-  import {
-  showMonthView,
-  renderMonthView
-} from "/js/monthView.js";
-
-window.showMonthView = showMonthView;
-window.renderMonthView = renderMonthView;
-window.state = state;
 
     const firebaseConfig = {
       apiKey: "AIzaSyBNTkw2BH2DqRH_zbytZE47OW2OCMoUUTw",
@@ -1608,8 +1597,15 @@ window.state = state;
 
     let language = localStorage.getItem("financeLang") || "es";
     let isProUser = false;
-    
-   
+    let transactions = [];
+   Object.defineProperty(window, "transactions", {
+  get() {
+    return transactions;
+  },
+  set(val) {
+    transactions = Array.isArray(val) ? val : [];
+  }
+});
     let currentView = "input";
     let currentMonth = null;
     let selectedExportOption = "year";
@@ -1631,7 +1627,7 @@ window.state = state;
 
     function getTrackedDaysSet() {
       const set = new Set();
-      state.transactions.forEach(tx => {
+      transactions.forEach(tx => {
         if (tx?.date) set.add(formatLocalDate(parseLocalDate(tx.date)));
       });
       return set;
@@ -1661,6 +1657,22 @@ window.state = state;
       }
 
       return streak;
+    }
+
+    function getCurrentMonthBalance() {
+      const now = new Date();
+      let income = 0;
+      let expense = 0;
+
+      transactions.forEach(tx => {
+        const d = parseLocalDate(tx.date);
+        if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
+          if (tx.type === "income") income += Number(tx.amount) || 0;
+          if (tx.type === "expense") expense += Number(tx.amount) || 0;
+        }
+      });
+
+      return income - expense;
     }
 
     function loadAdsIfNeeded() {
@@ -1758,8 +1770,8 @@ window.state = state;
       showSaveStatus("saving");
 
       if (!currentUser) {
-        state.transactions.push(tx);
-        localStorage.setItem("transactions", JSON.stringify(state.transactions));
+        transactions.push(tx);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
         renderCurrentView();
         drawCategoryChart();
         updateDashboard();
@@ -2288,7 +2300,7 @@ async function startPaidProCheckout() {
       let thisWeek = 0;
       let lastWeek = 0;
 
-      state.transactions.forEach(tx => {
+      transactions.forEach(tx => {
         if (tx.type !== "expense") return;
 
         const d = parseLocalDate(tx.date);
@@ -2334,7 +2346,7 @@ function getTopCategories(expenseByCategory, limit = 3) {
 
 function getTopIncomeCategories() {
   const map = {};
-  state.transactions.forEach(tx => {
+  transactions.forEach(tx => {
     if (tx.type !== "income") return;
     const key = tx.category || "Otros";
     map[key] = (map[key] || 0) + (Number(tx.amount) || 0);
@@ -2348,7 +2360,7 @@ function getTopIncomeCategories() {
 
 
 function generateInsights(income, expense, balance, expenseByCategory) {
-  if (!state.transactions.length) {
+  if (!transactions.length) {
     return t("💡 Empieza a registrar tus finanzas", "💡 Start tracking your finances");
   }
 
@@ -2442,7 +2454,7 @@ function generateInsights(income, expense, balance, expenseByCategory) {
       let expense = 0;
       const expenseByCategory = {};
 
-      state.transactions.forEach(tx => {
+      transactions.forEach(tx => {
         const amount = Number(tx.amount) || 0;
         if (tx.type === "income") {
           income += amount;
@@ -2471,7 +2483,7 @@ function generateInsights(income, expense, balance, expenseByCategory) {
       });
       let totalIncome = 0;
 
-      state.transactions.forEach(tx => {
+      transactions.forEach(tx => {
         const d = parseLocalDate(tx.date);
         if (d.getFullYear() === CURRENT_YEAR) {
           if (tx.type === "expense") {
@@ -2539,7 +2551,7 @@ function generateInsights(income, expense, balance, expenseByCategory) {
         let income = 0;
         let expense = 0;
 
-        state.transactions.forEach(tx => {
+        transactions.forEach(tx => {
           const d = parseLocalDate(tx.date);
           if (d.getMonth() === m && d.getFullYear() === CURRENT_YEAR) {
             if (tx.type === "income") income += tx.amount;
@@ -2591,7 +2603,52 @@ function isSameLocalDay(dateA, dateB) {
   );
 }
 
-    
+    function calculateMonthData(monthIndex) {
+      const daysInMonth = new Date(CURRENT_YEAR, monthIndex + 1, 0).getDate();
+      const monthData = [];
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        let income = 0;
+        let expense = 0;
+        let incomeCategory = null;
+        const categoriesSet = new Set();
+        const dayTransactions = [];
+
+        transactions.forEach(tx => {
+          const td = parseLocalDate(tx.date);
+          if (
+            td.getFullYear() === CURRENT_YEAR &&
+            td.getMonth() === monthIndex &&
+            td.getDate() === d
+          ) {
+            dayTransactions.push(tx);
+            if (tx.type === "income") {
+              income += tx.amount;
+              if (tx.category) incomeCategory = tx.category;
+            } else {
+              expense += tx.amount;
+              if (tx.category) categoriesSet.add(tx.category);
+            }
+          }
+        });
+
+        let categoryDisplay = "-";
+        if (categoriesSet.size === 1) categoryDisplay = [...categoriesSet][0];
+        else if (categoriesSet.size > 1) categoryDisplay = language === "es" ? "Múltiples" : "Multiple";
+
+        monthData.push({
+          day: d,
+          income,
+          incomeCategory,
+          expense,
+          profit: income - expense,
+          category: categoryDisplay,
+          transactions: dayTransactions
+        });
+      }
+
+      return monthData;
+    }
 
     function renderYearView() {
     
@@ -2689,7 +2746,7 @@ function isSameLocalDay(dateA, dateB) {
 
       if (!display) {
         const targetDate = new Date(CURRENT_YEAR, currentMonth, day);
-        const existingIncome = state.transactions.find(tx => {
+        const existingIncome = transactions.find(tx => {
           const d = parseLocalDate(tx.date);
           return tx.type === "income" && isSameLocalDay(d, targetDate);
         });
@@ -2708,7 +2765,111 @@ function isSameLocalDay(dateA, dateB) {
       return `<select data-day="${day}" class="income-category-select">${optsHtml}</select>`;
     }
 
-    
+    function renderMonthView(monthIndex) {
+      currentView = "month";
+      currentMonth = monthIndex;
+
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById("view-month").classList.add("active");
+
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+
+      updateBreadcrumb([
+        { label: t(`Año ${CURRENT_YEAR}`, `Year ${CURRENT_YEAR}`), action: () => switchTab("year") },
+        { label: getMonthNames()[monthIndex], action: null }
+      ]);
+
+      const monthData = calculateMonthData(monthIndex);
+      const tbody = document.getElementById("monthTableBody");
+      tbody.innerHTML = "";
+
+      let totalIncome = 0;
+      let totalExpense = 0;
+      let totalProfit = 0;
+
+      monthData.forEach(day => {
+        totalIncome += day.income;
+        totalExpense += day.expense;
+        totalProfit += day.profit;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><strong>${day.transactions && day.transactions.length > 1 ? "▸ " : ""}${day.day}</strong></td>
+          <td class="editable" data-day="${day.day}" data-field="income">$${day.income.toFixed(2)}</td>
+          <td>${day.income > 0 ? renderIncomeCategorySelect(day.incomeCategory, day.day) : "-"}</td>
+          <td class="editable" data-day="${day.day}" data-field="expense">$${day.expense.toFixed(2)}</td>
+          <td class="editable-category" data-day="${day.day}">${day.expense > 0 ? renderCategorySelect(day.category, day.day) : "-"}</td>
+          <td>$${day.profit.toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+
+  // 🔥 EXPANDABLE DETAIL
+  if (day.transactions && day.transactions.length > 1) {
+    const detailRow = document.createElement("tr");
+    detailRow.style.display = "none";
+    detailRow.className = "detail-row";
+
+    detailRow.innerHTML = `
+      <td colspan="6">
+        <div onclick="event.stopPropagation()" style="padding:10px;background:#f9fafb;border-radius:8px;">
+          ${day.transactions.map((tx, index) => `
+            <div onclick="event.stopPropagation()" style="display:flex;align-items:center;justify-content:space-between;font-size:0.85rem;padding:6px 0;border-bottom:1px dashed #e5e7eb;gap:8px;">
+              <span style="min-width:22px;">${tx.type === "income" ? "🟢 +" : "🔴 -"}</span>
+
+              <input
+                type="number"
+                value="${Number(tx.amount).toFixed(2)}"
+                step="0.01"
+                onclick="event.stopPropagation()"
+                onchange="window.updateTransactionAmount(${day.day}, ${index}, this.value)"
+                style="width:100px;padding:4px 6px;border-radius:4px;border:1px solid #d1d5db;"
+              />
+
+              <span style="flex:1;">${tx.category || "-"}</span>
+
+              <button
+                type="button"
+                onclick="event.stopPropagation(); window.deleteTransaction(${day.day}, ${index})"
+                style="border:none;background:#ef4444;color:white;border-radius:6px;padding:4px 8px;cursor:pointer;"
+                title="Eliminar"
+              >
+                ✖
+              </button>
+            </div>
+          `).join("")}
+        </div>
+      </td>
+    `;
+
+    tbody.appendChild(detailRow);
+    row.style.cursor = "pointer";
+
+    row.addEventListener("click", (e) => {
+      const clickedCell = e.target.closest("td");
+      if (!clickedCell || clickedCell !== row.children[0]) return;
+
+      detailRow.style.display =
+        detailRow.style.display === "none" ? "table-row" : "none";
+    });
+  }
+      });
+
+      const totalRow = document.createElement("tr");
+      totalRow.className = "total-row";
+      totalRow.innerHTML = `
+        <td><strong>${t("TOTAL","TOTAL")}</strong></td>
+        <td><strong>$${totalIncome.toFixed(2)}</strong></td>
+        <td></td>
+        <td><strong>$${totalExpense.toFixed(2)}</strong></td>
+        <td></td>
+        <td><strong>$${totalProfit.toFixed(2)}</strong></td>
+      `;
+      tbody.appendChild(totalRow);
+
+      attachEditListeners();
+      attachCategoryListeners();
+      attachIncomeCategoryListeners();
+    }
 
     function attachIncomeCategoryListeners() {
       document.querySelectorAll(".income-category-select").forEach(select => {
@@ -2727,15 +2888,9 @@ function isSameLocalDay(dateA, dateB) {
         cell.addEventListener("click", function () {
           const day = parseInt(this.dataset.day, 10);
           const field = this.dataset.field;
-        const txsOfDay = state.transactions.filter(tx => {
-          const d = parseLocalDate(tx.date);
-          return d.getFullYear() === CURRENT_YEAR &&
-                 d.getMonth() === currentMonth &&
-                 d.getDate() === day;
-        });
-        const income = txsOfDay.filter(tx => tx.type === "income").reduce((s, tx) => s + (Number(tx.amount) || 0), 0);
-        const expense = txsOfDay.filter(tx => tx.type === "expense").reduce((s, tx) => s + (Number(tx.amount) || 0), 0);
-        const currentValue = field === "income" ? income : expense;
+          const monthData = calculateMonthData(currentMonth);
+          const dayData = monthData.find(d => d.day === day);
+          const currentValue = dayData[field];
 
           const input = document.createElement("input");
           input.type = "number";
@@ -2775,7 +2930,7 @@ function isSameLocalDay(dateA, dateB) {
 
     async function loadTransactionsFromFirestore() {
       if (!currentUser) {
-        state.transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
         drawCategoryChart();
         updateDashboard();
@@ -2792,9 +2947,9 @@ function isSameLocalDay(dateA, dateB) {
       const txCol = collection(userRef, "transactions");
 
       unsubscribeTransactions = onSnapshot(txCol, (snapshot) => {
-        state.transactions = [];
+        transactions = [];
         snapshot.forEach(d => {
-          state.transactions.push({ id: d.id, ...d.data() });
+          transactions.push({ id: d.id, ...d.data() });
         });
 
         renderCurrentView();
@@ -2804,7 +2959,7 @@ function isSameLocalDay(dateA, dateB) {
         console.error("Error loading transactions:", error);
         showSyncStatus("error", t("Error de sincronización", "Sync error"));
 
-        state.transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         renderCurrentView();
         drawCategoryChart();
         updateDashboard();
@@ -2959,17 +3114,17 @@ function isSameLocalDay(dateA, dateB) {
     }
 
     async function replaceCategoryInTransactions(oldName, newName = "Otros") {
-      const matches = state.transactions.filter(tx => tx.type === "expense" && tx.category === oldName);
+      const matches = transactions.filter(tx => tx.type === "expense" && tx.category === oldName);
       if (!matches.length) return;
 
-      state.transactions = state.transactions.map(tx => (
+      transactions = transactions.map(tx => (
         tx.type === "expense" && tx.category === oldName
           ? { ...tx, category: newName }
           : tx
       ));
 
       if (!currentUser) {
-        localStorage.setItem("transactions", JSON.stringify(state.transactions));
+        localStorage.setItem("transactions", JSON.stringify(transactions));
         return;
       }
 
@@ -3011,8 +3166,8 @@ function isSameLocalDay(dateA, dateB) {
 
     async function saveTransactionToFirestore(transaction) {
       if (!currentUser) {
-        state.transactions.push(transaction);
-        localStorage.setItem("transactions", JSON.stringify(state.transactions));
+        transactions.push(transaction);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
         renderCurrentView();
         drawCategoryChart();
         return;
@@ -3035,8 +3190,8 @@ function isSameLocalDay(dateA, dateB) {
         console.error("Error saving transaction:", e);
         showSyncStatus("error", t("Error al guardar", "Save error"));
 
-        state.transactions.push(transaction);
-        localStorage.setItem("transactions", JSON.stringify(state.transactions));
+        transactions.push(transaction);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
         renderCurrentView();
         drawCategoryChart();
       }
@@ -3070,7 +3225,7 @@ function isSameLocalDay(dateA, dateB) {
       const targetDate = new Date(CURRENT_YEAR, monthIndex, day);
       const targetType = field === "income" ? "income" : "expense";
 
-      const matches = state.transactions.filter(tx => {
+      const matches = transactions.filter(tx => {
         const d = parseLocalDate(tx.date);
         return tx.type === targetType && isSameLocalDay(d, targetDate);
       });
@@ -3087,7 +3242,7 @@ function isSameLocalDay(dateA, dateB) {
         }
       }
 
-      state.transactions = state.transactions.filter(tx => {
+      transactions = transactions.filter(tx => {
         const d = parseLocalDate(tx.date);
         return !(tx.type === targetType && isSameLocalDay(d, targetDate));
       });
@@ -3104,11 +3259,11 @@ function isSameLocalDay(dateA, dateB) {
         if (currentUser) {
           await saveTransactionToFirestore(newTx);
         } else {
-          state.transactions.push(newTx);
-          localStorage.setItem("transactions", JSON.stringify(state.transactions));
+          transactions.push(newTx);
+          localStorage.setItem("transactions", JSON.stringify(transactions));
         }
       } else if (!currentUser) {
-        localStorage.setItem("transactions", JSON.stringify(state.transactions));
+        localStorage.setItem("transactions", JSON.stringify(transactions));
       }
 
       drawCategoryChart();
@@ -3118,7 +3273,7 @@ function isSameLocalDay(dateA, dateB) {
       const targetDate = new Date(CURRENT_YEAR, monthIndex, day);
 
       if (currentUser) {
-        const updates = state.transactions.filter(tx => {
+        const updates = transactions.filter(tx => {
           const d = parseLocalDate(tx.date);
           return tx.type === "expense" && isSameLocalDay(d, targetDate);
         });
@@ -3128,7 +3283,7 @@ function isSameLocalDay(dateA, dateB) {
         }
       }
 
-      state.transactions = state.transactions.map(tx => {
+      transactions = transactions.map(tx => {
         const d = parseLocalDate(tx.date);
         if (tx.type === "expense" && isSameLocalDay(d, targetDate)) {
           return { ...tx, category: newCategory };
@@ -3137,7 +3292,7 @@ function isSameLocalDay(dateA, dateB) {
       });
 
       if (!currentUser) {
-        localStorage.setItem("transactions", JSON.stringify(state.transactions));
+        localStorage.setItem("transactions", JSON.stringify(transactions));
       }
 
       drawCategoryChart();
@@ -3147,7 +3302,7 @@ function isSameLocalDay(dateA, dateB) {
       const targetDate = new Date(CURRENT_YEAR, monthIndex, day);
 
       if (currentUser) {
-        const updates = state.transactions.filter(tx => {
+        const updates = transactions.filter(tx => {
           const d = parseLocalDate(tx.date);
           return tx.type === "income" && isSameLocalDay(d, targetDate);
         });
@@ -3157,7 +3312,7 @@ function isSameLocalDay(dateA, dateB) {
         }
       }
 
-      state.transactions = state.transactions.map(tx => {
+      transactions = transactions.map(tx => {
         const d = parseLocalDate(tx.date);
         if (tx.type === "income" && isSameLocalDay(d, targetDate)) {
           return { ...tx, category: newCategory };
@@ -3166,7 +3321,7 @@ function isSameLocalDay(dateA, dateB) {
       });
 
       if (!currentUser) {
-        localStorage.setItem("transactions", JSON.stringify(state.transactions));
+        localStorage.setItem("transactions", JSON.stringify(transactions));
       }
 
       drawCategoryChart();
@@ -3186,7 +3341,7 @@ function isSameLocalDay(dateA, dateB) {
     let income = 0;
     let expense = 0;
 
-    state.transactions.forEach(tx => {
+    transactions.forEach(tx => {
       const d = parseLocalDate(tx.date);
       if (isSameLocalDay(d, date)) {
         if (tx.type === "income") income += tx.amount;
@@ -3260,18 +3415,7 @@ function isSameLocalDay(dateA, dateB) {
         10
       );
 
-        const daysInMonth = new Date(CURRENT_YEAR, currentMonth + 1, 0).getDate();
-        const monthData = Array.from({ length: daysInMonth }, (_, i) => {
-          const day = i + 1;
-          const txs = state.transactions.filter(tx => {
-            const d = parseLocalDate(tx.date);
-            return d.getFullYear() === CURRENT_YEAR && d.getMonth() === currentMonth && d.getDate() === day;
-          });
-          const income = txs.filter(tx => tx.type === "income").reduce((s, tx) => s + (Number(tx.amount) || 0), 0);
-          const expense = txs.filter(tx => tx.type === "expense").reduce((s, tx) => s + (Number(tx.amount) || 0), 0);
-          const category = txs.filter(tx => tx.type === "expense").map(tx => tx.category).filter(Boolean).join(", ") || "-";
-          return { day, income, expense, profit: income - expense, category };
-        });
+      const monthData = calculateMonthData(currentMonth);
 
       const tableData = monthData.map(day => [
         `${day.day}`,
@@ -3384,18 +3528,7 @@ function isSameLocalDay(dateA, dateB) {
         return;
       }
 
-        const daysInMonth = new Date(CURRENT_YEAR, currentMonth + 1, 0).getDate();
-        const monthData = Array.from({ length: daysInMonth }, (_, i) => {
-          const day = i + 1;
-          const txs = state.transactions.filter(tx => {
-            const d = parseLocalDate(tx.date);
-            return d.getFullYear() === CURRENT_YEAR && d.getMonth() === currentMonth && d.getDate() === day;
-          });
-          const income = txs.filter(tx => tx.type === "income").reduce((s, tx) => s + (Number(tx.amount) || 0), 0);
-          const expense = txs.filter(tx => tx.type === "expense").reduce((s, tx) => s + (Number(tx.amount) || 0), 0);
-          const category = txs.filter(tx => tx.type === "expense").map(tx => tx.category).filter(Boolean).join(", ") || "-";
-          return { day, income, expense, profit: income - expense, category };
-        });
+      const monthData = calculateMonthData(currentMonth);
       const monthNames = getMonthNames();
 
       const data = [[
@@ -3406,7 +3539,7 @@ function isSameLocalDay(dateA, dateB) {
         t("Ganancia", "Profit")
       ]];
 
-      monthData.forEach(day => {         const transactions = day.transactions || [];
+      monthData.forEach(day => {
         data.push([day.day, day.income, day.expense, day.category, day.profit]);
       });
 
@@ -3755,7 +3888,7 @@ function isSameLocalDay(dateA, dateB) {
         }
       }
 
-      state.transactions = [];
+      transactions = [];
       localStorage.removeItem("transactions");
 
       alert(t("✅ Datos eliminados", "✅ Data deleted"));
@@ -3875,34 +4008,15 @@ function isSameLocalDay(dateA, dateB) {
       if (e.target.id === "exportModal") closeExportModal();
     });
 
-onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, async (user) => {
   currentUser = user;
 
   const authButtonText = document.getElementById("authButtonText");
 
   if (user) {
-    // 🔥 NUEVO → sincronizar con arquitectura modular
-    state.user = user;
-
     // 🔐 Usuario logueado
     await ensureUserProfile(user);
-
-    watchUserProfile(user, async (profile) => {
-
-      // 🔥 NUEVO → detectar PRO correctamente
-      const isPro = isProfilePro(profile);
-      state.isPro = isPro;
-
-      // 🔥 MIGRACIÓN AUTOMÁTICA
-      if (isPro) {
-        await migrateLocalToFirebase();
-      }
-
-      // 👉 UI existente (no tocar)
-      updatePlanUI(profile);
-
-    });
-
+    watchUserProfile(user);
     await loadCategories();
     await loadTransactionsFromFirestore();
 
@@ -3915,21 +4029,37 @@ onAuthStateChanged(auth, async (user) => {
     await handleStripeReturn();
 
   } else {
-    // 🔥 NUEVO → limpiar estado modular
-    state.user = null;
-    state.isPro = false;
+    // ❌ Usuario NO logueado
 
-    currentUser = null;
+    if (unsubscribeTransactions) {
+      unsubscribeTransactions();
+      unsubscribeTransactions = null;
+    }
 
-    // 👉 comportamiento existente (no tocar)
-    state.transactions = loadTransactionsLocal();
-    renderAll();
-    updateYearView();
+    if (unsubscribeUserProfile) {
+      unsubscribeUserProfile();
+      unsubscribeUserProfile = null;
+    }
 
+    if (unsubscribeCategories) {
+      unsubscribeCategories();
+      unsubscribeCategories = null;
+    }
+
+    transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+    await loadCategories();
+    renderCurrentView();
+    drawCategoryChart();
     updatePlanUI(null);
 
-    authButtonText.textContent = "Iniciar sesión";
-  }});
+    // 🔥 AQUÍ VA EXACTAMENTE 👇
+    authButtonText.textContent = language === "es"
+      ? "Iniciar sesión"
+      : "Sign in";
+
+    await handleStripeReturn();
+  }
+});
 
     handleStripeReturn();
     loadCategories();
@@ -3943,8 +4073,8 @@ onAuthStateChanged(auth, async (user) => {
   let realIndex = -1;
   let counter = 0;
 
-  for (let i = 0; i < state.transactions.length; i++) {
-    const tx = state.transactions[i];
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
     const d = parseLocalDate(tx.date);
 
     if (
@@ -3962,7 +4092,7 @@ onAuthStateChanged(auth, async (user) => {
 
   if (realIndex === -1) return;
 
-  const tx = state.transactions[realIndex];
+  const tx = transactions[realIndex];
 
   if (currentUser && tx.id) {
     const userRef = doc(collection(db, "users"), currentUser.uid);
@@ -3972,8 +4102,8 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  state.transactions[realIndex].amount = amount;
-  localStorage.setItem("transactions", JSON.stringify(state.transactions));
+  transactions[realIndex].amount = amount;
+  localStorage.setItem("transactions", JSON.stringify(transactions));
 
   renderCurrentView();
   drawCategoryChart();
@@ -3987,8 +4117,8 @@ onAuthStateChanged(auth, async (user) => {
   let realIndex = -1;
   let counter = 0;
 
-  for (let i = 0; i < state.transactions.length; i++) {
-    const tx = state.transactions[i];
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
     const d = parseLocalDate(tx.date);
 
     if (
@@ -4006,7 +4136,7 @@ onAuthStateChanged(auth, async (user) => {
 
   if (realIndex === -1) return;
 
-  const tx = state.transactions[realIndex];
+  const tx = transactions[realIndex];
 
   if (currentUser && tx.id) {
     const userRef = doc(collection(db, "users"), currentUser.uid);
@@ -4014,8 +4144,8 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  state.transactions.splice(realIndex, 1);
-  localStorage.setItem("transactions", JSON.stringify(state.transactions));
+  transactions.splice(realIndex, 1);
+  localStorage.setItem("transactions", JSON.stringify(transactions));
 
   renderCurrentView();
   drawCategoryChart();
@@ -4094,7 +4224,7 @@ function buildFinancialContext() {
   const expenseByCategory = {};
   const incomeByCategory = {};
 
-  state.transactions.forEach(tx => {
+  transactions.forEach(tx => {
     const amount = Number(tx?.amount) || 0;
     const category = tx?.category || (tx?.type === "income" ? "Salario" : "Otros");
 
@@ -4121,7 +4251,7 @@ function buildFinancialContext() {
     balance,
     topExpense,
     topIncome,
-    txCount: state.transactions.length,
+    txCount: transactions.length,
     savingsGoal,
     monthBalance
   };
@@ -4447,25 +4577,6 @@ setTimeout(initializeAIChat, 300);
 </script>
 
 
-
-</div>
-
-<script type="module" defer>
-import { getCurrentMonthBalance as calcMonthBalance, getBalance as calcBalance } from "/public/core/financeCalc.js"
-// wrapper mes
-window.getCurrentMonthBalance = function(month, year) {
-  const now = new Date();
-  return calcMonthBalance(
-    month ?? now.getMonth(),
-    year ?? now.getFullYear()
-  );
-};
-
-// wrapper total
-window.getBalance = function() {
-  return calcBalance();
-};
-</script>
 
 </body>
 </html>
