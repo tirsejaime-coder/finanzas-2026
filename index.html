@@ -1224,6 +1224,8 @@ setTimeout(() => {
 
 
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjI4ODY5MDMxMDM0MjY0OTM1MzgxNDE="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjI4ODY5MDMxMDM0MjY0OTM1MzgxNDE="></script>
 </head>
 <body>
   <div class="container">
@@ -1413,12 +1415,7 @@ setTimeout(() => {
     </div>
 
     <div id="view-year" class="view">
-  <div id="yearGrid" class="year-grid"></div>
-</div>
-
-<div id="view-month" class="view"></div>
-        Aquí va tu código de anuncios (AdSense / Monetag)
-      </div>
+      <div id="yearGrid" class="year-grid"></div>
     </div>
 
     <div id="view-month" class="view">
@@ -1634,7 +1631,7 @@ window.state = state;
     function getTrackedDaysSet() {
       const set = new Set();
       state.transactions.forEach(tx => {
-        if (tx?.date) set.add(formatLocalDate(parseLocalDate(tx.date)));
+        if (tx?.date) set.add(formatLocalDate(getTransactionLocalDate(tx)));
       });
       return set;
     }
@@ -1671,7 +1668,7 @@ window.state = state;
       let expense = 0;
 
       state.transactions.forEach(tx => {
-        const d = parseLocalDate(tx.date);
+        const d = getTransactionLocalDate(tx);
         if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
           if (tx.type === "income") income += Number(tx.amount) || 0;
           if (tx.type === "expense") expense += Number(tx.amount) || 0;
@@ -1731,12 +1728,12 @@ window.state = state;
 
         const category = detectQuickCategory(text, isIncome);
 
-        const tx = {
+        const tx = normalizeTransactionDates({
           date: document.getElementById("date").value || formatLocalDate(new Date()),
           amount,
           type: isIncome ? "income" : "expense",
           category
-        };
+        });
 
         await saveQuickTransaction(tx);
       }
@@ -1775,8 +1772,10 @@ window.state = state;
     async function saveQuickTransaction(tx) {
       showSaveStatus("saving");
 
+      const normalizedTx = normalizeTransactionDates(tx);
+
       if (!currentUser) {
-        state.transactions.push(tx);
+        state.transactions.push(normalizedTx);
         localStorage.setItem("transactions", JSON.stringify(state.transactions));
         renderCurrentView();
         drawCategoryChart();
@@ -1788,7 +1787,7 @@ window.state = state;
 
       const userRef = doc(collection(db, "users"), currentUser.uid);
       await addDoc(collection(userRef, "transactions"), {
-        ...tx,
+        ...normalizedTx,
         createdAt: serverTimestamp()
       });
       // onSnapshot will refresh the UI, but we keep this for instant feedback
@@ -2309,7 +2308,7 @@ async function startPaidProCheckout() {
       state.transactions.forEach(tx => {
         if (tx.type !== "expense") return;
 
-        const d = parseLocalDate(tx.date);
+        const d = getTransactionLocalDate(tx);
         d.setHours(0, 0, 0, 0);
 
         const diffDays = Math.floor((today - d) / (1000 * 60 * 60 * 24));
@@ -2490,7 +2489,7 @@ function generateInsights(income, expense, balance, expenseByCategory) {
       let totalIncome = 0;
 
       state.transactions.forEach(tx => {
-        const d = parseLocalDate(tx.date);
+        const d = getTransactionLocalDate(tx);
         if (d.getFullYear() === CURRENT_YEAR) {
           if (tx.type === "expense") {
             const key = tx.category || "Otros";
@@ -2558,7 +2557,7 @@ function generateInsights(income, expense, balance, expenseByCategory) {
         let expense = 0;
 
         state.transactions.forEach(tx => {
-          const d = parseLocalDate(tx.date);
+          const d = getTransactionLocalDate(tx);
           if (d.getMonth() === m && d.getFullYear() === CURRENT_YEAR) {
             if (tx.type === "income") income += tx.amount;
             else expense += tx.amount;
@@ -2579,6 +2578,11 @@ function generateInsights(income, expense, balance, expenseByCategory) {
 function parseLocalDate(dateStr) {
   if (!dateStr) return new Date();
 
+  if (typeof dateStr !== "string") {
+    const d = new Date(dateStr);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
   if (dateStr.includes("T")) {
     const d = new Date(dateStr);
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -2586,10 +2590,11 @@ function parseLocalDate(dateStr) {
 
   const parts = dateStr.split("-");
   if (parts.length === 3) {
-    return new Date(parts[0], parts[1] - 1, parts[2]);
+    return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
   }
 
-  return new Date(dateStr);
+  const d = new Date(dateStr);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
 function formatLocalDate(date) {
@@ -2598,6 +2603,43 @@ function formatLocalDate(date) {
     String(date.getMonth() + 1).padStart(2, "0"),
     String(date.getDate()).padStart(2, "0")
   ].join("-");
+}
+
+function getTransactionLocalDate(tx) {
+  if (
+    tx &&
+    tx.day !== undefined &&
+    tx.month !== undefined &&
+    tx.year !== undefined
+  ) {
+    return new Date(Number(tx.year), Number(tx.month), Number(tx.day));
+  }
+
+  if (tx?.date) {
+    return getTransactionLocalDate(tx);
+  }
+
+  if (tx?.timestamp) {
+    const d = new Date(tx.timestamp);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  return new Date();
+}
+
+function normalizeTransactionDates(tx) {
+  if (!tx) return tx;
+
+  const localDate = getTransactionLocalDate(tx);
+
+  return {
+    ...tx,
+    date: formatLocalDate(localDate),
+    day: localDate.getDate(),
+    month: localDate.getMonth(),
+    year: localDate.getFullYear(),
+    timestamp: tx.timestamp ?? localDate.getTime()
+  };
 }
 
 // 👇 ESTA FUNCIÓN DEBE ESTAR FUERA
@@ -2678,6 +2720,8 @@ card.querySelector(".btn-month-excel").onclick = () => {
 };
 
 grid.appendChild(card);
+      });
+    }
 
     function renderCategorySelect(currentCategory, day) {
       const expenseCategories = getCategoriesByType("expense");
@@ -2708,7 +2752,7 @@ grid.appendChild(card);
       if (!display) {
         const targetDate = new Date(CURRENT_YEAR, currentMonth, day);
         const existingIncome = state.transactions.find(tx => {
-          const d = parseLocalDate(tx.date);
+          const d = getTransactionLocalDate(tx);
           return tx.type === "income" && isSameLocalDay(d, targetDate);
         });
         display = existingIncome?.category || incomeCategories[0]?.name || "Salario";
@@ -2746,7 +2790,7 @@ grid.appendChild(card);
           const day = parseInt(this.dataset.day, 10);
           const field = this.dataset.field;
         const txsOfDay = state.transactions.filter(tx => {
-          const d = parseLocalDate(tx.date);
+          const d = getTransactionLocalDate(tx);
           return d.getFullYear() === CURRENT_YEAR &&
                  d.getMonth() === currentMonth &&
                  d.getDate() === day;
@@ -2812,8 +2856,10 @@ grid.appendChild(card);
       unsubscribeTransactions = onSnapshot(txCol, (snapshot) => {
         state.transactions = [];
         snapshot.forEach(d => {
-          state.transactions.push({ id: d.id, ...d.data() });
+          state.transactions.push(normalizeTransactionDates({ id: d.id, ...d.data() }));
         });
+
+        localStorage.setItem("transactions", JSON.stringify(state.transactions));
 
         renderCurrentView();
         drawCategoryChart();
@@ -3033,8 +3079,10 @@ grid.appendChild(card);
     }
 
     async function saveTransactionToFirestore(transaction) {
+      const normalizedTransaction = normalizeTransactionDates(transaction);
+
       if (!currentUser) {
-        state.transactions.push(transaction);
+        state.transactions.push(normalizedTransaction);
         localStorage.setItem("transactions", JSON.stringify(state.transactions));
         renderCurrentView();
         drawCategoryChart();
@@ -3047,7 +3095,7 @@ grid.appendChild(card);
         const userRef = doc(collection(db, "users"), currentUser.uid);
         const txCol = collection(userRef, "transactions");
         const data = {
-          ...transaction,
+          ...normalizedTransaction,
           userId: currentUser.uid,
           createdAt: serverTimestamp()
         };
@@ -3058,7 +3106,7 @@ grid.appendChild(card);
         console.error("Error saving transaction:", e);
         showSyncStatus("error", t("Error al guardar", "Save error"));
 
-        state.transactions.push(transaction);
+        state.transactions.push(normalizedTransaction);
         localStorage.setItem("transactions", JSON.stringify(state.transactions));
         renderCurrentView();
         drawCategoryChart();
@@ -3094,7 +3142,7 @@ grid.appendChild(card);
       const targetType = field === "income" ? "income" : "expense";
 
       const matches = state.transactions.filter(tx => {
-        const d = parseLocalDate(tx.date);
+        const d = getTransactionLocalDate(tx);
         return tx.type === targetType && isSameLocalDay(d, targetDate);
       });
 
@@ -3111,18 +3159,18 @@ grid.appendChild(card);
       }
 
       state.transactions = state.transactions.filter(tx => {
-        const d = parseLocalDate(tx.date);
+        const d = getTransactionLocalDate(tx);
         return !(tx.type === targetType && isSameLocalDay(d, targetDate));
       });
 
       if (newValue > 0) {
-        const newTx = {
+        const newTx = normalizeTransactionDates({
           date: formatLocalDate(targetDate),
           type: targetType,
           amount: newValue,
           description: `Ajuste manual ${targetType === "income" ? t("ingreso","income") : t("gasto","expense")}`,
           category: preservedCategory
-        };
+        });
 
         if (currentUser) {
           await saveTransactionToFirestore(newTx);
@@ -3142,7 +3190,7 @@ grid.appendChild(card);
 
       if (currentUser) {
         const updates = state.transactions.filter(tx => {
-          const d = parseLocalDate(tx.date);
+          const d = getTransactionLocalDate(tx);
           return tx.type === "expense" && isSameLocalDay(d, targetDate);
         });
 
@@ -3152,7 +3200,7 @@ grid.appendChild(card);
       }
 
       state.transactions = state.transactions.map(tx => {
-        const d = parseLocalDate(tx.date);
+        const d = getTransactionLocalDate(tx);
         if (tx.type === "expense" && isSameLocalDay(d, targetDate)) {
           return { ...tx, category: newCategory };
         }
@@ -3171,7 +3219,7 @@ grid.appendChild(card);
 
       if (currentUser) {
         const updates = state.transactions.filter(tx => {
-          const d = parseLocalDate(tx.date);
+          const d = getTransactionLocalDate(tx);
           return tx.type === "income" && isSameLocalDay(d, targetDate);
         });
 
@@ -3181,7 +3229,7 @@ grid.appendChild(card);
       }
 
       state.transactions = state.transactions.map(tx => {
-        const d = parseLocalDate(tx.date);
+        const d = getTransactionLocalDate(tx);
         if (tx.type === "income" && isSameLocalDay(d, targetDate)) {
           return { ...tx, category: newCategory };
         }
@@ -3210,7 +3258,7 @@ grid.appendChild(card);
     let expense = 0;
 
     state.transactions.forEach(tx => {
-      const d = parseLocalDate(tx.date);
+      const d = getTransactionLocalDate(tx);
       if (isSameLocalDay(d, date)) {
         if (tx.type === "income") income += tx.amount;
         else expense += tx.amount;
@@ -3287,7 +3335,7 @@ grid.appendChild(card);
         const monthData = Array.from({ length: daysInMonth }, (_, i) => {
           const day = i + 1;
           const txs = state.transactions.filter(tx => {
-            const d = parseLocalDate(tx.date);
+            const d = getTransactionLocalDate(tx);
             return d.getFullYear() === CURRENT_YEAR && d.getMonth() === currentMonth && d.getDate() === day;
           });
           const income = txs.filter(tx => tx.type === "income").reduce((s, tx) => s + (Number(tx.amount) || 0), 0);
@@ -3411,7 +3459,7 @@ grid.appendChild(card);
         const monthData = Array.from({ length: daysInMonth }, (_, i) => {
           const day = i + 1;
           const txs = state.transactions.filter(tx => {
-            const d = parseLocalDate(tx.date);
+            const d = getTransactionLocalDate(tx);
             return d.getFullYear() === CURRENT_YEAR && d.getMonth() === currentMonth && d.getDate() === day;
           });
           const income = txs.filter(tx => tx.type === "income").reduce((s, tx) => s + (Number(tx.amount) || 0), 0);
@@ -3603,6 +3651,29 @@ grid.appendChild(card);
     };
 
     window.switchTab = function(view) {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+
+      if (view === "input") {
+        currentView = "input";
+        document.getElementById("view-input")?.classList.add("active");
+        document.getElementById("tabInput")?.classList.add("active");
+        updateBreadcrumb([]);
+        updateDashboard();
+        updateCurrentDateDisplay();
+        return;
+      }
+
+      if (view === "year") {
+        renderYearView();
+        return;
+      }
+
+      if (view === "month" && currentMonth !== null) {
+        currentView = "month";
+        showMonthView(currentMonth);
+      }
+    };
 
     window.openSavingsGoalPrompt = function () {
       const currentGoal = getSavingsGoal();
@@ -3616,11 +3687,13 @@ grid.appendChild(card);
       }
       localStorage.setItem("lumenssaveSavingsGoal", String(value));
       updateDashboard();
-  updateCurrentDateDisplay();
+      updateCurrentDateDisplay();
     };
 
     window.showMonthView = function (monthIndex) {
-      renderMonthView(monthIndex);
+      currentMonth = monthIndex;
+      currentView = "month";
+      showMonthView(monthIndex);
     };
 
     window.addCategoryPrompt = addCategoryPrompt;
@@ -3642,13 +3715,13 @@ grid.appendChild(card);
 
       const selectedCategory = category || (type === "expense" ? "Otros" : "Salario");
 
-      const transaction = {
+      const transaction = normalizeTransactionDates({
         date: dateInput,
         type,
         amount,
         description,
         category: selectedCategory
-      };
+      });
 
       await saveTransactionToFirestore(transaction);
 
@@ -3955,7 +4028,7 @@ onAuthStateChanged(auth, async (user) => {
 
   for (let i = 0; i < state.transactions.length; i++) {
     const tx = state.transactions[i];
-    const d = parseLocalDate(tx.date);
+    const d = getTransactionLocalDate(tx);
 
     if (
       d.getFullYear() === CURRENT_YEAR &&
@@ -3999,7 +4072,7 @@ onAuthStateChanged(auth, async (user) => {
 
   for (let i = 0; i < state.transactions.length; i++) {
     const tx = state.transactions[i];
-    const d = parseLocalDate(tx.date);
+    const d = getTransactionLocalDate(tx);
 
     if (
       d.getFullYear() === CURRENT_YEAR &&
@@ -4311,7 +4384,7 @@ setTimeout(initializeAIChat, 300);
         if (!tx || !tx.date) return;
         let d;
         try {
-          d = typeof parseLocalDate === "function" ? parseLocalDate(tx.date) : new Date(tx.date);
+          d = typeof parseLocalDate === "function" ? getTransactionLocalDate(tx) : new Date(tx.date);
         } catch (_) {
           d = new Date(tx.date);
         }
