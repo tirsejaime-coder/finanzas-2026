@@ -12,7 +12,7 @@
 // SAFE YEAR GOAL (NON BREAKING)
 function getYearGoalSafe(){
   const saved = localStorage.getItem("yearGoal");
-  if(saved) return Number(saved);
+  if(saved) return Number(saved);"/core/financeCalc.js"
   return getSavingsGoal()*12;
 }
 
@@ -4451,9 +4451,9 @@ setTimeout(initializeAIChat, 300);
 </div>
 
 <script type="module">
-import { getCurrentMonthBalance as calcMonthBalance, getBalance as calcBalance } from "/core/financeCalc.js"
+import { getCurrentMonthBalance as calcMonthBalance, getBalance as calcBalance } from "/core/financeCalc.js";
 
-// 🔥 wrapper mes actual
+// wrapper mes
 window.getCurrentMonthBalance = function(month, year) {
   const now = new Date();
   return calcMonthBalance(
@@ -4462,7 +4462,7 @@ window.getCurrentMonthBalance = function(month, year) {
   );
 };
 
-// 🔥 wrapper balance total
+// wrapper total
 window.getBalance = function() {
   return calcBalance();
 };
