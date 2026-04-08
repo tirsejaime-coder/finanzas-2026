@@ -4449,17 +4449,7 @@ setTimeout(initializeAIChat, 300);
 
 
 </div>
-  <script type="module">
-import { getCurrentMonthBalance as calcMonthBalance } from "./core/financeCalc.js";
 
-window.getCurrentMonthBalance = function(month, year) {
-  const now = new Date();
-  return calcMonthBalance(
-    month ?? now.getMonth(),
-    year ?? now.getFullYear()
-  );
-};
-</script>
 <script type="module">
 import { getCurrentMonthBalance as calcMonthBalance } from "./core/financeCalc.js";
 
@@ -4470,6 +4460,7 @@ window.getCurrentMonthBalance = function(month, year) {
     year ?? now.getFullYear()
   );
 };
-</script>  
+</script>
+
 </body>
 </html>
