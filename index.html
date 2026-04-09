@@ -3356,16 +3356,16 @@ function isSameLocalDay(dateA, dateB) {
     const date = new Date(weekAgo);
     date.setDate(weekAgo.getDate() + i);
 
-    let income = 0;
-    let expense = 0;
+    const balance = moduleGetBalance(transactions);
 
-    transactions.forEach(tx => {
-      const d = parseLocalDate(tx.date);
-      if (isSameLocalDay(d, date)) {
-        if (tx.type === "income") income += tx.amount;
-        else expense += tx.amount;
-      }
-    });
+let income = 0;
+let expense = 0;
+
+transactions.forEach(tx => {
+  const amount = Number(tx.amount) || 0;
+  if (tx.type === "income") income += amount;
+  if (tx.type === "expense") expense += amount;
+});
 
     weekData.push({
       date,
