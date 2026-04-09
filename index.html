@@ -1663,19 +1663,20 @@ setTimeout(() => {
     }
 
     function getCurrentMonthBalance() {
-      const now = new Date();
-      let { income, expense } = getIncomeExpense();
+  const now = new Date();
+  let income = 0;
+  let expense = 0;
 
-      transactions.forEach(tx => {
-        const d = parseLocalDate(tx.date);
-        if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
-          if (tx.type === "income") income += Number(tx.amount) || 0;
-          if (tx.type === "expense") expense += Number(tx.amount) || 0;
-        }
-      });
-
-      return income - expense;
+  transactions.forEach(tx => {
+    const d = parseLocalDate(tx.date);
+    if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
+      if (tx.type === "income") income += Number(tx.amount) || 0;
+      if (tx.type === "expense") expense += Number(tx.amount) || 0;
     }
+  });
+
+  return income - expense;
+}
 
     function loadAdsIfNeeded() {
       if (isProUser) return;
