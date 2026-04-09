@@ -4592,26 +4592,7 @@ setTimeout(initializeAIChat, 300);
     setTimeout(applyCategoryToggleUI, 1200);
   });
 })();
-</script>
- <script type="module">
-import {
-  getBalance as moduleGetBalance,
-  getCurrentMonthBalance as moduleGetMonthBalance
-} from "./core/financeCalc.js";
 
-// 🔥 REEMPLAZO INVISIBLE (MISMO NOMBRE)
-window.getBalance = function() {
-  return moduleGetBalance(window.transactions || []);
-};
-
-window.getCurrentMonthBalance = function(month, year) {
-  const now = new Date();
-  return moduleGetMonthBalance(
-    window.transactions || [],
-    month ?? now.getMonth(),
-    year ?? now.getFullYear()
-  );
-};
 </script> 
 
 
