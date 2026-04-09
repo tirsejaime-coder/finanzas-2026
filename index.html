@@ -1224,6 +1224,7 @@ setTimeout(() => {
 
 
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjI4ODY5MDMxMDM0MjY0OTM1MzgxNDE="></script>
 </head>
 <body>
   <div class="container">
@@ -1661,8 +1662,7 @@ setTimeout(() => {
 
     function getCurrentMonthBalance() {
       const now = new Date();
-      let income = 0;
-      let expense = 0;
+      const { income, expense } = getIncomeExpense();
 
       transactions.forEach(tx => {
         const d = parseLocalDate(tx.date);
@@ -2441,20 +2441,25 @@ function generateInsights(income, expense, balance, expenseByCategory) {
 
 
 
-      window.getIncomeExpense = function () {
-        let income = 0;
-        let expense = 0;
-        transactions.forEach(tx => {
-          const amount = Number(tx.amount) || 0;
-          if (tx.type === "income") {
-            income += amount;
-          } else if (tx.type === "expense") {
-            expense += amount;
-          }
-        });
-        return { income, expense };
-      };
-    function updateDashboard() {
+    
+function getIncomeExpense() {
+  let income = 0;
+  let expense = 0;
+
+  transactions.forEach(tx => {
+    const amount = Number(tx.amount) || 0;
+
+    if (tx.type === "income") {
+      income += amount;
+    } else if (tx.type === "expense") {
+      expense += amount;
+    }
+  });
+
+  return { income, expense };
+}
+
+function updateDashboard() {
       const balanceEl = document.getElementById("balanceAmount");
       const incomeEl = document.getElementById("incomeAmount");
       const expenseEl = document.getElementById("expenseAmount");
@@ -2463,12 +2468,16 @@ function generateInsights(income, expense, balance, expenseByCategory) {
 
       if (!balanceEl || !incomeEl || !expenseEl || !profitEl || !insightEl) return;
 
-        const { income, expense } = getIncomeExpense();
-              const expenseByCategory = {};
+      let income = 0;
+      let expense = 0;
+      const expenseByCategory = {};
 
       transactions.forEach(tx => {
         const amount = Number(tx.amount) || 0;
-          if (tx.type === "expense") {
+        if (tx.type === "income") {
+          income += amount;
+        } else if (tx.type === "expense") {
+          expense += amount;
           const key = tx.category || "Otros";
           expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
         }
