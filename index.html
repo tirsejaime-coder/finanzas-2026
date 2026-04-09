@@ -1662,7 +1662,7 @@ setTimeout(() => {
 
     function getCurrentMonthBalance() {
       const now = new Date();
-      const { income, expense } = getIncomeExpense();
+      let { income, expense } = getIncomeExpense();
 
       transactions.forEach(tx => {
         const d = parseLocalDate(tx.date);
