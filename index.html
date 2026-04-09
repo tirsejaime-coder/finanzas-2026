@@ -2471,18 +2471,22 @@ function updateDashboard() {
 
       if (!balanceEl || !incomeEl || !expenseEl || !profitEl || !insightEl) return;
 
-      const { income, expense } = getIncomeExpense();
-      const expenseByCategory = {};
+      const ctx = buildFinancialContext();
 
-      transactions.forEach(tx => {
-        const amount = Number(tx.amount) || 0;
-        if (tx.type === "expense") {
-          const key = tx.category || "Otros";
-          expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
-        }
-      });
+const income = ctx.income;
+const expense = ctx.expense;
+const balance = ctx.balance;
 
-      const balance = income - expense;
+// ⚠️ mantenemos esto porque generateInsights lo usa
+const expenseByCategory = {};
+
+transactions.forEach(tx => {
+  const amount = Number(tx.amount) || 0;
+  if (tx.type === "expense") {
+    const key = tx.category || "Otros";
+    expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
+  }
+});
 
       incomeEl.textContent = `$${income.toFixed(2)}`;
       expenseEl.textContent = `$${expense.toFixed(2)}`;
@@ -2571,8 +2575,10 @@ function updateDashboard() {
         transactions.forEach(tx => {
           const d = parseLocalDate(tx.date);
           if (d.getMonth() === m && d.getFullYear() === CURRENT_YEAR) {
-            if (tx.type === "income") income += tx.amount;
-            else expense += tx.amount;
+            const amount = Number(tx.amount) || 0;
+
+if (tx.type === "income") income += amount;
+if (tx.type === "expense") expense += amount;
           }
         });
 
