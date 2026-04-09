@@ -1225,6 +1225,7 @@ setTimeout(() => {
 
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjI4ODY5MDMxMDM0MjY0OTM1MzgxNDE="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjI4ODY5MDMxMDM0MjY0OTM1MzgxNDE="></script>
 </head>
 <body>
   <div class="container">
@@ -4596,6 +4597,22 @@ setTimeout(initializeAIChat, 300);
 </script> 
 
 
+
+
+<script type="module">
+import {
+  getBalance as moduleGetBalance,
+  getCurrentMonthBalance as moduleGetMonthBalance,
+  getIncomeExpense as moduleGetIncomeExpense
+} from "./core/financeCalc.js";
+
+// SAFE TEST (no breaking changes)
+window.__testModuleIncomeExpense = function() {
+  const data = moduleGetIncomeExpense(window.transactions || []);
+  console.log("MÓDULO:", data);
+  return data;
+};
+</script>
 
 </body>
 </html>
