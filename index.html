@@ -1226,6 +1226,7 @@ setTimeout(() => {
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=ODI2ODI0NTM3NTgwNzI4OTI2MTAyMw=="></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjI4ODY5MDMxMDM0MjY0OTM1MzgxNDE="></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjI4ODY5MDMxMDM0MjY0OTM1MzgxNDE="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjIyODE3MTk3MDM5MzQ1ODMzODU4NTE="></script>
 </head>
 <body>
   <div class="container">
@@ -2469,16 +2470,12 @@ function updateDashboard() {
 
       if (!balanceEl || !incomeEl || !expenseEl || !profitEl || !insightEl) return;
 
-      let income = 0;
-      let expense = 0;
+      const { income, expense } = getIncomeExpense();
       const expenseByCategory = {};
 
       transactions.forEach(tx => {
         const amount = Number(tx.amount) || 0;
-        if (tx.type === "income") {
-          income += amount;
-        } else if (tx.type === "expense") {
-          expense += amount;
+        if (tx.type === "expense") {
           const key = tx.category || "Otros";
           expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
         }
