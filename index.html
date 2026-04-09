@@ -2362,10 +2362,19 @@ function getTopIncomeCategories() {
 
 
 
-function generateInsights(income, expense, balance, expenseByCategory) {
+function generateInsights(income, expense, balance) {
   if (!transactions.length) {
     return t("💡 Empieza a registrar tus finanzas", "💡 Start tracking your finances");
   }
+  const expenseByCategory = {};
+
+transactions.forEach(tx => {
+  const amount = Number(tx.amount) || 0;
+  if (tx.type === "expense") {
+    const key = tx.category || "Otros";
+    expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
+  }
+});
 
   const messages = [];
   const weekly = getWeeklyExpenseTotals();
