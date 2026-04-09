@@ -4597,22 +4597,5 @@ setTimeout(initializeAIChat, 300);
 </script> 
 
 
-
-
-<script type="module">
-import {
-  getBalance as moduleGetBalance,
-  getCurrentMonthBalance as moduleGetMonthBalance,
-  getIncomeExpense as moduleGetIncomeExpense
-} from "./core/financeCalc.js";
-
-// SAFE TEST (no breaking changes)
-window.__testModuleIncomeExpense = function() {
-  const data = moduleGetIncomeExpense(window.transactions || []);
-  console.log("MÓDULO:", data);
-  return data;
-};
-</script>
-
 </body>
 </html>
