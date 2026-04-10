@@ -16,61 +16,6 @@ function getYearGoalSafe(){
   return getSavingsGoal()*12;
 }
 
-window.openYearGoalPrompt = function(){
-  const current = getYearGoalSafe();
-  const input = prompt("Meta anual:", current);
-  if(input===null) return;
-
-  const val = Number(input);
-  if(isNaN(val) || val<=0){
-    alert("Valor inválido");
-    return;
-  }
-
-  localStorage.setItem("yearGoal", val);
-
-  if(typeof updateHeroRetention==="function"){
-    updateHeroRetention();
-  }
-};
-
-
-// PATCH YEAR RENDER (SAFE EXTENSION)
-setTimeout(() => {
-  const original = window.updateHeroRetention;
-  if (!original) return;
-
-  window.updateHeroRetention = function () {
-    original.apply(this, arguments);
-
-    try {
-      const yVal = document.getElementById("yearGoalValue");
-      const yBar = document.getElementById("yearGoalProgressFill");
-      const ySub = document.getElementById("yearGoalSubtext");
-
-      if (!yVal) return;
-
-      const yearGoal = getYearGoalSafe();
-      const yearBalance = getCurrentMonthBalance() * 12;
-
-      yVal.textContent = `$${yearBalance.toFixed(0)} / $${yearGoal}`;
-
-      const progress = Math.min(100, (yearBalance / yearGoal) * 100);
-
-      if (yBar) yBar.style.width = progress + "%";
-
-      if (ySub) {
-        const missing = Math.max(0, yearGoal - yearBalance);
-        ySub.textContent = missing === 0
-          ? "Meta anual lograda 🚀"
-          : `Faltan $${missing}`;
-      }
-    } catch (e) {
-      console.log("year patch", e);
-    }
-  };
-}, 0);
-
 </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
