@@ -4445,50 +4445,6 @@ setTimeout(initializeAIChat, 300);
     }
   }
 
-  window.openYearGoalPrompt = function () {
-    const currentGoal = window.getYearGoalPersistent();
-    const input = window.prompt("Define tu meta anual de ahorro", String(Math.round(currentGoal)));
-    if (input === null) return;
-
-    const value = parseAmount(input);
-    if (!Number.isFinite(value) || value <= 0) {
-      window.alert("Ingresa un número válido.");
-      return;
-    }
-
-    // Guardamos en ambas llaves por compatibilidad con versiones previas
-    localStorage.setItem("lumenssaveYearGoal", String(value));
-    localStorage.setItem("yearGoal", String(value));
-
-    try {
-      if (typeof window.updateHeroRetention === "function") {
-        window.updateHeroRetention();
-      } else {
-        renderYearGoalUI();
-      }
-    } catch (_) {
-      renderYearGoalUI();
-    }
-  };
-
-  // Extensión segura del render existente
-  const originalUpdateHeroRetention = window.updateHeroRetention;
-  if (typeof originalUpdateHeroRetention === "function" && !window.__yearGoalPatched) {
-    window.updateHeroRetention = function () {
-      const result = originalUpdateHeroRetention.apply(this, arguments);
-      renderYearGoalUI();
-      return result;
-    };
-    window.__yearGoalPatched = true;
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    renderYearGoalUI();
-  });
-
-  setTimeout(renderYearGoalUI, 300);
-  setTimeout(renderYearGoalUI, 1200);
-})();
 </script>
 
 <!-- 🔥 CORE (AQUÍ EXACTO) -->
