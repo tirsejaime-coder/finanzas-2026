@@ -4452,56 +4452,7 @@ setTimeout(initializeAIChat, 300);
 
 <script>
 // ===== CATEGORÍAS COLAPSABLES (SEGURO, SIN TOCAR IA) =====
-(function () {
-  const STORAGE_KEY = "lumenssaveCategoriesExpanded";
 
-  function applyCategoryToggleUI() {
-    const manager = document.getElementById("categoryManager");
-    if (!manager) return;
-
-    let toggleBtn = document.getElementById("categoryManagerToggle");
-    if (!toggleBtn) {
-      toggleBtn = document.createElement("button");
-      toggleBtn.id = "categoryManagerToggle";
-      toggleBtn.type = "button";
-      toggleBtn.style.width = "100%";
-      toggleBtn.style.marginTop = "14px";
-      toggleBtn.style.marginBottom = "10px";
-      toggleBtn.style.padding = "12px 14px";
-      toggleBtn.style.borderRadius = "12px";
-      toggleBtn.style.border = "1px solid #d1d5db";
-      toggleBtn.style.background = "#f9fafb";
-      toggleBtn.style.color = "#111827";
-      toggleBtn.style.fontWeight = "700";
-      toggleBtn.style.fontSize = "0.95rem";
-      toggleBtn.style.cursor = "pointer";
-      toggleBtn.style.textAlign = "left";
-      toggleBtn.style.boxShadow = "0 1px 2px rgba(0,0,0,0.03)";
-      manager.parentNode.insertBefore(toggleBtn, manager);
-    }
-
-    const expanded = localStorage.getItem(STORAGE_KEY) === "1";
-    manager.style.display = expanded ? "block" : "none";
-    toggleBtn.textContent = expanded
-      ? "⚙️ Gestionar categorías — ocultar"
-      : "⚙️ Gestionar categorías — mostrar";
-
-    toggleBtn.onclick = function () {
-      const isOpen = manager.style.display !== "none";
-      manager.style.display = isOpen ? "none" : "block";
-      localStorage.setItem(STORAGE_KEY, isOpen ? "0" : "1");
-      toggleBtn.textContent = isOpen
-        ? "⚙️ Gestionar categorías — mostrar"
-        : "⚙️ Gestionar categorías — ocultar";
-    };
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    applyCategoryToggleUI();
-    setTimeout(applyCategoryToggleUI, 300);
-    setTimeout(applyCategoryToggleUI, 1200);
-  });
-})();
 </script> 
 
 </body>
