@@ -1506,67 +1506,6 @@ function getYearGoalSafe(){
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const CURRENT_YEAR = new Date().getFullYear();
-
-    const monthNamesEs = [
-      "Enero","Febrero","Marzo","Abril","Mayo","Junio",
-      "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
-    ];
-
-    const monthNamesEn = [
-      "January","February","March","April","May","June",
-      "July","August","September","October","November","December"
-    ];
-
-    const DEFAULT_CATEGORIES = [
-      { name: "Alimentos", type: "expense" },
-      { name: "Renta", type: "expense" },
-      { name: "Servicios", type: "expense" },
-      { name: "Auto", type: "expense" },
-      { name: "Entretenimiento", type: "expense" },
-      { name: "Otros", type: "expense" },
-      { name: "Salario", type: "income" },
-      { name: "Freelance", type: "income" }
-    ];
-
-    const DEFAULT_CATEGORY_TRANSLATIONS = {
-      Alimentos: { es: "Alimentos", en: "Food" },
-      Renta: { es: "Renta", en: "Rent" },
-      Servicios: { es: "Servicios", en: "Bills" },
-      Auto: { es: "Auto", en: "Car" },
-      Entretenimiento: { es: "Entretenimiento", en: "Entertainment" },
-      Otros: { es: "Otros", en: "Other" },
-      Salario: { es: "Salario", en: "Salary" },
-      Freelance: { es: "Freelance", en: "Freelance" }
-    };
-
-    let userCategories = [];
-    let unsubscribeCategories = null;
-
-    let language = localStorage.getItem("financeLang") || "es";
-    let isProUser = false;
-    let transactions = [];
-   Object.defineProperty(window, "transactions", {
-  get() {
-    return transactions;
-  },
-  set(val) {
-    transactions = Array.isArray(val) ? val : [];
-  }
-});
-    let currentView = "input";
-    let currentMonth = null;
-    let selectedExportOption = "year";
-    let currentUser = null;
-    let unsubscribeTransactions = null;
-    let unsubscribeUserProfile = null;
-    let syncTimeout = null;
-    let currentPlan = "free";
-    const PRO_TRIAL_DAYS = 60;
-    
-    const STRIPE_SUCCESS_PARAM = "success";
-    const STRIPE_CANCEL_PARAM = "cancel";
-    const DEFAULT_MONTHLY_SAVINGS_GOAL = 500;
 
     function getSavingsGoal() {
       const raw = parseFloat(localStorage.getItem("lumenssaveSavingsGoal") || DEFAULT_MONTHLY_SAVINGS_GOAL);
