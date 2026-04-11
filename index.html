@@ -2532,48 +2532,6 @@ transactions.forEach(tx => {
       return { categoryTotals, totalProfit };
     }
 
-    google.charts.load("current", { packages: ["corechart"] });
-    google.charts.setOnLoadCallback(drawCategoryChart);
-
-    function drawCategoryChart() {
-      updateDashboard();
-  updateCurrentDateDisplay();
-      if (!window.google || !google.visualization) return;
-
-      const { categoryTotals, totalProfit } = computeCategoryData();
-      const data = new google.visualization.DataTable();
-      data.addColumn("string", "Categoría");
-      data.addColumn("number", "Monto");
-
-      Object.keys(categoryTotals).forEach(key => {
-        const value = categoryTotals[key];
-        if (value > 0) data.addRow([getCategoryLabel(key), value]);
-      });
-
-      if (totalProfit > 0) {
-        data.addRow([language === "es" ? "Ganancia Neta" : "Net Profit", totalProfit]);
-      }
-
-      const el = document.getElementById("piechart_3d");
-      if (data.getNumberOfRows() === 0) {
-        el.innerHTML = "";
-        return;
-      }
-
-      const options = {
-        title: language === "es"
-          ? "Gastos por categoría vs ganancias"
-          : "Expenses by category vs profit",
-        is3D: true,
-        legend: { position: "left", alignment: "center", textStyle: { fontSize: 9 } },
-        chartArea: { left: 80, top: 25, width: "70%", height: "70%" },
-        backgroundColor: "transparent"
-      };
-
-      const chart = new google.visualization.PieChart(el);
-      chart.draw(data, options);
-    }
-
     function calculateYearData() {
       const yearData = [];
 
