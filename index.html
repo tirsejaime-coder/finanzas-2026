@@ -4483,35 +4483,33 @@ setTimeout(initializeAIChat, 300);
     }
   }
 
-  window.openYearGoalPrompt = function () {
-    const currentGoal = window.getYearGoalPersistent();
-    const input = window.prompt("Define tu meta anual de ahorro", String(Math.round(currentGoal)));
-    if (input === null) return;
+ <script>
+window.openYearGoalPrompt = function () {
+  const currentGoal = window.getYearGoalPersistent();
+  const input = window.prompt("Define tu meta anual de ahorro", String(Math.round(currentGoal)));
+  if (input === null) return;
 
-    const value = parseAmount(input);
-    if (!Number.isFinite(value) || value <= 0) {
-      window.alert("Ingresa un número válido.");
-      return;
-    }
+  const value = parseAmount(input);
+  if (!Number.isFinite(value) || value <= 0) {
+    window.alert("Ingresa un número válido.");
+    return;
+  }
 
-    // Guardamos en ambas llaves por compatibilidad con versiones previas
-    localStorage.setItem("lumenssaveYearGoal", String(value));
-    localStorage.setItem("yearGoal", String(value));
+  localStorage.setItem("lumenssaveYearGoal", String(value));
+  localStorage.setItem("yearGoal", String(value));
 
-    try {
-      if (typeof window.updateHeroRetention === "function") {
-        window.updateHeroRetention();
-      } else {
-        renderYearGoalUI();
-      }
-    } catch (_) {
+  try {
+    if (typeof window.updateHeroRetention === "function") {
+      window.updateHeroRetention();
+    } else {
       renderYearGoalUI();
     }
-  };
-  </script>
+  } catch (_) {
+    renderYearGoalUI();
+  }
+};
 
-<script>
-// Extensión segura del render existente
+// Extensión segura
 const originalUpdateHeroRetention = window.updateHeroRetention;
 
 if (typeof originalUpdateHeroRetention === "function" && !window.__yearGoalPatched) {
@@ -4524,27 +4522,19 @@ if (typeof originalUpdateHeroRetention === "function" && !window.__yearGoalPatch
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+
+  // Year Goal
   renderYearGoalUI();
-});
+  setTimeout(renderYearGoalUI, 300);
+  setTimeout(renderYearGoalUI, 1200);
 
-setTimeout(renderYearGoalUI, 300);
-setTimeout(renderYearGoalUI, 1200);
-</script>
-
-<!-- 🔥 CORE -->
-<script src="core/finance-core.js"></script>
-
-<script>
-window.STORAGE_KEY = "lumenssaveCategoriesExpanded";
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+  // Category Toggle UI
   if (typeof window.applyCategoryToggleUI === "function") {
     window.applyCategoryToggleUI();
     setTimeout(window.applyCategoryToggleUI, 300);
     setTimeout(window.applyCategoryToggleUI, 1200);
   }
+
 });
 </script>
 
