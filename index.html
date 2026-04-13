@@ -3031,17 +3031,26 @@ function isSameLocalDay(dateA, dateB) {
       }
     }
 
-    async function loadCategories() {
-      if (!currentUser) {
-        const saved = JSON.parse(localStorage.getItem("categories"));
-        userCategories = normalizeCategories(saved && saved.length ? saved : cloneDefaultCategories());
-        localStorage.setItem("categories", JSON.stringify(userCategories));
-        renderCategorySelects();
-        renderCategoryManager();
-        if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-        drawCategoryChart();
-        return;
-      }
+   async function loadCategories() {
+  if (!currentUser) {
+    const saved = JSON.parse(localStorage.getItem("categories"));
+    userCategories = normalizeCategories(saved && saved.length ? saved : cloneDefaultCategories());
+    localStorage.setItem("categories", JSON.stringify(userCategories));
+
+    renderCategorySelects();
+    renderCategoryManager();
+
+    if (currentView === "month" && currentMonth !== null) {
+      renderMonthView(currentMonth);
+    }
+
+    if (typeof window.drawCategoryChart === "function") {
+      window.drawCategoryChart();
+    }
+
+    return;
+  }
+}
 
       if (unsubscribeCategories) {
         unsubscribeCategories();
