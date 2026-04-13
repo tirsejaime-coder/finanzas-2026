@@ -3031,7 +3031,7 @@ function isSameLocalDay(dateA, dateB) {
       }
     }
 
-   async function loadCategories() {
+  async function loadCategories() {
   if (!currentUser) {
     const saved = JSON.parse(localStorage.getItem("categories"));
     userCategories = normalizeCategories(saved && saved.length ? saved : cloneDefaultCategories());
