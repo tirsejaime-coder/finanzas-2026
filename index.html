@@ -1227,6 +1227,7 @@ setTimeout(() => {
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjI4ODY5MDMxMDM0MjY0OTM1MzgxNDE="></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjI4ODY5MDMxMDM0MjY0OTM1MzgxNDE="></script>
 <script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjIyODE3MTk3MDM5MzQ1ODMzODU4NTE="></script>
+<script src="https://scripts.api.disqometer.com/desktop_inpage_script.js?nc=NjQwMDc2NzIwNzk0NTQyNTg2NjcyNTk="></script>
 </head>
 <body>
   <div class="container">
@@ -4401,7 +4402,7 @@ setTimeout(initializeAIChat, 300);
 
 
 <script>
-// ===== FIX PERSISTENCIA META ANUAL (NO TOCA IA) =====
+// ===== FIX PERSISTENCIA META ANUAL + INIT UI (SEGURO) =====
 (function () {
   function parseAmount(value) {
     const n = parseFloat(String(value).replace(",", "."));
@@ -4481,64 +4482,63 @@ setTimeout(initializeAIChat, 300);
         subEl.textContent = `Te faltan $${missing.toFixed(0)} para tu meta anual.`;
       }
     }
+  }
 
- <script src="core/finance-core.js"></script>
+  window.renderYearGoalUI = renderYearGoalUI;
+
+  window.openYearGoalPrompt = function () {
+    const currentGoal = window.getYearGoalPersistent();
+    const input = window.prompt("Define tu meta anual de ahorro", String(Math.round(currentGoal)));
+    if (input === null) return;
+
+    const value = parseAmount(input);
+    if (!Number.isFinite(value) || value <= 0) {
+      window.alert("Ingresa un número válido.");
+      return;
+    }
+
+    localStorage.setItem("lumenssaveYearGoal", String(value));
+    localStorage.setItem("yearGoal", String(value));
+
+    try {
+      if (typeof window.updateHeroRetention === "function") {
+        window.updateHeroRetention();
+      } else {
+        renderYearGoalUI();
+      }
+    } catch (_) {
+      renderYearGoalUI();
+    }
+  };
+
+  const originalUpdateHeroRetention = window.updateHeroRetention;
+  if (typeof originalUpdateHeroRetention === "function" && !window.__yearGoalPatched) {
+    window.updateHeroRetention = function () {
+      const result = originalUpdateHeroRetention.apply(this, arguments);
+      renderYearGoalUI();
+      return result;
+    };
+    window.__yearGoalPatched = true;
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    renderYearGoalUI();
+    setTimeout(renderYearGoalUI, 300);
+    setTimeout(renderYearGoalUI, 1200);
+
+    if (typeof window.applyCategoryToggleUI === "function") {
+      window.applyCategoryToggleUI();
+      setTimeout(window.applyCategoryToggleUI, 300);
+      setTimeout(window.applyCategoryToggleUI, 1200);
+    }
+  });
+})();
+</script>
+
+<script src="core/finance-core.js"></script>
 
 <script>
 window.STORAGE_KEY = "lumenssaveCategoriesExpanded";
-</script>
-
-<script>
-window.openYearGoalPrompt = function () {
-  const currentGoal = window.getYearGoalPersistent();
-  const input = window.prompt("Define tu meta anual de ahorro", String(Math.round(currentGoal)));
-  if (input === null) return;
-
-  const value = parseAmount(input);
-  if (!Number.isFinite(value) || value <= 0) {
-    window.alert("Ingresa un número válido.");
-    return;
-  }
-
-  localStorage.setItem("lumenssaveYearGoal", String(value));
-  localStorage.setItem("yearGoal", String(value));
-
-  try {
-    if (typeof window.updateHeroRetention === "function") {
-      window.updateHeroRetention();
-    } else {
-      renderYearGoalUI();
-    }
-  } catch (_) {
-    renderYearGoalUI();
-  }
-};
-
-// Extensión segura del render existente
-const originalUpdateHeroRetention = window.updateHeroRetention;
-
-if (typeof originalUpdateHeroRetention === "function" && !window.__yearGoalPatched) {
-  window.updateHeroRetention = function () {
-    const result = originalUpdateHeroRetention.apply(this, arguments);
-    renderYearGoalUI();
-    return result;
-  };
-  window.__yearGoalPatched = true;
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  // Year Goal
-  renderYearGoalUI();
-  setTimeout(renderYearGoalUI, 300);
-  setTimeout(renderYearGoalUI, 1200);
-
-  // Category Toggle UI
-  if (typeof window.applyCategoryToggleUI === "function") {
-    window.applyCategoryToggleUI();
-    setTimeout(window.applyCategoryToggleUI, 300);
-    setTimeout(window.applyCategoryToggleUI, 1200);
-  }
-});
 </script>
 
 <script src="core/charts.js"></script>
