@@ -3058,17 +3058,26 @@ function isSameLocalDay(dateA, dateB) {
       }
 
       await seedDefaultCategoriesToFirestore();
-      const colRef = collection(db, "users", currentUser.uid, "categories");
+const colRef = collection(db, "users", currentUser.uid, "categories");
 
-      unsubscribeCategories = onSnapshot(colRef, (snapshot) => {
-        userCategories = normalizeCategories(snapshot.docs.map(docItem => ({ id: docItem.id, ...docItem.data() })));
-        renderCategorySelects();
-        renderCategoryManager();
-        if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-        drawCategoryChart();
-      }, (error) => {
-        console.error("Error loading categories:", error);
-      });
+unsubscribeCategories = onSnapshot(colRef, (snapshot) => {
+  userCategories = normalizeCategories(
+    snapshot.docs.map(docItem => ({ id: docItem.id, ...docItem.data() }))
+  );
+
+  renderCategorySelects();
+  renderCategoryManager();
+
+  if (currentView === "month" && currentMonth !== null) {
+    renderMonthView(currentMonth);
+  }
+
+  if (typeof window.drawCategoryChart === "function") {
+    window.drawCategoryChart();
+  }
+}, (error) => {
+  console.error("Error loading categories:", error);
+});
     }
 
     async function saveCategoryToStorage(category) {
