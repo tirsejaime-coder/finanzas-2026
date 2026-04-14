@@ -4414,67 +4414,84 @@ setTimeout(initializeAIChat, 300);
     }
   }
 
-  window.renderYearGoalUI = renderYearGoalUI;
+ window.renderYearGoalUI = renderYearGoalUI;
 
-  window.openYearGoalPrompt = function () {
-    const currentGoal = window.getYearGoalPersistent();
-    const input = window.prompt("Define tu meta anual de ahorro", String(Math.round(currentGoal)));
-    if (input === null) return;
+window.openYearGoalPrompt = function () {
+  const currentGoal = window.getYearGoalPersistent();
+  const input = window.prompt("Define tu meta anual de ahorro", String(Math.round(currentGoal)));
+  if (input === null) return;
 
-    const value = parseAmount(input);
-    if (!Number.isFinite(value) || value <= 0) {
-      window.alert("Ingresa un número válido.");
-      return;
-    }
-
-    localStorage.setItem("lumenssaveYearGoal", String(value));
-    localStorage.setItem("yearGoal", String(value));
-
-    try {
-      if (typeof window.updateHeroRetention === "function") {
-        window.updateHeroRetention();
-      } else {
-        renderYearGoalUI();
-      }
-    } catch (_) {
-      renderYearGoalUI();
-    }
-  };
-
-  const originalUpdateHeroRetention = window.updateHeroRetention;
-  if (typeof originalUpdateHeroRetention === "function" && !window.__yearGoalPatched) {
-    window.updateHeroRetention = function () {
-      const result = originalUpdateHeroRetention.apply(this, arguments);
-      renderYearGoalUI();
-      return result;
-    };
-    window.__yearGoalPatched = true;
+  const value = parseAmount(input);
+  if (!Number.isFinite(value) || value <= 0) {
+    window.alert("Ingresa un número válido.");
+    return;
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    renderYearGoalUI();
-    setTimeout(renderYearGoalUI, 300);
-    setTimeout(renderYearGoalUI, 1200);
+  localStorage.setItem("lumenssaveYearGoal", String(value));
+  localStorage.setItem("yearGoal", String(value));
 
-    if (typeof window.applyCategoryToggleUI === "function") {
-      window.applyCategoryToggleUI();
-      setTimeout(window.applyCategoryToggleUI, 300);
-      setTimeout(window.applyCategoryToggleUI, 1200);
+  try {
+    if (typeof window.updateHeroRetention === "function") {
+      window.updateHeroRetention();
+    } else {
+      renderYearGoalUI();
     }
-  });
+  } catch (_) {
+    renderYearGoalUI();
+  }
+};
+
+const originalUpdateHeroRetention = window.updateHeroRetention;
+if (typeof originalUpdateHeroRetention === "function" && !window.__yearGoalPatched) {
+  window.updateHeroRetention = function () {
+    const result = originalUpdateHeroRetention.apply(this, arguments);
+    renderYearGoalUI();
+    return result;
+  };
+  window.__yearGoalPatched = true;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  renderYearGoalUI();
+  setTimeout(renderYearGoalUI, 300);
+  setTimeout(renderYearGoalUI, 1200);
+
+  if (typeof window.applyCategoryToggleUI === "function") {
+    window.applyCategoryToggleUI();
+    setTimeout(window.applyCategoryToggleUI, 300);
+    setTimeout(window.applyCategoryToggleUI, 1200);
+  }
+});
 })();
 </script>
 
-<script src="core/finance-core.js"></script>
-
+<!-- ========================= -->
+<!-- 🔥 CONFIG GLOBAL -->
+<!-- ========================= -->
 <script>
 window.STORAGE_KEY = "lumenssaveCategoriesExpanded";
 </script>
 
+<!-- ========================= -->
+<!-- 🔥 SCRIPTS (ORDEN CRÍTICO) -->
+<!-- ========================= -->
+
+<!-- CORE -->
+<script src="core/state.js"></script>
+<script src="core/dates.js"></script>
+
+<!-- FEATURES -->
+<script src="features/categories.js"></script>
+
+<!-- CORE LOGIC -->
 <script src="core/finance-core.js"></script>
-<script src="core/app.js"></script>
-<script src="core/charts.js"></script>
-<script src="core/ui.js"></script>
+
+<!-- UI -->
+<script src="ui/charts.js"></script>
+<script src="ui/ui.js"></script>
+
+<!-- APP -->
+<script src="app.js"></script>
 
 </body>
 </html>
