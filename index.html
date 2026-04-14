@@ -6,79 +6,192 @@
   <title>LumensSave - Smart Finance Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- ========================= -->
+  <!-- 📦 LIBRERÍAS -->
+  <!-- ========================= -->
+
   <!-- jsPDF / AutoTable / XLSX -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-// SAFE YEAR GOAL (NON BREAKING)
-function getYearGoalSafe(){
-  const saved = localStorage.getItem("yearGoal");
-  if(saved) return Number(saved);
-  return getSavingsGoal()*12;
-}
-
-window.openYearGoalPrompt = function(){
-  const current = getYearGoalSafe();
-  const input = prompt("Meta anual:", current);
-  if(input===null) return;
-
-  const val = Number(input);
-  if(isNaN(val) || val<=0){
-    alert("Valor inválido");
-    return;
-  }
-
-  localStorage.setItem("yearGoal", val);
-
-  if(typeof updateHeroRetention==="function"){
-    updateHeroRetention();
-  }
-};
-
-
-// PATCH YEAR RENDER (SAFE EXTENSION)
-setTimeout(() => {
-  const original = window.updateHeroRetention;
-  if (!original) return;
-
-  window.updateHeroRetention = function () {
-    original.apply(this, arguments);
-
-    try {
-      const yVal = document.getElementById("yearGoalValue");
-      const yBar = document.getElementById("yearGoalProgressFill");
-      const ySub = document.getElementById("yearGoalSubtext");
-
-      if (!yVal) return;
-
-      const yearGoal = getYearGoalSafe();
-      const yearBalance = getCurrentMonthBalance() * 12;
-
-      yVal.textContent = `$${yearBalance.toFixed(0)} / $${yearGoal}`;
-
-      const progress = Math.min(100, (yearBalance / yearGoal) * 100);
-
-      if (yBar) yBar.style.width = progress + "%";
-
-      if (ySub) {
-        const missing = Math.max(0, yearGoal - yearBalance);
-        ySub.textContent = missing === 0
-          ? "Meta anual lograda 🚀"
-          : `Faltan $${missing}`;
-      }
-    } catch (e) {
-      console.log("year patch", e);
-    }
-  };
-}, 0);
-
-</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+  <!-- ========================= -->
+  <!-- 🧠 CONFIG / PATCHES -->
+  <!-- ========================= -->
+
+  <script>
+  // SAFE YEAR GOAL (NON BREAKING)
+  function getYearGoalSafe(){
+    const saved = localStorage.getItem("yearGoal");
+    if(saved) return Number(saved);
+    return getSavingsGoal()*12;
+  }
+
+  window.openYearGoalPrompt = function(){
+    const current = getYearGoalSafe();
+    const input = prompt("Meta anual:", current);
+    if(input===null) return;
+
+    const val = Number(input);
+    if(isNaN(val) || val<=0){
+      alert("Valor inválido");
+      return;
+    }
+
+    localStorage.setItem("yearGoal", val);
+
+    if(typeof updateHeroRetention==="function"){
+      updateHeroRetention();
+    }
+  };
+
+  // PATCH YEAR RENDER
+  setTimeout(() => {
+    const original = window.updateHeroRetention;
+    if (!original) return;
+
+    window.updateHeroRetention = function () {
+      original.apply(this, arguments);
+
+      try {
+        const yVal = document.getElementById("yearGoalValue");
+        const yBar = document.getElementById("yearGoalProgressFill");
+        const ySub = document.getElementById("yearGoalSubtext");
+
+        if (!yVal) return;
+
+        const yearGoal = getYearGoalSafe();
+        const yearBalance = getCurrentMonthBalance() * 12;
+
+        yVal.textContent = `$${yearBalance.toFixed(0)} / $${yearGoal}`;
+
+        const progress = Math.min(100, (yearBalance / yearGoal) * 100);
+
+        if (yBar) yBar.style.width = progress + "%";
+
+        if (ySub) {
+          const missing = Math.max(0, yearGoal - yearBalance);
+          ySub.textContent = missing === 0
+            ? "Meta anual lograda 🚀"
+            : `Faltan $${missing}`;
+        }
+      } catch (e) {
+        console.log("year patch", e);
+      }
+    };
+  }, 0);
+  </script>
+
+  <!-- ========================= -->
+  <!-- 🎨 ESTILOS -->
+  <!-- ========================= -->
+
   <style>
+
+  /* ===== TU CSS ACTUAL (NO BORRAR) ===== */
+  /* (Aquí ya tienes dashboard-hero, botones, etc) */
+
+
+  /* ========================= */
+  /* 🚀 NUEVO LAYOUT PRO (SIDEBAR READY) */
+  /* ========================= */
+
+  .app-shell {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+    gap: 20px;
+  }
+
+  .sidebar {
+    background: #0f172a;
+    color: white;
+    border-radius: 20px;
+    padding: 20px 16px;
+    position: sticky;
+    top: 20px;
+    height: calc(100vh - 40px);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .sidebar-logo {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.1);
+    font-size: 1.2rem;
+  }
+
+  .sidebar-title {
+    font-weight: 800;
+    font-size: 1rem;
+  }
+
+  .sidebar-subtitle {
+    font-size: 0.78rem;
+    color: #94a3b8;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .sidebar-link {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: #cbd5e1;
+    text-align: left;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .sidebar-link:hover,
+  .sidebar-link.active {
+    background: rgba(59,130,246,0.18);
+    color: white;
+  }
+
+  .main-panel {
+    min-width: 0;
+  }
+
+  .app-view {
+    display: none;
+  }
+
+  .app-view.active {
+    display: block;
+  }
+
+  .panel-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+
+  </style>
+
+</head>
     :root {
       --color-bg-primary: #f4f6f9;
       --color-surface: #ffffff;
