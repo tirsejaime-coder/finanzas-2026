@@ -1597,14 +1597,6 @@ setTimeout(() => {
     };
 
     let userCategories = [];
-    Object.defineProperty(window, "userCategories", {
-  get() {
-    return userCategories;
-  },
-  set(val) {
-    userCategories = Array.isArray(val) ? val : [];
-  }
-});
     let unsubscribeCategories = null;
 
     let language = localStorage.getItem("financeLang") || "es";
@@ -1859,10 +1851,8 @@ setTimeout(() => {
     }
 
     function getCategoriesByType(type) {
-  return userCategories.filter(category => category.type === type);
-}
-
-window.getCategoriesByType = getCategoriesByType;
+      return userCategories.filter(category => category.type === type);
+    }
 
     function getTranslatedCategoryName(name) {
       const found = DEFAULT_CATEGORY_TRANSLATIONS[name];
@@ -4542,7 +4532,9 @@ setTimeout(initializeAIChat, 300);
     }
   });
 })();
+</script>
 
+<script src="core/finance-core.js"></script>
 
 <script>
 window.STORAGE_KEY = "lumenssaveCategoriesExpanded";
