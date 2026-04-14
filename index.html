@@ -1663,22 +1663,6 @@ setTimeout(() => {
       return streak;
     }
 
-    function getCurrentMonthBalance() {
-  const now = new Date();
-  let income = 0;
-  let expense = 0;
-
-  transactions.forEach(tx => {
-    const d = parseLocalDate(tx.date);
-    if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
-      if (tx.type === "income") income += Number(tx.amount) || 0;
-      if (tx.type === "expense") expense += Number(tx.amount) || 0;
-    }
-  });
-
-  return income - expense;
-}
-
     function loadAdsIfNeeded() {
       if (isProUser) return;
       if (document.getElementById("ads-script-main")) return;
@@ -2505,59 +2489,6 @@ transactions.forEach(tx => {
 
       insightEl.textContent = generateInsights(income, expense, balance, expenseByCategory);
       updateHeroRetention(balance);
-    }
-
-    function computeCategoryData() {
-      const categoryTotals = {};
-      getCategoriesByType("expense").forEach(c => {
-        categoryTotals[c.name] = 0;
-      });
-      let totalIncome = 0;
-
-      transactions.forEach(tx => {
-        const d = parseLocalDate(tx.date);
-        if (d.getFullYear() === CURRENT_YEAR) {
-          if (tx.type === "expense") {
-            const key = tx.category || "Otros";
-            if (!categoryTotals[key]) categoryTotals[key] = 0;
-            categoryTotals[key] += tx.amount;
-          } else if (tx.type === "income") {
-            totalIncome += tx.amount;
-          }
-        }
-      });
-
-      const totalExpenses = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
-      const totalProfit = totalIncome - totalExpenses;
-
-      return { categoryTotals, totalProfit };
-    }
-
-    function calculateYearData() {
-      const yearData = [];
-
-      for (let m = 0; m < 12; m++) {
-        let income = 0;
-        let expense = 0;
-
-        transactions.forEach(tx => {
-          const d = parseLocalDate(tx.date);
-          if (d.getMonth() === m && d.getFullYear() === CURRENT_YEAR) {
-            const amount = Number(tx.amount) || 0;
-
-if (tx.type === "income") income += amount;
-if (tx.type === "expense") expense += amount;
-          }
-        });
-
-        yearData.push({
-          income,
-          expense,
-          profit: income - expense
-        });
-      }
-
-      return yearData;
     }
 
     
