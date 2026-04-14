@@ -1268,163 +1268,149 @@ setTimeout(() => {
 
     <div id="view-input" class="view active">
 
-  <!-- 🔥 HERO DASHBOARD (NUEVO) -->
-<div class="dashboard-hero">
+  <!-- 🔥 HERO DASHBOARD -->
+  <div class="dashboard-hero">
 
-  <div class="hero-balance">
-  <div id="balanceAmount" class="hero-amount">$0</div>
-  <div class="hero-label">Balance actual</div>
-
-  <!-- 🆕 FECHA ACTUAL -->
-  <div id="currentDateDisplay" style="margin-top:6px; font-size:0.85rem; opacity:0.7;"></div>
-</div>
-
-  <div class="hero-stats">
-    <div class="hero-card income">
-      <div id="incomeAmount" class="hero-value">$0</div>
-      <div>Ingresos</div>
+    <div class="hero-balance">
+      <div id="balanceAmount" class="hero-amount">$0</div>
+      <div class="hero-label">Balance actual</div>
+      <div id="currentDateDisplay" style="margin-top:6px;font-size:0.85rem;opacity:0.7;"></div>
     </div>
 
-    <div class="hero-card expense">
-      <div id="expenseAmount" class="hero-value">$0</div>
-      <div>Gastos</div>
+    <div class="hero-stats">
+      <div class="hero-card income">
+        <div id="incomeAmount" class="hero-value">$0</div>
+        <div>Ingresos</div>
+      </div>
+
+      <div class="hero-card expense">
+        <div id="expenseAmount" class="hero-value">$0</div>
+        <div>Gastos</div>
+      </div>
+
+      <div class="hero-card profit">
+        <div id="profitAmount" class="hero-value">$0</div>
+        <div>Ahorro</div>
+      </div>
     </div>
 
-    <div class="hero-card profit">
-      <div id="profitAmount" class="hero-value">$0</div>
-      <div>Ahorro</div>
-    </div>
-  </div>
-
-  <div id="insightBox" class="hero-insight">
-    🧠 Cargando análisis...
-  </div>
-
-  <div class="hero-meta">
-    <div class="hero-mini-card">
-      <div class="hero-mini-label" id="streakLabel">Racha activa</div>
-      <div class="hero-mini-value" id="streakValue">0 días</div>
-      <div class="hero-mini-subtext" id="streakSubtext">Empieza hoy y crea el hábito.</div>
+    <div id="insightBox" class="hero-insight">
+      🧠 Cargando análisis...
     </div>
 
-    <div class="hero-mini-card">
-      <div class="hero-mini-label" id="goalLabel">Meta de ahorro</div>
-      <div class="hero-mini-value" id="goalValue">$0 / $500</div>
-      <div class="progress-row">
+    <div class="hero-meta">
+      <div class="hero-mini-card">
+        <div class="hero-mini-label">Racha activa</div>
+        <div id="streakValue" class="hero-mini-value">0 días</div>
+        <div id="streakSubtext" class="hero-mini-subtext">Empieza hoy.</div>
+      </div>
+
+      <div class="hero-mini-card">
+        <div class="hero-mini-label">Meta de ahorro</div>
+        <div id="goalValue" class="hero-mini-value">$0 / $500</div>
+
         <div class="progress-bar">
           <div id="goalProgressFill" class="progress-fill"></div>
         </div>
-      </div>
-      <div class="hero-mini-subtext" id="goalSubtext">Define una meta y sigue tu progreso.</div>
-      <button type="button" class="hero-action-link" id="goalActionButton" onclick="openSavingsGoalPrompt()">✏️ Ajustar meta mensual</button>
 
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">
-        <div class="hero-mini-label" style="font-size:0.72rem;opacity:0.7;">Anual</div>
-        <div class="hero-mini-value" id="yearGoalValue">$0 / $6000</div>
-        <div class="progress-row">
-          <div class="progress-bar">
-            <div id="yearGoalProgressFill" class="progress-fill"></div>
-          </div>
-        </div>
-        <div class="hero-mini-subtext" id="yearGoalSubtext"></div>
-        <button class="hero-action-link" onclick="openYearGoalPrompt()">✏️ Ajustar meta anual</button>
+        <div id="goalSubtext" class="hero-mini-subtext"></div>
+        <button class="hero-action-link" onclick="openSavingsGoalPrompt()">✏️ Ajustar meta</button>
       </div>
+    </div>
+
+  </div>
+
+  <!-- 📊 PANEL DE ANALYTICS (MEJORADO) -->
+  <div style="margin-top:24px; display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(320px,1fr));">
+
+    <!-- 📈 GRÁFICA -->
+    <div style="background:white; padding:16px; border-radius:12px; border:1px solid #e5e7eb;">
+      <h3 style="margin-top:0;">📈 Evolución mensual</h3>
+      <div id="trend_chart" style="height:280px;"></div>
+    </div>
+
+    <!-- 🧠 INSIGHTS -->
+    <div style="background:white; padding:16px; border-radius:12px; border:1px solid #e5e7eb;">
+      <h3 style="margin-top:0;">🧠 Insights inteligentes</h3>
+      <div id="insights_box" style="font-size:0.9rem; color:#374151;">
+        Cargando análisis...
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ⚡ QUICK ADD -->
+  <div class="quick-add-box">
+    <input
+      id="quickInput"
+      placeholder="Ej: 50 comida; 2000 salario; 30 uber"
+      onkeyup="handleQuickAdd(event)"
+      class="quick-add-input"
+    />
+    <div class="quick-add-helper">
+      Escribe varios movimientos separados por ; y presiona Enter.
     </div>
   </div>
 
-</div>
-
-      <!-- 🚀 DASHBOARD PRO (NUEVO) -->
-<div style="margin-top:20px;">
-  <h3>📈 Evolución mensual</h3>
-  <div id="trend_chart" style="height:300px;"></div>
-</div>
-
-<div style="margin-top:20px;">
-  <h3>🧠 Insights</h3>
-  <div id="insights_box"></div>
-</div>
-
-      
-      <!-- ⚡ QUICK ADD INTELIGENTE -->
-      <div class="quick-add-box">
-        <input
-          id="quickInput"
-          placeholder="Ej: 50 comida; 2000 salario; 30 uber"
-          onkeyup="handleQuickAdd(event)"
-          class="quick-add-input"
-        />
-        <div class="quick-add-helper" id="quickAddHelper">Escribe varios movimientos separados por ; y presiona Enter.</div>
-      </div>
-
-<form class="quick-form" onsubmit="saveTransaction(event)" style="display:none;">
-
-        <div class="field">
-  <label for="date" id="labelDate">Fecha</label>
-  <input type="date" id="date" required />
-</div>
-
-<div class="field">
-  <label for="type" id="labelType">Tipo</label>
-  <select id="type">
-    <option value="income" id="optIncome">Ingreso</option>
-    <option value="expense" id="optExpense">Gasto</option>
-  </select>
-</div>
-
-<div class="field">
-  <label for="amount" id="labelAmount">Monto ($)</label>
-  <input type="number" id="amount" step="0.01" placeholder="0.00" required />
-</div>
-
-<div class="field">
-  <label for="category" id="labelCategory">Categoría</label>
-  <select id="category"></select>
-</div>
-
-        <div class="field" style="justify-content:flex-end;">
-          <label>&nbsp;</label>
-          <button type="submit" class="btn btn-primary" id="btnSave">💾 Guardar</button>
-        </div>
-      </form>
-
-      <div class="category-manager" id="categoryManager"></div>
-
-      <div class="buttons-row">
-        <button class="btn btn-secondary" onclick="checkExportAccess()" id="btnExport">📥 Exportar Datos</button>
-        <button class="btn btn-outline" onclick="window.print()" id="btnPrint">🖨 Imprimir</button>
-        <button class="btn btn-danger" onclick="clearData()" id="btnClear">🗑 Borrar datos</button>
-      </div>
-
-      <div class="plans-wrapper" id="plansWrapper">
-        <div class="plan-box">
-          <div class="plan-title" id="freePlanTitle">Plan gratuito</div>
-          <div class="plan-price" id="freePlanPrice">0 USD / mes</div>
-          <ul class="plan-features" id="freePlanFeatures">
-            <li>Uso sin registro (datos guardados solo en tu navegador).</li>
-            <li>Control de ingresos y gastos del año actual.</li>
-            <li>Gráficas e impresión gratuita.</li>
-            <li>Publicidad discreta dentro de la app.</li>
-          </ul>
-        </div>
-
-        <div class="plan-box">
-          <div class="plan-title" id="proPlanTitle">Plan PRO</div>
-          <div class="plan-price" id="proPlanPrice">4,99 USD / mes</div>
-          <ul class="plan-features" id="proPlanFeatures">
-            <li>Años ilimitados de historial financiero.</li>
-            <li>Copias de seguridad automáticas semanales en la nube.</li>
-            <li>Acceso desde varios dispositivos con tu cuenta.</li>
-            <li>Uso sin anuncios.</li>
-            <li>Prioridad en nuevas funciones y soporte.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="ad-slot" id="adSlot1">
-        Aquí va tu código de anuncios (AdSense / Monetag)
-      </div>
+  <!-- FORM OCULTO -->
+  <form class="quick-form" onsubmit="saveTransaction(event)" style="display:none;">
+    <div class="field">
+      <label>Fecha</label>
+      <input type="date" id="date" required />
     </div>
+
+    <div class="field">
+      <label>Tipo</label>
+      <select id="type">
+        <option value="income">Ingreso</option>
+        <option value="expense">Gasto</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Monto</label>
+      <input type="number" id="amount" step="0.01" required />
+    </div>
+
+    <div class="field">
+      <label>Categoría</label>
+      <select id="category"></select>
+    </div>
+
+    <div class="field">
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+  </form>
+
+  <!-- CATEGORÍAS -->
+  <div class="category-manager" id="categoryManager"></div>
+
+  <!-- BOTONES -->
+  <div class="buttons-row">
+    <button class="btn btn-secondary" onclick="checkExportAccess()">📥 Exportar</button>
+    <button class="btn btn-outline" onclick="window.print()">🖨 Imprimir</button>
+    <button class="btn btn-danger" onclick="clearData()">🗑 Borrar</button>
+  </div>
+
+  <!-- PLANES -->
+  <div class="plans-wrapper" id="plansWrapper">
+    <div class="plan-box">
+      <div class="plan-title">Plan gratuito</div>
+      <div class="plan-price">0 USD / mes</div>
+    </div>
+
+    <div class="plan-box">
+      <div class="plan-title">Plan PRO</div>
+      <div class="plan-price">4.99 USD / mes</div>
+    </div>
+  </div>
+
+  <!-- ADS -->
+  <div class="ad-slot" id="adSlot1">
+    Aquí va tu publicidad
+  </div>
+
+</div>
 
     <div id="view-year" class="view">
       <div class="year-grid" id="yearGrid"></div>
