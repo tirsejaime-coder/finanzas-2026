@@ -2740,35 +2740,68 @@ function updateDashboard() {
   const expense = ctx.expense;
   const balance = ctx.balance;
 
-  // ⚠️ mantenemos esto porque generateInsights lo usa
+  // =========================
+  // 📊 AGRUPACIÓN POR CATEGORÍA
+  // =========================
   const expenseByCategory = {};
 
   transactions.forEach(tx => {
     const amount = Number(tx.amount) || 0;
+
     if (tx.type === "expense") {
       const key = tx.category || "Otros";
       expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
     }
   });
 
-  // 💰 UI
+  // =========================
+  // 💰 UI PRINCIPAL
+  // =========================
   incomeEl.textContent = `$${income.toFixed(2)}`;
   expenseEl.textContent = `$${expense.toFixed(2)}`;
   profitEl.textContent = `$${balance.toFixed(2)}`;
   balanceEl.textContent = `$${balance.toFixed(2)}`;
 
-  // 🧠 Insight básico (el tuyo)
-  insightEl.textContent = generateInsights(income, expense, balance, expenseByCategory);
+  // =========================
+  // 🧠 INSIGHTS
+  // =========================
+  if (typeof generateInsights === "function") {
+    insightEl.textContent = generateInsights(
+      income,
+      expense,
+      balance,
+      expenseByCategory
+    );
+  }
 
-  // 🎯 Retención / metas
-  updateHeroRetention(balance);
+  // =========================
+  // 🎯 METAS / RETENCIÓN
+  // =========================
+  if (typeof updateHeroRetention === "function") {
+    updateHeroRetention(balance);
+  }
 
-  // 🔥 NUEVO: dashboard PRO (gráfica + insights avanzados)
-  if (window.renderDashboardPro) {
+  // =========================
+  // 🔥 DASHBOARD PRO
+  // =========================
+  if (typeof window.renderDashboardPro === "function") {
     window.renderDashboardPro();
   }
-  if (window.drawCategoryBarChart) {
-    drawCategoryBarChart();
+
+  // =========================
+  // 📊 GRÁFICAS (RENDER SEGURO)
+  // =========================
+  try {
+    if (typeof window.drawCategoryBarChart === "function") {
+      window.drawCategoryBarChart();
+    }
+
+    if (typeof window.drawCashflowChart === "function") {
+      window.drawCashflowChart();
+    }
+
+  } catch (e) {
+    console.warn("⚠️ Error actualizando gráficas:", e);
   }
 }
 
