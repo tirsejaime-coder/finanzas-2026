@@ -3875,127 +3875,153 @@ transactions.forEach(tx => {
     }
 
     function applyLanguage() {
-      document.documentElement.lang = language;
+  document.documentElement.lang = language;
 
-      document.querySelector("#titleText .logo-text").innerText = "LumensSave";
-      document.getElementById("subtitleText").innerText = t(
-        "Gestiona tus ingresos y gastos por día, mes y año.",
-        "Manage your income and expenses by day, month and year."
-      );
+  // 🔒 helper seguro
+  const safe = (id, text, isHTML = false) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (isHTML) el.innerHTML = text;
+    else el.innerText = text;
+  };
 
-      document.getElementById("tabInput").innerText = t("📝 Registro Rápido", "📝 Quick Entry");
-      document.getElementById("tabYear").innerText = t("📅 Vista Anual", "📅 Year View");
+  const safeQuery = (selector, text) => {
+    const el = document.querySelector(selector);
+    if (el) el.innerText = text;
+  };
 
-      document.getElementById("labelDate").innerText = t("Fecha", "Date");
-      document.getElementById("labelType").innerText = t("Tipo", "Type");
-      document.getElementById("labelAmount").innerText = t("Monto ($)", "Amount ($)");
-      document.getElementById("labelCategory").innerText = t("Categoría", "Category");
+  // =========================
+  // 🧠 TEXTOS PRINCIPALES
+  // =========================
+  safeQuery("#titleText .logo-text", "LumensSave");
 
-      document.getElementById("optIncome").innerText = t("Ingreso", "Income");
-      document.getElementById("optExpense").innerText = t("Gasto", "Expense");
+  safe("subtitleText", t(
+    "Gestiona tus ingresos y gastos por día, mes y año.",
+    "Manage your income and expenses by day, month and year."
+  ));
 
-      renderCategorySelects();
-      renderCategoryManager();
+  safe("tabInput", t("📝 Registro Rápido", "📝 Quick Entry"));
+  safe("tabYear", t("📅 Vista Anual", "📅 Year View"));
 
-      document.getElementById("btnSave").innerText = t("💾 Guardar", "💾 Save");
-      document.getElementById("btnExport").innerText = t("📥 Exportar Datos", "📥 Export Data");
-      document.getElementById("btnPrint").innerText = t("🖨 Imprimir", "🖨 Print");
-      document.getElementById("btnClear").innerText = t("🗑 Borrar datos", "🗑 Clear data");
-      document.getElementById("quickAddHelper").innerText = t("Escribe varios movimientos separados por ; y presiona Enter.", "Type multiple entries separated by ; and press Enter.");
-      document.getElementById("streakLabel").innerText = t("Racha activa", "Active streak");
-      document.getElementById("goalLabel").innerText = t("Meta mensual de ahorro", "Monthly savings goal");
-      document.getElementById("goalActionButton").innerText = t("✏️ Ajustar meta", "✏️ Adjust goal");
+  // =========================
+  // 📥 FORM
+  // =========================
+  safe("labelDate", t("Fecha", "Date"));
+  safe("labelType", t("Tipo", "Type"));
+  safe("labelAmount", t("Monto ($)", "Amount ($)"));
+  safe("labelCategory", t("Categoría", "Category"));
 
-      document.getElementById("adSlot1").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
-      document.getElementById("adSlot2").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
-      document.getElementById("adSlot3").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
+  safe("optIncome", t("Ingreso", "Income"));
+  safe("optExpense", t("Gasto", "Expense"));
 
-      document.getElementById("thDay").innerText = t("Día", "Day");
-      document.getElementById("thIncome").innerText = t("Ingresos", "Income");
-      document.getElementById("thIncomeCategory").innerText = t("Cat. Ingreso", "Income Cat.");
-      document.getElementById("thExpense").innerText = t("Gastos", "Expenses");
-      document.getElementById("thCategory").innerText = t("Categoría", "Category");
-      document.getElementById("thProfit").innerText = t("Ganancia", "Profit");
+  if (typeof renderCategorySelects === "function") renderCategorySelects();
+  if (typeof renderCategoryManager === "function") renderCategoryManager();
 
-      document.getElementById("modalTitle").innerText = t("📥 Exportar Datos", "📥 Export Data");
-      document.getElementById("optYearTitle").innerText = t(`📅 Año Completo ${CURRENT_YEAR}`, `📅 Full Year ${CURRENT_YEAR}`);
-      document.getElementById("optYearDesc").innerText = t("Exporta resumen de todos los meses del año", "Export summary of all months in the year");
-      document.getElementById("optMonthTitle").innerText = t("📆 Mes Actual", "📆 Current Month");
-      document.getElementById("optMonthDesc").innerText = t("Exporta detalles día por día del mes seleccionado", "Export day by day details of selected month");
-      document.getElementById("optWeekTitle").innerText = t("📊 Semana Actual", "📊 Current Week");
-      document.getElementById("optWeekDesc").innerText = t("Exporta los últimos 7 días de transacciones", "Export last 7 days of transactions");
+  safe("btnSave", t("💾 Guardar", "💾 Save"));
+  safe("btnExport", t("📥 Exportar Datos", "📥 Export Data"));
+  safe("btnPrint", t("🖨 Imprimir", "🖨 Print"));
+  safe("btnClear", t("🗑 Borrar datos", "🗑 Clear data"));
 
-      document.getElementById("btnCancel").innerText = t("Cancelar", "Cancel");
-      document.getElementById("btnPDF").innerText = "📄 PDF";
-      document.getElementById("btnExcel").innerText = "📊 Excel";
-      document.getElementById("langToggleLabel").innerText = language === "es" ? "ES / EN" : "EN / ES";
+  safe("quickAddHelper", t(
+    "Escribe varios movimientos separados por ; y presiona Enter.",
+    "Type multiple entries separated by ; and press Enter."
+  ));
 
-      const proBannerText = document.getElementById("proBannerText");
-      const proBannerButton = document.getElementById("proBannerButton");
+  safe("streakLabel", t("Racha activa", "Active streak"));
+  safe("goalLabel", t("Meta mensual de ahorro", "Monthly savings goal"));
+  safe("goalActionButton", t("✏️ Ajustar meta", "✏️ Adjust goal"));
 
-      proBannerText.innerHTML = language === "es"
-        ? '<span class="pro-badge">PRO</span>Controla tus finanzas como un profesional. Prueba la versión PRO 60 días gratis y guarda todos tus años, con copias de seguridad automáticas semanales.'
-        : '<span class="pro-badge">PRO</span>Take control of your money like a pro. Try the PRO version free for 60 days and keep unlimited years with weekly automatic backups.';
+  // =========================
+  // 📢 ADS
+  // =========================
+  const adText = t(
+    "Aquí va tu código de anuncios (AdSense / Monetag)",
+    "Your ad code goes here (AdSense / Monetag)"
+  );
 
-      proBannerButton.textContent = language === "es"
-        ? "🚀 Empezar prueba PRO de 60 días"
-        : "🚀 Start 60-day PRO trial";
+  safe("adSlot1", adText);
+  safe("adSlot2", adText);
+  safe("adSlot3", adText);
 
-      document.getElementById("freePlanTitle").textContent = t("Plan gratuito", "Free plan");
-      document.getElementById("freePlanPrice").textContent = t("0 USD / mes", "0 USD / month");
-      document.getElementById("proPlanTitle").textContent = t("Plan PRO", "PRO plan");
-      document.getElementById("proPlanPrice").textContent = t("4,99 USD / mes", "4.99 USD / month");
+  // =========================
+  // 📊 TABLA
+  // =========================
+  safe("thDay", t("Día", "Day"));
+  safe("thIncome", t("Ingresos", "Income"));
+  safe("thIncomeCategory", t("Cat. Ingreso", "Income Cat."));
+  safe("thExpense", t("Gastos", "Expenses"));
+  safe("thCategory", t("Categoría", "Category"));
+  safe("thProfit", t("Ganancia", "Profit"));
 
-      document.getElementById("freePlanFeatures").innerHTML = language === "es"
-        ? `<li>Uso sin registro (datos guardados solo en tu navegador).</li>
-           <li>Control de ingresos y gastos del año actual.</li>
-           <li>Gráficas e impresión gratuita.</li>
-           <li>Publicidad discreta dentro de la app.</li>`
-        : `<li>No registration required (data stored only in your browser).</li>
-           <li>Track income and expenses for the current year.</li>
-           <li>Charts and printing included.</li>
-           <li>Light ads inside the app.</li>`;
+  // =========================
+  // 📦 EXPORT
+  // =========================
+  safe("modalTitle", t("📥 Exportar Datos", "📥 Export Data"));
+  safe("optYearTitle", t(`📅 Año Completo ${CURRENT_YEAR}`, `📅 Full Year ${CURRENT_YEAR}`));
+  safe("optYearDesc", t("Exporta resumen de todos los meses del año", "Export summary of all months"));
+  safe("optMonthTitle", t("📆 Mes Actual", "📆 Current Month"));
+  safe("optMonthDesc", t("Exporta detalles día por día", "Export day by day details"));
+  safe("optWeekTitle", t("📊 Semana Actual", "📊 Current Week"));
+  safe("optWeekDesc", t("Exporta últimos 7 días", "Export last 7 days"));
 
-      document.getElementById("proPlanFeatures").innerHTML = language === "es"
-        ? `<li>Años ilimitados de historial financiero.</li>
-           <li>Copias de seguridad automáticas semanales en la nube.</li>
-           <li>Acceso desde varios dispositivos con tu cuenta.</li>
-           <li>Uso sin anuncios.</li>
-           <li>Prioridad en nuevas funciones y soporte.</li>`
-        : `<li>Unlimited years of financial history.</li>
-           <li>Automatic weekly cloud backups.</li>
-           <li>Access from multiple devices with your account.</li>
-           <li>Ad-free experience.</li>
-           <li>PDF and Excel exports.</li>
-           <li>Priority for new features and support.</li>`;
+  safe("btnCancel", t("Cancelar", "Cancel"));
+  safe("btnPDF", "📄 PDF");
+  safe("btnExcel", "📊 Excel");
 
-      document.getElementById("loginModalTitle").textContent = t("🔐 Iniciar sesión", "🔐 Sign in");
-      document.getElementById("loginEmailLabel").textContent = t("Correo electrónico", "Email");
-      document.getElementById("loginPasswordLabel").textContent = t("Contraseña", "Password");
-      document.getElementById("btnTogglePassword").textContent = t("👁 Ver", "👁 Show");
-      document.getElementById("btnLoginEmail").textContent = t("✉️ Entrar", "✉️ Login");
-      document.getElementById("btnRegisterEmail").textContent = t("🆕 Crear cuenta", "🆕 Create account");
-      document.getElementById("btnLoginGoogle").textContent = "🔵 Google";
-      document.getElementById("btnCloseLogin").textContent = t("Cerrar", "Close");
-      document.getElementById("loginNote").textContent = t(
-        "Tus datos se sincronizan en la nube cuando inicias sesión.",
-        "Your data syncs to the cloud when you sign in."
-      );
+  safe("langToggleLabel", language === "es" ? "ES / EN" : "EN / ES");
 
-      updateCurrentDateDisplay();
-      drawCategoryChart();
-      updatePlanUI(currentUser ? { plan: currentPlan } : null);
+  // =========================
+  // 🚀 PRO BANNER
+  // =========================
+  const proBannerText = document.getElementById("proBannerText");
+  const proBannerButton = document.getElementById("proBannerButton");
 
-      if (currentView === "year") renderYearView();
-      if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
-    }
+  if (proBannerText) {
+    proBannerText.innerHTML = language === "es"
+      ? '<span class="pro-badge">PRO</span> Controla tus finanzas como un profesional.'
+      : '<span class="pro-badge">PRO</span> Take control of your money like a pro.';
+  }
 
-    window.toggleLanguage = function () {
-      language = language === "es" ? "en" : "es";
-      localStorage.setItem("financeLang", language);
-      handleStripeReturn();
-      applyLanguage();
-    };
+  if (proBannerButton) {
+    proBannerButton.textContent = language === "es"
+      ? "🚀 Empezar prueba PRO"
+      : "🚀 Start PRO trial";
+  }
+
+  // =========================
+  // 🔐 LOGIN
+  // =========================
+  safe("loginModalTitle", t("🔐 Iniciar sesión", "🔐 Sign in"));
+  safe("loginEmailLabel", t("Correo electrónico", "Email"));
+  safe("loginPasswordLabel", t("Contraseña", "Password"));
+  safe("btnTogglePassword", t("👁 Ver", "👁 Show"));
+  safe("btnLoginEmail", t("✉️ Entrar", "✉️ Login"));
+  safe("btnRegisterEmail", t("🆕 Crear cuenta", "🆕 Create account"));
+  safe("btnLoginGoogle", "🔵 Google");
+  safe("btnCloseLogin", t("Cerrar", "Close"));
+
+  safe("loginNote", t(
+    "Tus datos se sincronizan en la nube cuando inicias sesión.",
+    "Your data syncs to the cloud when you sign in."
+  ));
+
+  // =========================
+  // 🔄 ACTUALIZACIONES
+  // =========================
+  if (typeof updateCurrentDateDisplay === "function") updateCurrentDateDisplay();
+  if (typeof drawCategoryChart === "function") drawCategoryChart();
+  if (typeof updatePlanUI === "function") {
+    updatePlanUI(currentUser ? { plan: currentPlan } : null);
+  }
+
+  if (currentView === "year" && typeof renderYearView === "function") {
+    renderYearView();
+  }
+
+  if (currentView === "month" && currentMonth !== null && typeof renderMonthView === "function") {
+    renderMonthView(currentMonth);
+  }
+}
 
     window.switchTab = function (view) {
       currentView = view;
