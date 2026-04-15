@@ -1333,33 +1333,28 @@ setTimeout(() => {
 
 <div class="app-shell">
 
-  <!-- 🧭 SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-brand">
       <div class="sidebar-logo">💡</div>
       <div>
         <div class="sidebar-title">LumensSave</div>
-        <div class="sidebar-subtitle">Finance Pro</div>
+        <div class="sidebar-subtitle">Profesional de finanzas</div>
       </div>
     </div>
 
     <nav class="sidebar-nav">
-      <button class="sidebar-link active" onclick="switchView('dashboard')">📊 Dashboard</button>
-      <button class="sidebar-link" onclick="switchView('analytics')">📈 Gráficas</button>
-      <button class="sidebar-link" onclick="switchView('goals')">🎯 Metas</button>
-      <button class="sidebar-link" onclick="switchView('tools')">🧮 Herramientas</button>
-      <button class="sidebar-link" onclick="switchView('settings')">⚙️ Ajustes</button>
+      <button class="sidebar-link active" type="button" onclick="switchSection('dashboard', this)">📊 Panel de control</button>
+      <button class="sidebar-link" type="button" onclick="switchSection('analytics', this)">📈 Gráficas</button>
+      <button class="sidebar-link" type="button" onclick="switchSection('goals', this)">🎯 Metas</button>
+      <button class="sidebar-link" type="button" onclick="switchSection('tools', this)">🧮 Herramientas</button>
+      <button class="sidebar-link" type="button" onclick="switchSection('settings', this)">⚙️ Ajustes</button>
     </nav>
   </aside>
 
-  <!-- 🧱 CONTENIDO PRINCIPAL -->
   <main class="main-panel">
 
-    <!-- 🔥 DASHBOARD (TU APP ACTUAL) -->
-    <div id="view-dashboard" class="app-view active">
-
+    <section id="section-dashboard" class="app-view active">
       <div class="container">
-
         <div class="top-bar">
           <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">
             🌐 <span id="langToggleLabel">ES / EN</span>
@@ -1383,8 +1378,8 @@ setTimeout(() => {
         <div class="breadcrumb" id="breadcrumb"></div>
 
         <div class="tabs">
-          <button class="tab active" onclick="switchTab('input')" id="tabInput">📝 Registro Rápido</button>
-          <button class="tab" onclick="switchTab('year')" id="tabYear">📅 Vista Anual</button>
+          <button class="tab active" onclick="switchTab('input')" id="tabInput">📝 Entrada rápida</button>
+          <button class="tab" onclick="switchTab('year')" id="tabYear">📅 Vista anual</button>
         </div>
 
         <div class="pro-banner" id="proBanner">
@@ -1392,12 +1387,9 @@ setTimeout(() => {
             <span class="pro-badge">PRO</span>
             Controla tus finanzas como un profesional. Prueba la versión PRO 60 días gratis y guarda todos tus años, con copias de seguridad automáticas semanales.
           </div>
-          <button class="btn btn-secondary" id="proBannerButton">
-            🚀 Empezar prueba PRO de 60 días
-          </button>
+          <button class="btn btn-secondary" id="proBannerButton">🚀 Empezar prueba PRO de 60 días</button>
         </div>
 
-        <!-- ⚠️ IMPORTANTE: NO TOCAR LO DE ABAJO -->
         <div id="view-input" class="view active">
 
   <!-- 🔥 HERO DASHBOARD (NUEVO) -->
