@@ -1466,105 +1466,140 @@ setTimeout(() => {
     </div>
 
     <div id="view-month" class="view">
-      <div class="table-wrapper">
-        <table class="data-table" id="monthTable">
-          <thead>
-            <tr>
-              <th id="thDay">Día</th>
-              <th id="thIncome">Ingresos</th>
-              <th id="thIncomeCategory">Cat. Ingreso</th>
-              <th id="thExpense">Gastos</th>
-              <th id="thCategory">Categoría</th>
-              <th id="thProfit">Ganancia</th>
-            </tr>
-          </thead>
-          <tbody id="monthTableBody"></tbody>
-        </table>
+  <div class="table-wrapper">
+    <table class="data-table" id="monthTable">
+      <thead>
+        <tr>
+          <th id="thDay">Día</th>
+          <th id="thIncome">Ingresos</th>
+          <th id="thIncomeCategory">Cat. Ingreso</th>
+          <th id="thExpense">Gastos</th>
+          <th id="thCategory">Categoría</th>
+          <th id="thProfit">Ganancia</th>
+        </tr>
+      </thead>
+      <tbody id="monthTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="ad-slot" id="adSlot3">
+    Aquí va tu código de anuncios (AdSense / Monetag)
+  </div>
+</div>
+
+</div> <!-- FIN view-input -->
+</div> <!-- FIN container -->
+</div> <!-- FIN dashboard -->
+
+<!-- 📈 PANEL LATERAL: ANALYTICS -->
+<div id="view-analytics" class="app-view">
+  <div class="panel-card">
+    <h3>📈 Evolución mensual</h3>
+    <div id="trend_chart" style="height:300px;"></div>
+  </div>
+
+  <div class="panel-card">
+    <h3>🧠 Insights</h3>
+    <div id="insights_box"></div>
+  </div>
+</div>
+
+<!-- 🎯 METAS -->
+<div id="view-goals" class="app-view">
+  <div class="panel-card">🚧 Próximamente metas avanzadas</div>
+</div>
+
+<!-- 🧮 TOOLS -->
+<div id="view-tools" class="app-view">
+  <div class="panel-card">🚧 Calculadoras financieras</div>
+</div>
+
+<!-- ⚙️ SETTINGS -->
+<div id="view-settings" class="app-view">
+  <div class="panel-card">🚧 Configuración</div>
+</div>
+
+</main>
+</div>
+
+<!-- Modal exportar -->
+<div id="exportModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">📥 Exportar Datos</h2>
+    </div>
+
+    <div class="modal-body">
+      <div class="export-option" onclick="selectExportOption('year', this)">
+        <h4 id="optYearTitle">📅 Año Completo</h4>
+        <p id="optYearDesc">Exporta resumen de todos los meses del año</p>
       </div>
-      <div class="ad-slot" id="adSlot3">
-        Aquí va tu código de anuncios (AdSense / Monetag)
+
+      <div class="export-option" onclick="selectExportOption('month', this)">
+        <h4 id="optMonthTitle">📆 Mes Actual</h4>
+        <p id="optMonthDesc">Exporta detalles día por día del mes seleccionado</p>
+      </div>
+
+      <div class="export-option" onclick="selectExportOption('week', this)">
+        <h4 id="optWeekTitle">📊 Semana Actual</h4>
+        <p id="optWeekDesc">Exporta los últimos 7 días de transacciones</p>
       </div>
     </div>
-  </div>
 
-  <!-- Modal exportar -->
-  <div id="exportModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle">📥 Exportar Datos</h2>
-      </div>
-
-      <div class="modal-body">
-        <div class="export-option" onclick="selectExportOption('year', this)">
-          <h4 id="optYearTitle">📅 Año Completo</h4>
-          <p id="optYearDesc">Exporta resumen de todos los meses del año</p>
-        </div>
-
-        <div class="export-option" onclick="selectExportOption('month', this)">
-          <h4 id="optMonthTitle">📆 Mes Actual</h4>
-          <p id="optMonthDesc">Exporta detalles día por día del mes seleccionado</p>
-        </div>
-
-        <div class="export-option" onclick="selectExportOption('week', this)">
-          <h4 id="optWeekTitle">📊 Semana Actual</h4>
-          <p id="optWeekDesc">Exporta los últimos 7 días de transacciones</p>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeExportModal()" id="btnCancel">Cancelar</button>
-        <button class="btn btn-secondary" onclick="exportPDF()" id="btnPDF">📄 PDF</button>
-        <button class="btn btn-primary" onclick="exportExcel()" id="btnExcel">📊 Excel</button>
-      </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeExportModal()" id="btnCancel">Cancelar</button>
+      <button class="btn btn-secondary" onclick="exportPDF()" id="btnPDF">📄 PDF</button>
+      <button class="btn btn-primary" onclick="exportExcel()" id="btnExcel">📊 Excel</button>
     </div>
   </div>
+</div>
 
-  <!-- Modal login -->
-  <div id="loginModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="loginModalTitle">🔐 Iniciar sesión</h2>
-      </div>
+<!-- Modal login -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="loginModalTitle">🔐 Iniciar sesión</h2>
+    </div>
 
-      <div class="modal-body">
-        <div class="login-form">
-          <div class="login-field">
-            <label for="loginEmail" id="loginEmailLabel">Correo electrónico</label>
-            <input type="email" id="loginEmail" placeholder="tuemail@gmail.com" />
-          </div>
+    <div class="modal-body">
+      <div class="login-form">
+        <div class="login-field">
+          <label for="loginEmail" id="loginEmailLabel">Correo electrónico</label>
+          <input type="email" id="loginEmail" placeholder="tuemail@gmail.com" />
+        </div>
 
-          <div class="login-field">
-            <label for="loginPassword" id="loginPasswordLabel">Contraseña</label>
-            <div class="password-wrap">
-              <input type="password" id="loginPassword" placeholder="******" />
-              <button type="button" class="btn btn-outline" onclick="togglePassword()" id="btnTogglePassword">👁 Ver</button>
-            </div>
-          </div>
-
-          <div class="login-actions">
-            <button type="button" class="btn btn-secondary" onclick="loginEmail()" id="btnLoginEmail">✉️ Entrar</button>
-            <button type="button" class="btn btn-primary" onclick="registerEmail()" id="btnRegisterEmail">🆕 Crear cuenta</button>
-            <button type="button" class="btn btn-outline" onclick="loginGoogle()" id="btnLoginGoogle">🔵 Google</button>
-          </div>
-
-          <div class="login-note" id="loginNote">
-            Tus datos se sincronizan en la nube cuando inicias sesión.
+        <div class="login-field">
+          <label for="loginPassword" id="loginPasswordLabel">Contraseña</label>
+          <div class="password-wrap">
+            <input type="password" id="loginPassword" placeholder="******" />
+            <button type="button" class="btn btn-outline" onclick="togglePassword()" id="btnTogglePassword">👁 Ver</button>
           </div>
         </div>
-      </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeLogin()" id="btnCloseLogin">Cerrar</button>
+        <div class="login-actions">
+          <button type="button" class="btn btn-secondary" onclick="loginEmail()" id="btnLoginEmail">✉️ Entrar</button>
+          <button type="button" class="btn btn-primary" onclick="registerEmail()" id="btnRegisterEmail">🆕 Crear cuenta</button>
+          <button type="button" class="btn btn-outline" onclick="loginGoogle()" id="btnLoginGoogle">🔵 Google</button>
+        </div>
+
+        <div class="login-note" id="loginNote">
+          Tus datos se sincronizan en la nube cuando inicias sesión.
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="saveStatus" style="position:fixed;top:20px;right:20px;background:#111827;color:white;padding:6px 10px;border-radius:8px;opacity:0;transition:all 0.3s ease;z-index:1100;pointer-events:none;font-size:0.85rem;"></div>
-
-  <div id="syncStatus" class="sync-status success" style="display:none;">
-    <span>🔄</span>
-    <span id="syncMessage">Sincronizado</span>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeLogin()" id="btnCloseLogin">Cerrar</button>
+    </div>
   </div>
+</div>
+
+<div id="saveStatus" style="position:fixed;top:20px;right:20px;background:#111827;color:white;padding:6px 10px;border-radius:8px;opacity:0;transition:all 0.3s ease;z-index:1100;pointer-events:none;font-size:0.85rem;"></div>
+
+<div id="syncStatus" class="sync-status success" style="display:none;">
+  <span>🔄</span>
+  <span id="syncMessage">Sincronizado</span>
+</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
