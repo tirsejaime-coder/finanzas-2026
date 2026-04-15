@@ -77,6 +77,19 @@ setTimeout(() => {
 
   <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+google.charts.load('current', { packages: ['corechart', 'bar', 'gauge'] });
+
+google.charts.setOnLoadCallback(() => {
+  drawCategoryChart();
+  drawCategoryBarChart();
+  drawCashflowChart();
+  setupChartAutoResize();
+
+  // 🔥 SCORE (IMPORTANTE)
+  drawScoreGauge(50);
+});
+</script>
 
   <style>
     :root {
