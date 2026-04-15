@@ -2742,82 +2742,98 @@ function getIncomeExpense() {
 }
 
 function updateDashboard() {
-  const balanceEl = document.getElementById("balanceAmount");
-  const incomeEl = document.getElementById("incomeAmount");
-  const expenseEl = document.getElementById("expenseAmount");
-  const profitEl = document.getElementById("profitAmount");
-  const insightEl = document.getElementById("insightBox");
-
-  if (!balanceEl || !incomeEl || !expenseEl || !profitEl || !insightEl) return;
-
-  const ctx = buildFinancialContext();
-
-  const income = ctx.income;
-  const expense = ctx.expense;
-  const balance = ctx.balance;
-
-  // =========================
-  // 📊 AGRUPACIÓN POR CATEGORÍA
-  // =========================
-  const expenseByCategory = {};
-
-  transactions.forEach(tx => {
-    const amount = Number(tx.amount) || 0;
-
-    if (tx.type === "expense") {
-      const key = tx.category || "Otros";
-      expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
-    }
-  });
-
-  // =========================
-  // 💰 UI PRINCIPAL
-  // =========================
-  incomeEl.textContent = `$${income.toFixed(2)}`;
-  expenseEl.textContent = `$${expense.toFixed(2)}`;
-  profitEl.textContent = `$${balance.toFixed(2)}`;
-  balanceEl.textContent = `$${balance.toFixed(2)}`;
-
-  // =========================
-  // 🧠 INSIGHTS
-  // =========================
-  if (typeof generateInsights === "function") {
-    insightEl.textContent = generateInsights(
-      income,
-      expense,
-      balance,
-      expenseByCategory
-    );
-  }
-
-  // =========================
-  // 🎯 METAS / RETENCIÓN
-  // =========================
-  if (typeof updateHeroRetention === "function") {
-    updateHeroRetention(balance);
-  }
-
-  // =========================
-  // 🔥 DASHBOARD PRO
-  // =========================
-  if (typeof window.renderDashboardPro === "function") {
-    window.renderDashboardPro();
-  }
-
-  // =========================
-  // 📊 GRÁFICAS (RENDER SEGURO)
-  // =========================
   try {
-    if (typeof window.drawCategoryBarChart === "function") {
-      window.drawCategoryBarChart();
+    const balanceEl = document.getElementById("balanceAmount");
+    const incomeEl = document.getElementById("incomeAmount");
+    const expenseEl = document.getElementById("expenseAmount");
+    const profitEl = document.getElementById("profitAmount");
+    const insightEl = document.getElementById("insightBox");
+
+    if (!balanceEl || !incomeEl || !expenseEl || !profitEl || !insightEl) return;
+
+    const ctx = buildFinancialContext();
+
+    const income = ctx.income;
+    const expense = ctx.expense;
+    const balance = ctx.balance;
+
+    // =========================
+    // 📊 AGRUPACIÓN POR CATEGORÍA
+    // =========================
+    const expenseByCategory = {};
+
+    transactions.forEach(tx => {
+      const amount = Number(tx.amount) || 0;
+
+      if (tx.type === "expense") {
+        const key = tx.category || "Otros";
+        expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
+      }
+    });
+
+    // =========================
+    // 💰 UI PRINCIPAL
+    // =========================
+    incomeEl.textContent = `$${income.toFixed(2)}`;
+    expenseEl.textContent = `$${expense.toFixed(2)}`;
+    profitEl.textContent = `$${balance.toFixed(2)}`;
+    balanceEl.textContent = `$${balance.toFixed(2)}`;
+
+    // =========================
+    // 🧠 INSIGHTS
+    // =========================
+    if (typeof generateInsights === "function") {
+      insightEl.textContent = generateInsights(
+        income,
+        expense,
+        balance,
+        expenseByCategory
+      );
     }
 
-    if (typeof window.drawCashflowChart === "function") {
-      window.drawCashflowChart();
+    // =========================
+    // 🎯 METAS / RETENCIÓN
+    // =========================
+    if (typeof updateHeroRetention === "function") {
+      updateHeroRetention(balance);
     }
 
-  } catch (e) {
-    console.warn("⚠️ Error actualizando gráficas:", e);
+    // =========================
+    // 💳 SCORE FINANCIERO
+    // =========================
+    if (typeof updateFinancialScore === "function") {
+      updateFinancialScore();
+    }
+
+    // =========================
+    // 🔥 DASHBOARD PRO
+    // =========================
+    if (typeof window.renderDashboardPro === "function") {
+      window.renderDashboardPro();
+    }
+
+    // =========================
+    // 📊 GRÁFICAS (SEGURO)
+    // =========================
+    try {
+      if (typeof window.drawCategoryChart === "function") {
+        window.drawCategoryChart();
+      }
+
+      if (typeof window.drawCategoryBarChart === "function") {
+        window.drawCategoryBarChart();
+      }
+
+      if (typeof window.drawCashflowChart === "function") {
+        window.drawCashflowChart();
+      }
+
+    } catch (e) {
+      console.warn("⚠️ Error actualizando gráficas:", e);
+    }
+
+  } catch (err) {
+    console.error("❌ Error en updateDashboard:", err);
   }
 }
 
