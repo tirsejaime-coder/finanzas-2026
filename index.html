@@ -73,58 +73,12 @@ setTimeout(() => {
 
 </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  <!-- Google Charts -->
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script>
-google.charts.load('current', { packages: ['corechart', 'bar', 'gauge'] });
+<!-- Google Charts -->
+<script src="https://www.gstatic.com/charts/loader.js"></script>
 
-google.charts.setOnLoadCallback(() => {
-
-  try {
-    if (typeof drawCategoryChart === "function") {
-      drawCategoryChart();
-    }
-  } catch (e) {
-    console.warn("Error pie chart", e);
-  }
-
-  try {
-    if (typeof drawCategoryBarChart === "function") {
-      drawCategoryBarChart();
-    }
-  } catch (e) {
-    console.warn("Error bar chart", e);
-  }
-
-  try {
-    if (typeof drawCashflowChart === "function") {
-      drawCashflowChart();
-    }
-  } catch (e) {
-    console.warn("Error cashflow", e);
-  }
-
-  try {
-    if (typeof setupChartAutoResize === "function") {
-      setupChartAutoResize();
-    }
-  } catch (e) {
-    console.warn("Error resize", e);
-  }
-
-  // ✅ SCORE siempre se dibuja
-  try {
-    drawScoreGauge(50);
-  } catch (e) {
-    console.warn("Error score", e);
-  }
-
-});
-</script>
-
-  <style>
+<style>
     :root {
       --color-bg-primary: #f4f6f9;
       --color-surface: #ffffff;
