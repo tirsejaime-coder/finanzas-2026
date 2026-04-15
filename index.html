@@ -6,174 +6,1215 @@
   <title>LumensSave - Smart Finance Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- ========================= -->
-  <!-- 📦 LIBRERÍAS -->
-  <!-- ========================= -->
-
   <!-- jsPDF / AutoTable / XLSX -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// SAFE YEAR GOAL (NON BREAKING)
+function getYearGoalSafe(){
+  const saved = localStorage.getItem("yearGoal");
+  if(saved) return Number(saved);
+  return getSavingsGoal()*12;
+}
+
+window.openYearGoalPrompt = function(){
+  const current = getYearGoalSafe();
+  const input = prompt("Meta anual:", current);
+  if(input===null) return;
+
+  const val = Number(input);
+  if(isNaN(val) || val<=0){
+    alert("Valor inválido");
+    return;
+  }
+
+  localStorage.setItem("yearGoal", val);
+
+  if(typeof updateHeroRetention==="function"){
+    updateHeroRetention();
+  }
+};
+
+
+// PATCH YEAR RENDER (SAFE EXTENSION)
+setTimeout(() => {
+  const original = window.updateHeroRetention;
+  if (!original) return;
+
+  window.updateHeroRetention = function () {
+    original.apply(this, arguments);
+
+    try {
+      const yVal = document.getElementById("yearGoalValue");
+      const yBar = document.getElementById("yearGoalProgressFill");
+      const ySub = document.getElementById("yearGoalSubtext");
+
+      if (!yVal) return;
+
+      const yearGoal = getYearGoalSafe();
+      const yearBalance = getCurrentMonthBalance() * 12;
+
+      yVal.textContent = `$${yearBalance.toFixed(0)} / $${yearGoal}`;
+
+      const progress = Math.min(100, (yearBalance / yearGoal) * 100);
+
+      if (yBar) yBar.style.width = progress + "%";
+
+      if (ySub) {
+        const missing = Math.max(0, yearGoal - yearBalance);
+        ySub.textContent = missing === 0
+          ? "Meta anual lograda 🚀"
+          : `Faltan $${missing}`;
+      }
+    } catch (e) {
+      console.log("year patch", e);
+    }
+  };
+}, 0);
+
+</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-  <!-- ========================= -->
-  <!-- 🧠 CONFIG -->
-  <!-- ========================= -->
-
-  <script>
-  function getYearGoalSafe(){
-    const saved = localStorage.getItem("yearGoal");
-    if(saved) return Number(saved);
-    return getSavingsGoal()*12;
-  }
-
-  window.openYearGoalPrompt = function(){
-    const current = getYearGoalSafe();
-    const input = prompt("Meta anual:", current);
-    if(input===null) return;
-
-    const val = Number(input);
-    if(isNaN(val) || val<=0){
-      alert("Valor inválido");
-      return;
-    }
-
-    localStorage.setItem("yearGoal", val);
-
-    if(typeof updateHeroRetention==="function"){
-      updateHeroRetention();
-    }
-  };
-
-  setTimeout(() => {
-    const original = window.updateHeroRetention;
-    if (!original) return;
-
-    window.updateHeroRetention = function () {
-      original.apply(this, arguments);
-
-      try {
-        const yVal = document.getElementById("yearGoalValue");
-        const yBar = document.getElementById("yearGoalProgressFill");
-        const ySub = document.getElementById("yearGoalSubtext");
-
-        if (!yVal) return;
-
-        const yearGoal = getYearGoalSafe();
-        const yearBalance = getCurrentMonthBalance() * 12;
-
-        yVal.textContent = `$${yearBalance.toFixed(0)} / $${yearGoal}`;
-
-        const progress = Math.min(100, (yearBalance / yearGoal) * 100);
-
-        if (yBar) yBar.style.width = progress + "%";
-
-        if (ySub) {
-          const missing = Math.max(0, yearGoal - yearBalance);
-          ySub.textContent = missing === 0
-            ? "Meta anual lograda 🚀"
-            : `Faltan $${missing}`;
-        }
-      } catch (e) {
-        console.log("year patch", e);
-      }
-    };
-  }, 0);
-  </script>
-
-  <!-- ========================= -->
-  <!-- 🎨 ESTILOS -->
-  <!-- ========================= -->
-
   <style>
+    :root {
+      --color-bg-primary: #f4f6f9;
+      --color-surface: #ffffff;
+      --color-text-primary: #111827;
+      --color-text-secondary: #6b7280;
+      --color-border: #e5e7eb;
+      --color-primary: #3b82f6;
+      --color-success: #16a34a;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+    }
 
-  /* ========================= */
-  /* 🎯 VARIABLES (SIEMPRE ARRIBA) */
-  /* ========================= */
-  :root {
-    --color-bg-primary: #f4f6f9;
-    --color-surface: #ffffff;
-    --color-text-primary: #111827;
-    --color-text-secondary: #6b7280;
-    --color-border: #e5e7eb;
-    --color-primary: #3b82f6;
-    --color-success: #16a34a;
-    --color-danger: #ef4444;
-    --color-warning: #f59e0b;
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: var(--color-bg-primary);
+      margin: 0;
+      padding: 20px;
+      color: var(--color-text-primary);
+    }
+
+    .container {
+      background: var(--color-surface);
+      padding: 24px 20px 28px;
+      border-radius: 12px;
+      max-width: 1200px;
+      margin: 0 auto;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      position: relative;
+    }
+
+    .top-bar {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      z-index: 20;
+    }
+
+    .lang-toggle,
+    .user-btn {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: #f9fafb;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-text-secondary);
+    }
+
+    .lang-toggle span,
+    .user-btn span {
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .user-btn {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+    }
+
+    .user-btn span {
+      color: white;
+    }
+
+    .user-btn:hover {
+      background: #2563eb;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.8rem;
+      color: var(--color-text-primary);
+    }
+
+    p.desc {
+      margin-top: 4px;
+      margin-bottom: 18px;
+      color: var(--color-text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .breadcrumb {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      flex-wrap: wrap;
+    }
+
+    .breadcrumb a {
+      color: var(--color-primary);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb span {
+      color: var(--color-text-secondary);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 10px 16px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-size: 0.95rem;
+      color: var(--color-text-secondary);
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      color: var(--color-text-primary);
+      font-weight: 600;
+      border-bottom-color: var(--color-primary);
+    }
+
+    .tab:hover {
+      color: var(--color-text-primary);
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .quick-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      min-width: 120px;
+      flex: 1 1 160px;
+    }
+
+    .field label {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    .field input,
+    .field select {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--color-border);
+      font-size: 0.9rem;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+      touch-action: manipulation;
+    }
+
+    .btn-primary {
+      background: var(--color-success);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #15803d;
+    }
+
+    .btn-secondary {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #2563eb;
+    }
+
+    .btn-danger {
+      background: var(--color-danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-primary);
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .year-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .month-card {
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      transition: all 0.2s;
+    }
+
+    .month-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .month-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      color: var(--color-text-primary);
+    }
+
+    .month-card .stat {
+      display: flex;
+      justify-content: space-between;
+      margin: 4px 0;
+      font-size: 0.85rem;
+    }
+
+    .month-card .stat-label { color: var(--color-text-secondary); }
+    .month-card .stat-value { font-weight: 600; }
+    .month-card .stat-positive { color: var(--color-success); }
+    .month-card .stat-negative { color: var(--color-danger); }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    table.data-table thead {
+      background: #f9fafb;
+      border-bottom: 2px solid var(--color-border);
+      position: sticky;
+      top: 0;
+    }
+
+    table.data-table th {
+      padding: 10px 8px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    table.data-table td {
+      padding: 8px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    table.data-table tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    table.data-table td.editable {
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    table.data-table td.editable:hover {
+      background: #dbeafe;
+    }
+
+    table.data-table input.edit-input {
+      width: 90px;
+      padding: 4px 6px;
+      border: 1px solid var(--color-primary);
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    .total-row {
+      font-weight: 600;
+      background: #f9fafb !important;
+      border-top: 2px solid var(--color-border);
+    }
+
+    .ad-slot {
+      margin: 18px auto 0;
+      max-width: 728px;
+      height: 90px;
+      background: #f3f4f6;
+      border-radius: 10px;
+      border: 1px dashed var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: var(--color-surface);
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: var(--color-text-primary);
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .export-option {
+      padding: 12px;
+      margin-bottom: 8px;
+      border: 2px solid var(--color-border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .export-option:hover {
+      border-color: var(--color-primary);
+      background: #f0f9ff;
+    }
+
+    .export-option.selected {
+      border-color: var(--color-primary);
+      background: #dbeafe;
+    }
+
+    .export-option h4 {
+      margin: 0 0 4px;
+      font-size: 0.95rem;
+      color: var(--color-text-primary);
+    }
+
+    .export-option p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .pro-banner {
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #ecfdf5;
+      border: 1px solid #bbf7d0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .pro-banner-text {
+      font-size: 0.9rem;
+      color: #14532d;
+    }
+
+    .pro-banner-text strong {
+      font-weight: 700;
+    }
+
+    .pro-badge {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #16a34a;
+      color: white;
+      font-size: 0.7rem;
+      margin-right: 6px;
+    }
+
+    .plans-wrapper {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px solid var(--color-border);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .plan-box {
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 12px 14px;
+    }
+
+    .plan-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .plan-price {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .plan-features {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+    }
+
+    .plan-features li {
+      margin-bottom: 4px;
+    }
+
+    .sync-status {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 30px;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+
+    .sync-status.syncing {
+      background: #fef3c7;
+      border-color: #f59e0b;
+    }
+
+    .sync-status.success {
+      background: #d1fae5;
+      border-color: #10b981;
+    }
+
+    .sync-status.error {
+      background: #fee2e2;
+      border-color: #ef4444;
+    }
+
+    .login-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .login-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .login-field label {
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+    }
+
+    .login-field input {
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .login-field input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.08);
+    }
+
+    .password-wrap {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .password-wrap input {
+      flex: 1;
+    }
+
+    .login-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .login-note {
+      font-size: 0.82rem;
+      color: var(--color-text-secondary);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .category-manager {
+      margin-top: 14px;
+      padding: 14px;
+      background: #f9fafb;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+    }
+
+    .category-manager-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .category-manager-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .category-limit {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+    }
+
+    .category-groups {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .category-group {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .category-group-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .category-group-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .category-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: #1f2937;
+    }
+
+    .category-chip button {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+      color: #6b7280;
+      padding: 0;
+    }
+
+    .category-chip button:hover {
+      color: var(--color-danger);
+    }
+
+    .category-add-btn {
+      border: 1px dashed var(--color-primary);
+      background: white;
+      color: var(--color-primary);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .category-add-btn:hover {
+      background: #eff6ff;
+    }
+
+
+
+
+    /* 🔥 DASHBOARD */
+    .dashboard {
+      margin-bottom: 20px;
+    }
+
+    .balance-card {
+      text-align: center;
+      padding: 20px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      margin-bottom: 12px;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+    }
+
+    .balance-amount {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .balance-label {
+      font-size: 0.9rem;
+      opacity: 0.92;
+      margin-top: 4px;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .stat-card {
+      padding: 12px;
+      border-radius: 10px;
+      background: #f9fafb;
+      text-align: center;
+      border: 1px solid var(--color-border);
+    }
+
+    .stat-card.income { border-top: 3px solid #16a34a; }
+    .stat-card.expense { border-top: 3px solid #ef4444; }
+    .stat-card.profit { border-top: 3px solid #3b82f6; }
+
+    .stat-value {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .insight-box {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #0369a1;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 18px 14px 24px; }
+      h1 { font-size: 1.4rem; }
+      .year-grid { grid-template-columns: 1fr; }
+      .quick-form { flex-direction: column; }
+      .stats-row { grid-template-columns: 1fr; }
+      .field { width: 100%; }
+      #piechart_3d {
+        position: static !important;
+        width: 100% !important;
+        height: 260px !important;
+        margin-bottom: 10px;
+      }
+      .top-bar {
+        position: static;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+      }
+    }
+
+    .logo-icon {
+      font-size: 1.4rem;
+      margin-right: 4px;
+    }
+
+    .logo-text {
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .btn, .tab, .export-option {
+      touch-action: manipulation;
+    }
+  
+/* 🔥 HERO DASHBOARD (NUEVO DISEÑO) */
+
+.dashboard-hero {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  color: white;
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.hero-balance {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.hero-amount {
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+
+.hero-label {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.hero-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  background: rgba(255,255,255,0.08);
+}
+
+.hero-card.income { border-top: 3px solid #22c55e; }
+.hero-card.expense { border-top: 3px solid #ef4444; }
+.hero-card.profit { border-top: 3px solid #3b82f6; }
+
+.hero-value {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.hero-insight {
+  background: rgba(255,255,255,0.1);
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+
+/* ⚡ QUICK ADD */
+.quick-add-box {
+  margin: 20px 0;
+}
+.quick-add-input {
+  width: 100%;
+  padding: 18px;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+}
+.quick-add-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  outline: none;
+}
+.quick-add-input::placeholder {
+  color: #9ca3af;
+}
+
+.quick-add-helper {
+  margin-top: 8px;
+  font-size: 0.84rem;
+  color: var(--color-text-secondary);
+}
+
+.hero-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.hero-mini-card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.hero-mini-label {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.hero-mini-value {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.hero-mini-subtext {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.progress-row {
+  margin-top: 8px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #22c55e, #3b82f6);
+  transition: width 0.35s ease;
+}
+
+.hero-action-link {
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #bfdbfe;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.hero-action-link:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+.dashboard-hero, .month-card, .plan-box, .category-group, .pro-banner {
+  animation: fadeInUp 0.35s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-
-  * { box-sizing: border-box; }
-
-  body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-    background: var(--color-bg-primary);
-    margin: 0;
-    padding: 20px;
-    color: var(--color-text-primary);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
 
-  /* ========================= */
-  /* 🚀 NUEVO LAYOUT (NO ROMPE APP) */
-  /* ========================= */
-
-  .app-shell {
-    display: flex;
-    gap: 20px;
+@media (max-width: 768px) {
+  .hero-stats,
+  .hero-meta {
+    flex-direction: column;
+    grid-template-columns: 1fr;
   }
+}
 
-  .sidebar {
-    width: 240px;
-    background: #0f172a;
-    color: white;
-    border-radius: 16px;
-    padding: 20px;
-    height: fit-content;
+
+/* 🤖 AI CHAT */
+.ai-chat-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2100;
+  border: none;
+  border-radius: 999px;
+  background: #111827;
+  color: white;
+  padding: 12px 16px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  font-weight: 600;
+}
+
+.ai-chat-panel {
+  position: fixed;
+  bottom: 78px;
+  right: 20px;
+  width: 360px;
+  max-width: calc(100vw - 24px);
+  height: 520px;
+  max-height: calc(100vh - 110px);
+  background: #0f172a;
+  color: white;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 2100;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.ai-chat-panel.active {
+  display: flex;
+}
+
+.ai-chat-header {
+  padding: 14px 16px;
+  background: #111827;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ai-chat-header-title {
+  font-weight: 700;
+  font-size: 0.96rem;
+}
+
+.ai-chat-header-sub {
+  font-size: 0.78rem;
+  opacity: 0.72;
+  margin-top: 2px;
+}
+
+.ai-chat-close {
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.ai-chat-messages {
+  flex: 1;
+  overflow: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+}
+
+.ai-chat-bubble {
+  max-width: 88%;
+  line-height: 1.45;
+  padding: 10px 12px;
+  border-radius: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.9rem;
+}
+
+.ai-chat-bubble.bot {
+  align-self: flex-start;
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+.ai-chat-bubble.user {
+  align-self: flex-end;
+  background: #2563eb;
+  color: white;
+}
+
+.ai-chat-prompts {
+  padding: 10px 14px 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: #111827;
+}
+
+.ai-chip {
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
+  color: #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.ai-chat-input-wrap {
+  padding: 12px;
+  background: #111827;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.ai-chat-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.ai-chat-input {
+  flex: 1;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #0f172a;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.ai-chat-send {
+  border: none;
+  background: #16a34a;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.ai-chat-note {
+  margin-top: 8px;
+  font-size: 0.76rem;
+  color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  .ai-chat-toggle {
+    right: 14px;
+    bottom: 14px;
   }
-
-  .sidebar-link {
-    display: block;
-    width: 100%;
-    border: none;
-    background: transparent;
-    color: #cbd5e1;
-    text-align: left;
-    padding: 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-bottom: 6px;
+  .ai-chat-panel {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    bottom: 70px;
+    height: 70vh;
   }
+}
 
-  .sidebar-link:hover {
-    background: rgba(59,130,246,0.2);
-    color: white;
-  }
-
-  .main-panel {
-    flex: 1;
-  }
-
-  /* ========================= */
-  /* 🧱 TU APP ORIGINAL (INTACTA) */
-  /* ========================= */
-
-  .container {
-    background: var(--color-surface);
-    padding: 24px 20px 28px;
-    border-radius: 12px;
-    max-width: 1200px;
-    margin: 0 auto;
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-    position: relative;
-  }
-
-  /* 👇 TODO lo demás sigue EXACTAMENTE igual */
-  /* NO BORRES NADA DE TU CSS EXISTENTE */
-
-  </style>
-
-</head>
+</style>
 
   <!-- Ads se cargan dinámicamente solo para usuarios FREE -->
 
@@ -227,149 +1268,163 @@
 
     <div id="view-input" class="view active">
 
-  <!-- 🔥 HERO DASHBOARD -->
-  <div class="dashboard-hero">
+  <!-- 🔥 HERO DASHBOARD (NUEVO) -->
+<div class="dashboard-hero">
 
-    <div class="hero-balance">
-      <div id="balanceAmount" class="hero-amount">$0</div>
-      <div class="hero-label">Balance actual</div>
-      <div id="currentDateDisplay" style="margin-top:6px;font-size:0.85rem;opacity:0.7;"></div>
+  <div class="hero-balance">
+  <div id="balanceAmount" class="hero-amount">$0</div>
+  <div class="hero-label">Balance actual</div>
+
+  <!-- 🆕 FECHA ACTUAL -->
+  <div id="currentDateDisplay" style="margin-top:6px; font-size:0.85rem; opacity:0.7;"></div>
+</div>
+
+  <div class="hero-stats">
+    <div class="hero-card income">
+      <div id="incomeAmount" class="hero-value">$0</div>
+      <div>Ingresos</div>
     </div>
 
-    <div class="hero-stats">
-      <div class="hero-card income">
-        <div id="incomeAmount" class="hero-value">$0</div>
-        <div>Ingresos</div>
-      </div>
-
-      <div class="hero-card expense">
-        <div id="expenseAmount" class="hero-value">$0</div>
-        <div>Gastos</div>
-      </div>
-
-      <div class="hero-card profit">
-        <div id="profitAmount" class="hero-value">$0</div>
-        <div>Ahorro</div>
-      </div>
+    <div class="hero-card expense">
+      <div id="expenseAmount" class="hero-value">$0</div>
+      <div>Gastos</div>
     </div>
 
-    <div id="insightBox" class="hero-insight">
-      🧠 Cargando análisis...
+    <div class="hero-card profit">
+      <div id="profitAmount" class="hero-value">$0</div>
+      <div>Ahorro</div>
+    </div>
+  </div>
+
+  <div id="insightBox" class="hero-insight">
+    🧠 Cargando análisis...
+  </div>
+
+  <div class="hero-meta">
+    <div class="hero-mini-card">
+      <div class="hero-mini-label" id="streakLabel">Racha activa</div>
+      <div class="hero-mini-value" id="streakValue">0 días</div>
+      <div class="hero-mini-subtext" id="streakSubtext">Empieza hoy y crea el hábito.</div>
     </div>
 
-    <div class="hero-meta">
-      <div class="hero-mini-card">
-        <div class="hero-mini-label">Racha activa</div>
-        <div id="streakValue" class="hero-mini-value">0 días</div>
-        <div id="streakSubtext" class="hero-mini-subtext">Empieza hoy.</div>
-      </div>
-
-      <div class="hero-mini-card">
-        <div class="hero-mini-label">Meta de ahorro</div>
-        <div id="goalValue" class="hero-mini-value">$0 / $500</div>
-
+    <div class="hero-mini-card">
+      <div class="hero-mini-label" id="goalLabel">Meta de ahorro</div>
+      <div class="hero-mini-value" id="goalValue">$0 / $500</div>
+      <div class="progress-row">
         <div class="progress-bar">
           <div id="goalProgressFill" class="progress-fill"></div>
         </div>
+      </div>
+      <div class="hero-mini-subtext" id="goalSubtext">Define una meta y sigue tu progreso.</div>
+      <button type="button" class="hero-action-link" id="goalActionButton" onclick="openSavingsGoalPrompt()">✏️ Ajustar meta mensual</button>
 
-        <div id="goalSubtext" class="hero-mini-subtext"></div>
-        <button class="hero-action-link" onclick="openSavingsGoalPrompt()">✏️ Ajustar meta</button>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">
+        <div class="hero-mini-label" style="font-size:0.72rem;opacity:0.7;">Anual</div>
+        <div class="hero-mini-value" id="yearGoalValue">$0 / $6000</div>
+        <div class="progress-row">
+          <div class="progress-bar">
+            <div id="yearGoalProgressFill" class="progress-fill"></div>
+          </div>
+        </div>
+        <div class="hero-mini-subtext" id="yearGoalSubtext"></div>
+        <button class="hero-action-link" onclick="openYearGoalPrompt()">✏️ Ajustar meta anual</button>
       </div>
     </div>
-
-  </div>
-
-  <!-- 📊 PANEL DE ANALYTICS (MEJORADO) -->
-  <div style="margin-top:24px; display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(320px,1fr));">
-
-    <!-- 📈 GRÁFICA -->
-    <div style="background:white; padding:16px; border-radius:12px; border:1px solid #e5e7eb;">
-      <h3 style="margin-top:0;">📈 Evolución mensual</h3>
-      <div id="trend_chart" style="height:280px;"></div>
-    </div>
-
-    <!-- 🧠 INSIGHTS -->
-    <div style="background:white; padding:16px; border-radius:12px; border:1px solid #e5e7eb;">
-      <h3 style="margin-top:0;">🧠 Insights inteligentes</h3>
-      <div id="insights_box" style="font-size:0.9rem; color:#374151;">
-        Cargando análisis...
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ⚡ QUICK ADD -->
-  <div class="quick-add-box">
-    <input
-      id="quickInput"
-      placeholder="Ej: 50 comida; 2000 salario; 30 uber"
-      onkeyup="handleQuickAdd(event)"
-      class="quick-add-input"
-    />
-    <div class="quick-add-helper">
-      Escribe varios movimientos separados por ; y presiona Enter.
-    </div>
-  </div>
-
-  <!-- FORM OCULTO -->
-  <form class="quick-form" onsubmit="saveTransaction(event)" style="display:none;">
-    <div class="field">
-      <label>Fecha</label>
-      <input type="date" id="date" required />
-    </div>
-
-    <div class="field">
-      <label>Tipo</label>
-      <select id="type">
-        <option value="income">Ingreso</option>
-        <option value="expense">Gasto</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label>Monto</label>
-      <input type="number" id="amount" step="0.01" required />
-    </div>
-
-    <div class="field">
-      <label>Categoría</label>
-      <select id="category"></select>
-    </div>
-
-    <div class="field">
-      <button type="submit" class="btn btn-primary">Guardar</button>
-    </div>
-  </form>
-
-  <!-- CATEGORÍAS -->
-  <div class="category-manager" id="categoryManager"></div>
-
-  <!-- BOTONES -->
-  <div class="buttons-row">
-    <button class="btn btn-secondary" onclick="checkExportAccess()">📥 Exportar</button>
-    <button class="btn btn-outline" onclick="window.print()">🖨 Imprimir</button>
-    <button class="btn btn-danger" onclick="clearData()">🗑 Borrar</button>
-  </div>
-
-  <!-- PLANES -->
-  <div class="plans-wrapper" id="plansWrapper">
-    <div class="plan-box">
-      <div class="plan-title">Plan gratuito</div>
-      <div class="plan-price">0 USD / mes</div>
-    </div>
-
-    <div class="plan-box">
-      <div class="plan-title">Plan PRO</div>
-      <div class="plan-price">4.99 USD / mes</div>
-    </div>
-  </div>
-
-  <!-- ADS -->
-  <div class="ad-slot" id="adSlot1">
-    Aquí va tu publicidad
   </div>
 
 </div>
+
+      <!-- 🚀 DASHBOARD PRO (NUEVO) -->
+<div style="margin-top:20px;">
+  <h3>📈 Evolución mensual</h3>
+  <div id="trend_chart" style="height:300px;"></div>
+</div>
+
+<div style="margin-top:20px;">
+  <h3>🧠 Insights</h3>
+  <div id="insights_box"></div>
+</div>
+
+      
+      <!-- ⚡ QUICK ADD INTELIGENTE -->
+      <div class="quick-add-box">
+        <input
+          id="quickInput"
+          placeholder="Ej: 50 comida; 2000 salario; 30 uber"
+          onkeyup="handleQuickAdd(event)"
+          class="quick-add-input"
+        />
+        <div class="quick-add-helper" id="quickAddHelper">Escribe varios movimientos separados por ; y presiona Enter.</div>
+      </div>
+
+<form class="quick-form" onsubmit="saveTransaction(event)" style="display:none;">
+
+        <div class="field">
+  <label for="date" id="labelDate">Fecha</label>
+  <input type="date" id="date" required />
+</div>
+
+<div class="field">
+  <label for="type" id="labelType">Tipo</label>
+  <select id="type">
+    <option value="income" id="optIncome">Ingreso</option>
+    <option value="expense" id="optExpense">Gasto</option>
+  </select>
+</div>
+
+<div class="field">
+  <label for="amount" id="labelAmount">Monto ($)</label>
+  <input type="number" id="amount" step="0.01" placeholder="0.00" required />
+</div>
+
+<div class="field">
+  <label for="category" id="labelCategory">Categoría</label>
+  <select id="category"></select>
+</div>
+
+        <div class="field" style="justify-content:flex-end;">
+          <label>&nbsp;</label>
+          <button type="submit" class="btn btn-primary" id="btnSave">💾 Guardar</button>
+        </div>
+      </form>
+
+      <div class="category-manager" id="categoryManager"></div>
+
+      <div class="buttons-row">
+        <button class="btn btn-secondary" onclick="checkExportAccess()" id="btnExport">📥 Exportar Datos</button>
+        <button class="btn btn-outline" onclick="window.print()" id="btnPrint">🖨 Imprimir</button>
+        <button class="btn btn-danger" onclick="clearData()" id="btnClear">🗑 Borrar datos</button>
+      </div>
+
+      <div class="plans-wrapper" id="plansWrapper">
+        <div class="plan-box">
+          <div class="plan-title" id="freePlanTitle">Plan gratuito</div>
+          <div class="plan-price" id="freePlanPrice">0 USD / mes</div>
+          <ul class="plan-features" id="freePlanFeatures">
+            <li>Uso sin registro (datos guardados solo en tu navegador).</li>
+            <li>Control de ingresos y gastos del año actual.</li>
+            <li>Gráficas e impresión gratuita.</li>
+            <li>Publicidad discreta dentro de la app.</li>
+          </ul>
+        </div>
+
+        <div class="plan-box">
+          <div class="plan-title" id="proPlanTitle">Plan PRO</div>
+          <div class="plan-price" id="proPlanPrice">4,99 USD / mes</div>
+          <ul class="plan-features" id="proPlanFeatures">
+            <li>Años ilimitados de historial financiero.</li>
+            <li>Copias de seguridad automáticas semanales en la nube.</li>
+            <li>Acceso desde varios dispositivos con tu cuenta.</li>
+            <li>Uso sin anuncios.</li>
+            <li>Prioridad en nuevas funciones y soporte.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ad-slot" id="adSlot1">
+        Aquí va tu código de anuncios (AdSense / Monetag)
+      </div>
+    </div>
 
     <div id="view-year" class="view">
       <div class="year-grid" id="yearGrid"></div>
@@ -2483,102 +3538,463 @@ transactions.forEach(tx => {
       XLSX.writeFile(wb, language === "es" ? "reporte-semanal.xlsx" : "weekly-report.xlsx");
     }
 
-    function safeSet(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.innerText = value;
-}
+    function applyLanguage() {
+      document.documentElement.lang = language;
 
-function safeHTML(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.innerHTML = value;
-}
+      document.querySelector("#titleText .logo-text").innerText = "LumensSave";
+      document.getElementById("subtitleText").innerText = t(
+        "Gestiona tus ingresos y gastos por día, mes y año.",
+        "Manage your income and expenses by day, month and year."
+      );
 
-function applyLanguage() {
-  try {
-    document.documentElement.lang = language;
+      document.getElementById("tabInput").innerText = t("📝 Registro Rápido", "📝 Quick Entry");
+      document.getElementById("tabYear").innerText = t("📅 Vista Anual", "📅 Year View");
 
-    const logoText = document.querySelector("#titleText .logo-text");
-    if (logoText) logoText.innerText = "LumensSave";
+      document.getElementById("labelDate").innerText = t("Fecha", "Date");
+      document.getElementById("labelType").innerText = t("Tipo", "Type");
+      document.getElementById("labelAmount").innerText = t("Monto ($)", "Amount ($)");
+      document.getElementById("labelCategory").innerText = t("Categoría", "Category");
 
-    safeSet("subtitleText", t(
-      "Gestiona tus ingresos y gastos por día, mes y año.",
-      "Manage your income and expenses by day, month and year."
-    ));
+      document.getElementById("optIncome").innerText = t("Ingreso", "Income");
+      document.getElementById("optExpense").innerText = t("Gasto", "Expense");
 
-    safeSet("tabInput", t("📝 Registro Rápido", "📝 Quick Entry"));
-    safeSet("tabYear", t("📅 Vista Anual", "📅 Year View"));
+      renderCategorySelects();
+      renderCategoryManager();
 
-    safeSet("labelDate", t("Fecha", "Date"));
-    safeSet("labelType", t("Tipo", "Type"));
-    safeSet("labelAmount", t("Monto ($)", "Amount ($)"));
-    safeSet("labelCategory", t("Categoría", "Category"));
+      document.getElementById("btnSave").innerText = t("💾 Guardar", "💾 Save");
+      document.getElementById("btnExport").innerText = t("📥 Exportar Datos", "📥 Export Data");
+      document.getElementById("btnPrint").innerText = t("🖨 Imprimir", "🖨 Print");
+      document.getElementById("btnClear").innerText = t("🗑 Borrar datos", "🗑 Clear data");
+      document.getElementById("quickAddHelper").innerText = t("Escribe varios movimientos separados por ; y presiona Enter.", "Type multiple entries separated by ; and press Enter.");
+      document.getElementById("streakLabel").innerText = t("Racha activa", "Active streak");
+      document.getElementById("goalLabel").innerText = t("Meta mensual de ahorro", "Monthly savings goal");
+      document.getElementById("goalActionButton").innerText = t("✏️ Ajustar meta", "✏️ Adjust goal");
 
-    safeSet("optIncome", t("Ingreso", "Income"));
-    safeSet("optExpense", t("Gasto", "Expense"));
+      document.getElementById("adSlot1").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
+      document.getElementById("adSlot2").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
+      document.getElementById("adSlot3").innerText = t("Aquí va tu código de anuncios (AdSense / Monetag)", "Your ad code goes here (AdSense / Monetag)");
 
-    if (typeof renderCategorySelects === "function") renderCategorySelects();
-    if (typeof renderCategoryManager === "function") renderCategoryManager();
+      document.getElementById("thDay").innerText = t("Día", "Day");
+      document.getElementById("thIncome").innerText = t("Ingresos", "Income");
+      document.getElementById("thIncomeCategory").innerText = t("Cat. Ingreso", "Income Cat.");
+      document.getElementById("thExpense").innerText = t("Gastos", "Expenses");
+      document.getElementById("thCategory").innerText = t("Categoría", "Category");
+      document.getElementById("thProfit").innerText = t("Ganancia", "Profit");
 
-    safeSet("btnSave", t("💾 Guardar", "💾 Save"));
-    safeSet("btnExport", t("📥 Exportar Datos", "📥 Export Data"));
-    safeSet("btnPrint", t("🖨 Imprimir", "🖨 Print"));
-    safeSet("btnClear", t("🗑 Borrar datos", "🗑 Clear data"));
+      document.getElementById("modalTitle").innerText = t("📥 Exportar Datos", "📥 Export Data");
+      document.getElementById("optYearTitle").innerText = t(`📅 Año Completo ${CURRENT_YEAR}`, `📅 Full Year ${CURRENT_YEAR}`);
+      document.getElementById("optYearDesc").innerText = t("Exporta resumen de todos los meses del año", "Export summary of all months in the year");
+      document.getElementById("optMonthTitle").innerText = t("📆 Mes Actual", "📆 Current Month");
+      document.getElementById("optMonthDesc").innerText = t("Exporta detalles día por día del mes seleccionado", "Export day by day details of selected month");
+      document.getElementById("optWeekTitle").innerText = t("📊 Semana Actual", "📊 Current Week");
+      document.getElementById("optWeekDesc").innerText = t("Exporta los últimos 7 días de transacciones", "Export last 7 days of transactions");
 
-    safeSet("quickAddHelper", t(
-      "Escribe varios movimientos separados por ; y presiona Enter.",
-      "Type multiple entries separated by ; and press Enter."
-    ));
+      document.getElementById("btnCancel").innerText = t("Cancelar", "Cancel");
+      document.getElementById("btnPDF").innerText = "📄 PDF";
+      document.getElementById("btnExcel").innerText = "📊 Excel";
+      document.getElementById("langToggleLabel").innerText = language === "es" ? "ES / EN" : "EN / ES";
 
-    safeSet("streakLabel", t("Racha activa", "Active streak"));
-    safeSet("goalLabel", t("Meta mensual de ahorro", "Monthly savings goal"));
-    safeSet("goalActionButton", t("✏️ Ajustar meta", "✏️ Adjust goal"));
+      const proBannerText = document.getElementById("proBannerText");
+      const proBannerButton = document.getElementById("proBannerButton");
 
-    safeSet("thDay", t("Día", "Day"));
-    safeSet("thIncome", t("Ingresos", "Income"));
-    safeSet("thIncomeCategory", t("Cat. Ingreso", "Income Cat."));
-    safeSet("thExpense", t("Gastos", "Expenses"));
-    safeSet("thCategory", t("Categoría", "Category"));
-    safeSet("thProfit", t("Ganancia", "Profit"));
-
-    safeSet("btnCancel", t("Cancelar", "Cancel"));
-    safeSet("btnPDF", "📄 PDF");
-    safeSet("btnExcel", "📊 Excel");
-
-    const proBannerText = document.getElementById("proBannerText");
-    if (proBannerText) {
       proBannerText.innerHTML = language === "es"
-        ? '<span class="pro-badge">PRO</span> Controla tus finanzas como un profesional.'
-        : '<span class="pro-badge">PRO</span> Take control of your finances like a pro.';
-    }
+        ? '<span class="pro-badge">PRO</span>Controla tus finanzas como un profesional. Prueba la versión PRO 60 días gratis y guarda todos tus años, con copias de seguridad automáticas semanales.'
+        : '<span class="pro-badge">PRO</span>Take control of your money like a pro. Try the PRO version free for 60 days and keep unlimited years with weekly automatic backups.';
 
-    const proBannerButton = document.getElementById("proBannerButton");
-    if (proBannerButton) {
       proBannerButton.textContent = language === "es"
-        ? "🚀 Empezar prueba PRO"
-        : "🚀 Start PRO trial";
-    }
+        ? "🚀 Empezar prueba PRO de 60 días"
+        : "🚀 Start 60-day PRO trial";
 
-    safeSet("loginModalTitle", t("🔐 Iniciar sesión", "🔐 Sign in"));
+      document.getElementById("freePlanTitle").textContent = t("Plan gratuito", "Free plan");
+      document.getElementById("freePlanPrice").textContent = t("0 USD / mes", "0 USD / month");
+      document.getElementById("proPlanTitle").textContent = t("Plan PRO", "PRO plan");
+      document.getElementById("proPlanPrice").textContent = t("4,99 USD / mes", "4.99 USD / month");
 
-    if (typeof updateCurrentDateDisplay === "function") updateCurrentDateDisplay();
-    if (typeof drawCategoryChart === "function") drawCategoryChart();
+      document.getElementById("freePlanFeatures").innerHTML = language === "es"
+        ? `<li>Uso sin registro (datos guardados solo en tu navegador).</li>
+           <li>Control de ingresos y gastos del año actual.</li>
+           <li>Gráficas e impresión gratuita.</li>
+           <li>Publicidad discreta dentro de la app.</li>`
+        : `<li>No registration required (data stored only in your browser).</li>
+           <li>Track income and expenses for the current year.</li>
+           <li>Charts and printing included.</li>
+           <li>Light ads inside the app.</li>`;
 
-    if (typeof updatePlanUI === "function") {
+      document.getElementById("proPlanFeatures").innerHTML = language === "es"
+        ? `<li>Años ilimitados de historial financiero.</li>
+           <li>Copias de seguridad automáticas semanales en la nube.</li>
+           <li>Acceso desde varios dispositivos con tu cuenta.</li>
+           <li>Uso sin anuncios.</li>
+           <li>Prioridad en nuevas funciones y soporte.</li>`
+        : `<li>Unlimited years of financial history.</li>
+           <li>Automatic weekly cloud backups.</li>
+           <li>Access from multiple devices with your account.</li>
+           <li>Ad-free experience.</li>
+           <li>PDF and Excel exports.</li>
+           <li>Priority for new features and support.</li>`;
+
+      document.getElementById("loginModalTitle").textContent = t("🔐 Iniciar sesión", "🔐 Sign in");
+      document.getElementById("loginEmailLabel").textContent = t("Correo electrónico", "Email");
+      document.getElementById("loginPasswordLabel").textContent = t("Contraseña", "Password");
+      document.getElementById("btnTogglePassword").textContent = t("👁 Ver", "👁 Show");
+      document.getElementById("btnLoginEmail").textContent = t("✉️ Entrar", "✉️ Login");
+      document.getElementById("btnRegisterEmail").textContent = t("🆕 Crear cuenta", "🆕 Create account");
+      document.getElementById("btnLoginGoogle").textContent = "🔵 Google";
+      document.getElementById("btnCloseLogin").textContent = t("Cerrar", "Close");
+      document.getElementById("loginNote").textContent = t(
+        "Tus datos se sincronizan en la nube cuando inicias sesión.",
+        "Your data syncs to the cloud when you sign in."
+      );
+
+      updateCurrentDateDisplay();
+      drawCategoryChart();
       updatePlanUI(currentUser ? { plan: currentPlan } : null);
+
+      if (currentView === "year") renderYearView();
+      if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
     }
 
-    if (currentView === "year" && typeof renderYearView === "function") {
-      renderYearView();
+    window.toggleLanguage = function () {
+      language = language === "es" ? "en" : "es";
+      localStorage.setItem("financeLang", language);
+      handleStripeReturn();
+      applyLanguage();
+    };
+
+    window.switchTab = function (view) {
+      currentView = view;
+
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+
+      if (view === "input") {
+        document.getElementById("tabInput").classList.add("active");
+        document.getElementById("view-input").classList.add("active");
+        updateBreadcrumb([]);
+      } else if (view === "year") {
+        renderYearView();
+      }
+    };
+
+    window.openSavingsGoalPrompt = function () {
+      const currentGoal = getSavingsGoal();
+      const message = t("Define tu meta mensual de ahorro en USD:", "Set your monthly savings goal in USD:");
+      const result = window.prompt(message, String(currentGoal));
+      if (result === null) return;
+      const value = parseFloat(result);
+      if (!Number.isFinite(value) || value <= 0) {
+        alert(t("Ingresa una meta válida mayor que 0.", "Enter a valid goal greater than 0."));
+        return;
+      }
+      localStorage.setItem("lumenssaveSavingsGoal", String(value));
+      updateDashboard();
+  updateCurrentDateDisplay();
+    };
+
+    window.showMonthView = function (monthIndex) {
+      renderMonthView(monthIndex);
+    };
+
+    window.addCategoryPrompt = addCategoryPrompt;
+    window.deleteCategory = deleteCategory;
+
+    window.saveTransaction = async function (e) {
+      e.preventDefault();
+
+      const dateInput = document.getElementById("date").value;
+      const type = document.getElementById("type").value;
+      const amount = parseFloat(document.getElementById("amount").value) || 0;
+      const description = "";
+      const category = document.getElementById("category").value;
+
+      if (!dateInput || !amount) {
+        alert(t("Por favor ingresa fecha y monto.", "Please enter date and amount."));
+        return;
+      }
+
+      const selectedCategory = category || (type === "expense" ? "Otros" : "Salario");
+
+      const transaction = {
+        date: dateInput,
+        type,
+        amount,
+        description,
+        category: selectedCategory
+      };
+
+      await saveTransactionToFirestore(transaction);
+
+      document.getElementById("amount").value = "";
+      renderCategorySelects();
+
+      alert(t("✅ Transacción guardada", "✅ Transaction saved"));
+      drawCategoryChart();
+    };
+
+    window.showProExportMessage = function () {
+      alert(
+        language === "es"
+          ? "La exportación de documentos es una función PRO.\n\nPuedes imprimir gratis usando el botón 🖨 Imprimir."
+          : "Document export is a PRO feature.\n\nYou can still print for free using the 🖨 Print button."
+      );
+    };
+
+    window.checkExportAccess = function () {
+      if (!isProUser) {
+        showProExportMessage();
+        return;
+      }
+
+      showExportModal();
+    };
+
+    window.showExportModal = function () {
+      document.getElementById("exportModal").classList.add("active");
+      selectedExportOption = "year";
+      document.querySelectorAll(".export-option").forEach(el => el.classList.remove("selected"));
+    };
+
+    window.closeExportModal = function () {
+      document.getElementById("exportModal").classList.remove("active");
+    };
+
+    window.selectExportOption = function (option, el) {
+      selectedExportOption = option;
+      document.querySelectorAll(".export-option").forEach(e => e.classList.remove("selected"));
+      if (el) el.classList.add("selected");
+    };
+
+    window.exportPDF = function () {
+      if (!isProUser) {
+        alert(
+          language === "es"
+            ? "Exportar documentos es una función PRO."
+            : "Document export is a PRO feature."
+        );
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const docPdf = new jsPDF();
+
+      if (selectedExportOption === "year") {
+        exportYearPDF(docPdf);
+      } else if (selectedExportOption === "month") {
+        if (currentMonth === null) {
+          alert(t("Por favor selecciona un mes primero desde la vista anual", "Please select a month first from the year view"));
+          return;
+        }
+        exportMonthPDF(docPdf);
+      } else if (selectedExportOption === "week") {
+        exportWeekPDF(docPdf);
+      }
+
+      closeExportModal();
+    };
+
+    window.exportExcel = function () {
+      if (!isProUser) {
+        alert(
+          language === "es"
+            ? "Exportar documentos es una función PRO."
+            : "Document export is a PRO feature."
+        );
+        return;
+      }
+
+      if (selectedExportOption === "year") {
+        exportYearExcel();
+      } else if (selectedExportOption === "month") {
+        if (currentMonth === null) {
+          alert(t("Por favor selecciona un mes primero desde la vista anual", "Please select a month first from the year view"));
+          return;
+        }
+        exportMonthExcel();
+      } else if (selectedExportOption === "week") {
+        exportWeekExcel();
+      }
+
+      closeExportModal();
+    };
+
+    window.clearData = async function () {
+      if (!confirm(t("¿Seguro que quieres borrar todos los datos?", "Are you sure you want to delete all data?"))) {
+        return;
+      }
+
+      if (currentUser) {
+        showSyncStatus("syncing", t("Borrando...", "Deleting..."));
+
+        const userRef = doc(collection(db, "users"), currentUser.uid);
+        const txCol = collection(userRef, "transactions");
+        const snapshot = await getDocs(txCol);
+        const batchIds = [];
+
+        snapshot.forEach(d => batchIds.push(d.id));
+
+        for (const id of batchIds) {
+          await deleteTransactionFromFirestore(id);
+        }
+      }
+
+      transactions = [];
+      localStorage.removeItem("transactions");
+
+      alert(t("✅ Datos eliminados", "✅ Data deleted"));
+
+      if (currentView === "month" && currentMonth !== null) renderMonthView(currentMonth);
+      else if (currentView === "year") renderYearView();
+      else {
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        document.getElementById("view-input").classList.add("active");
+      }
+
+      drawCategoryChart();
+      showSyncStatus("success", t("Datos eliminados", "Data deleted"));
+    };
+
+    window.openLogin = function () {
+      if (currentUser) {
+        const confirmText = t("¿Cerrar sesión?", "Sign out?");
+        if (confirm(confirmText)) {
+          signOut(auth)
+            .then(() => {
+              alert(t("Sesión cerrada", "Signed out"));
+            })
+            .catch(err => {
+              console.error(err);
+              alert(err.message);
+            });
+        }
+      } else {
+        document.getElementById("loginModal").classList.add("active");
+      }
+    };
+
+    window.closeLogin = function () {
+      document.getElementById("loginModal").classList.remove("active");
+    };
+
+    window.togglePassword = function () {
+      const pass = document.getElementById("loginPassword");
+      pass.type = pass.type === "password" ? "text" : "password";
+    };
+
+    window.loginEmail = function () {
+      const email = document.getElementById("loginEmail").value.trim();
+      const pass = document.getElementById("loginPassword").value;
+
+      if (!email || !pass) {
+        alert(t("Ingresa correo y contraseña.", "Enter email and password."));
+        return;
+      }
+
+      signInWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+          closeLogin();
+        })
+        .catch(err => {
+          console.error(err);
+          alert(err.message);
+        });
+    };
+
+    window.registerEmail = function () {
+      const email = document.getElementById("loginEmail").value.trim();
+      const pass = document.getElementById("loginPassword").value;
+
+      if (!email || !pass) {
+        alert(t("Ingresa correo y contraseña.", "Enter email and password."));
+        return;
+      }
+
+      if (pass.length < 6) {
+        alert(t("La contraseña debe tener al menos 6 caracteres.", "Password must be at least 6 characters."));
+        return;
+      }
+
+      createUserWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+          closeLogin();
+        })
+        .catch(err => {
+          console.error(err);
+          alert(err.message);
+        });
+    };
+
+    window.loginGoogle = function () {
+      const provider = new GoogleAuthProvider();
+
+      signInWithPopup(auth, provider)
+        .then(() => {
+          closeLogin();
+        })
+        .catch(err => {
+          console.error(err);
+          alert(err.message);
+        });
+    };
+
+    document.getElementById("proBannerButton").addEventListener("click", async () => {
+      if (!currentUser) {
+        alert(t("Primero inicia sesión", "Please sign in first"));
+        return;
+      }
+
+      await startProTrial();
+    });
+
+    document.getElementById("type").addEventListener("change", () => {
+      renderCategorySelects();
+    });
+
+    document.getElementById("loginModal").addEventListener("click", (e) => {
+      if (e.target.id === "loginModal") closeLogin();
+    });
+
+    document.getElementById("exportModal").addEventListener("click", (e) => {
+      if (e.target.id === "exportModal") closeExportModal();
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+
+  const authButtonText = document.getElementById("authButtonText");
+
+  if (user) {
+    // 🔐 Usuario logueado
+    await ensureUserProfile(user);
+    watchUserProfile(user);
+    await loadCategories();
+    await loadTransactionsFromFirestore();
+
+    // 🔥 MOSTRAR NOMBRE / EMAIL
+    authButtonText.textContent =
+      user.displayName ||
+      user.email ||
+      "Usuario";
+
+    await handleStripeReturn();
+
+  } else {
+    // ❌ Usuario NO logueado
+
+    if (unsubscribeTransactions) {
+      unsubscribeTransactions();
+      unsubscribeTransactions = null;
     }
 
-    if (currentView === "month" && currentMonth !== null && typeof renderMonthView === "function") {
-      renderMonthView(currentMonth);
+    if (unsubscribeUserProfile) {
+      unsubscribeUserProfile();
+      unsubscribeUserProfile = null;
     }
 
-  } catch (e) {
-    console.log("⚠️ applyLanguage protegido:", e);
-  }
-}
+    if (unsubscribeCategories) {
+      unsubscribeCategories();
+      unsubscribeCategories = null;
+    }
+
     transactions = JSON.parse(localStorage.getItem("transactions")) || [];
     await loadCategories();
     renderCurrentView();
