@@ -2467,39 +2467,48 @@ function getIncomeExpense() {
 }
 
 function updateDashboard() {
-      const balanceEl = document.getElementById("balanceAmount");
-      const incomeEl = document.getElementById("incomeAmount");
-      const expenseEl = document.getElementById("expenseAmount");
-      const profitEl = document.getElementById("profitAmount");
-      const insightEl = document.getElementById("insightBox");
+  const balanceEl = document.getElementById("balanceAmount");
+  const incomeEl = document.getElementById("incomeAmount");
+  const expenseEl = document.getElementById("expenseAmount");
+  const profitEl = document.getElementById("profitAmount");
+  const insightEl = document.getElementById("insightBox");
 
-      if (!balanceEl || !incomeEl || !expenseEl || !profitEl || !insightEl) return;
+  if (!balanceEl || !incomeEl || !expenseEl || !profitEl || !insightEl) return;
 
-      const ctx = buildFinancialContext();
+  const ctx = buildFinancialContext();
 
-const income = ctx.income;
-const expense = ctx.expense;
-const balance = ctx.balance;
+  const income = ctx.income;
+  const expense = ctx.expense;
+  const balance = ctx.balance;
 
-// ⚠️ mantenemos esto porque generateInsights lo usa
-const expenseByCategory = {};
+  // ⚠️ mantenemos esto porque generateInsights lo usa
+  const expenseByCategory = {};
 
-transactions.forEach(tx => {
-  const amount = Number(tx.amount) || 0;
-  if (tx.type === "expense") {
-    const key = tx.category || "Otros";
-    expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
-  }
-});
-
-      incomeEl.textContent = `$${income.toFixed(2)}`;
-      expenseEl.textContent = `$${expense.toFixed(2)}`;
-      profitEl.textContent = `$${balance.toFixed(2)}`;
-      balanceEl.textContent = `$${balance.toFixed(2)}`;
-
-      insightEl.textContent = generateInsights(income, expense, balance, expenseByCategory);
-      updateHeroRetention(balance);
+  transactions.forEach(tx => {
+    const amount = Number(tx.amount) || 0;
+    if (tx.type === "expense") {
+      const key = tx.category || "Otros";
+      expenseByCategory[key] = (expenseByCategory[key] || 0) + amount;
     }
+  });
+
+  // 💰 UI
+  incomeEl.textContent = `$${income.toFixed(2)}`;
+  expenseEl.textContent = `$${expense.toFixed(2)}`;
+  profitEl.textContent = `$${balance.toFixed(2)}`;
+  balanceEl.textContent = `$${balance.toFixed(2)}`;
+
+  // 🧠 Insight básico (el tuyo)
+  insightEl.textContent = generateInsights(income, expense, balance, expenseByCategory);
+
+  // 🎯 Retención / metas
+  updateHeroRetention(balance);
+
+  // 🔥 NUEVO: dashboard PRO (gráfica + insights avanzados)
+  if (window.renderDashboardPro) {
+    window.renderDashboardPro();
+  }
+}
 
     
 function parseLocalDate(dateStr) {
