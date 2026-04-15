@@ -81,13 +81,46 @@ setTimeout(() => {
 google.charts.load('current', { packages: ['corechart', 'bar', 'gauge'] });
 
 google.charts.setOnLoadCallback(() => {
-  drawCategoryChart();
-  drawCategoryBarChart();
-  drawCashflowChart();
-  setupChartAutoResize();
 
-  // 🔥 SCORE (IMPORTANTE)
-  drawScoreGauge(50);
+  try {
+    if (typeof drawCategoryChart === "function") {
+      drawCategoryChart();
+    }
+  } catch (e) {
+    console.warn("Error pie chart", e);
+  }
+
+  try {
+    if (typeof drawCategoryBarChart === "function") {
+      drawCategoryBarChart();
+    }
+  } catch (e) {
+    console.warn("Error bar chart", e);
+  }
+
+  try {
+    if (typeof drawCashflowChart === "function") {
+      drawCashflowChart();
+    }
+  } catch (e) {
+    console.warn("Error cashflow", e);
+  }
+
+  try {
+    if (typeof setupChartAutoResize === "function") {
+      setupChartAutoResize();
+    }
+  } catch (e) {
+    console.warn("Error resize", e);
+  }
+
+  // ✅ SCORE siempre se dibuja
+  try {
+    drawScoreGauge(50);
+  } catch (e) {
+    console.warn("Error score", e);
+  }
+
 });
 </script>
 
