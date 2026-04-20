@@ -115,11 +115,13 @@ google.charts.setOnLoadCallback(() => {
   }
 
   // ✅ SCORE siempre se dibuja
-  try {
-    drawScoreGauge(50);
-  } catch (e) {
-    console.warn("Error score", e);
+ try {
+  if (typeof window.updateFinancialScore === "function") {
+    window.updateFinancialScore();
   }
+} catch (e) {
+  console.warn("Error score", e);
+}
 
 });
 </script>
